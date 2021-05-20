@@ -27,7 +27,7 @@ Once the recipe is clicked, the searching grid is replaced with the recipe descr
 * The list of matched ingredient names
 * Does not include measures
 * If matched with Wikidata ingredient, the ingredient image is shown on mouse hover
-  * Can be clicked for redirection to the ingredient info screen (with data extracted from Wikidata)
+  * Can be clicked for redirection to the ingredient info page (with data extracted from Wikidata)
 
 #### Steps
 
