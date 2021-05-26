@@ -7,3 +7,26 @@ WHERE
 ?item wdt:P18 ?pic
 SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
 }
+
+
+#All subclasses of ingredient instance with images
+
+select ?item ?itemLabel ?pic
+WHERE {
+  ?item p:P31/ps:P31/wdt:P279* wd:Q25403900.
+  ?item wdt:P18 ?pic
+SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+}
+ORDER BY ASC(?itemLabel)
+
+
+#All subclasses of ingredient instance with images - more results
+
+select ?item ?itemLabel ?pic
+WHERE {
+  ?item wdt:P279* wd:Q25403900.
+  ?item wdt:P18 ?pic
+  
+SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+}
+ORDER BY ASC(?itemLabel)
