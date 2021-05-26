@@ -13,7 +13,7 @@ SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
 
 select ?item ?itemLabel ?pic
 WHERE {
-  ?item p:P31/ps:P31/wdt:P279* wd:Q25403900.
+  ?item p:P31/ps:P31/wdt:P279+ wd:Q25403900.
   ?item wdt:P18 ?pic
 SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
 }
@@ -24,7 +24,7 @@ ORDER BY ASC(?itemLabel)
 
 select ?item ?itemLabel ?pic
 WHERE {
-  ?item wdt:P279* wd:Q25403900.
+  ?item wdt:P279+ wd:Q25403900.
   ?item wdt:P18 ?pic
   
 SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
