@@ -1,0 +1,83 @@
+###########################
+# Get ingredient overview #
+###########################
+
+PREFIX db: <http://dbpedia.org/>
+prefix dbo: <http://dbpedia.org/ontology/>
+prefix dbp: <http://dbpedia.org/property/>
+prefix dct: <http://purl.org/dc/terms/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT * WHERE {
+    VALUES ?ingredient {<http://dbpedia.org/resource/Chocolate>}
+    ?ingredient rdfs:label ?label .
+    OPTIONAL {?ingredient dbo:abstract ?description .}
+    OPTIONAL {?ingredient dbo:thumbnail ?image .}
+    
+    # Nutrition info
+    OPTIONAL {?ingredient dbp:kcal ?kcal .}
+    OPTIONAL {?ingredient dbp:kj ?kj .}
+    OPTIONAL {?ingredient dbp:fat ?fat .}
+    OPTIONAL {?ingredient dbp:carbs ?carbs .}
+    OPTIONAL {?ingredient dbp:cholesterol ?cholesterol .}
+    OPTIONAL {?ingredient dbp:protein ?protein .}
+    OPTIONAL {?ingredient dbp:fiber ?fiber .}
+    OPTIONAL {?ingredient dbp:sugars ?sugars .}
+    
+    # OPTIONAL {?ingredient dbp:country ?country .}
+    # OPTIONAL {?ingredient dbp:region ?region .}
+    
+    OPTIONAL {?ingredient dct:subject ?categories .}
+    
+    OPTIONAL {?ingredient dbo:ingredient ?meals .}
+    
+    
+    FILTER (lang(?label) = "en")
+    FILTER (lang(?description) = "en")
+}
+
+limit 10
+
+
+########################################
+# Get members of ingredient categories #
+########################################
+
+prefix dct: <http://purl.org/dc/terms/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT * WHERE {
+    ?ingredient dct:subject/skos:broader* <http://dbpedia.org/resource/Category:Cheeses> .
+    ?ingredient rdfs:label ?label .
+    FILTER (lang(?label) = "en")
+}
+
+limit 100
+
+######################################
+# Get corresponding IRI in Wikidata  #
+# Get ingredient image from Wikidata #
+######################################
+
+PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX db: <http://dbpedia.org/>
+prefix dbo: <http://dbpedia.org/ontology/>
+prefix dbp: <http://dbpedia.org/property/>
+prefix dct: <http://purl.org/dc/terms/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT DISTINCT * WHERE {
+    VALUES ?ingredient {<http://dbpedia.org/resource/Formaggio_di_Fossa>}
+    ?ingredient rdfs:label ?label .
+    ?ingredient owl:sameAs ?ingredient2 .
+    
+    FILTER (CONTAINS(STR(?ingredient2), "wikidata"))
+    
+    # SERVICE <https://query.wikidata.org/sparql> {?ingredient2 wdt:P18 ?image}
+    
+    FILTER (lang(?label) = "en")
+}
+
+limit 10
