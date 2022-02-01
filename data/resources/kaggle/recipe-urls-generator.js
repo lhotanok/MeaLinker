@@ -1,4 +1,5 @@
-var fs = require('fs');
+const fs = require('fs');
+const { APIFY_SCRAPER_INPUT_PATH, JSON_RECIPES_PATH, URL_BASE } = require('./constants');
 
 function getRecipeIds(jsonRecipesPath) {
     const recipes = JSON.parse(fs.readFileSync(jsonRecipesPath, 'utf8'));
@@ -8,7 +9,6 @@ function getRecipeIds(jsonRecipesPath) {
 }
 
 function createUrlsFromRecipeIds(recipeIds) {
-    const URL_BASE = `https://www.food.com/recipe`;
     const urls = recipeIds.map((id) => `${URL_BASE}/${id}`);
 
     return urls;
@@ -22,9 +22,6 @@ function createApifyScraperInput(recipeUrls) {
 }
 
 function main() {
-    const JSON_RECIPES_PATH = './recipes/RAW_recipes.json';
-    const APIFY_SCRAPER_INPUT_PATH = './food-com-scraper/apify_storage/key_value_stores/default/INPUT.json';
-
     const recipeIds = getRecipeIds(JSON_RECIPES_PATH);
     const recipeUrls = createUrlsFromRecipeIds(recipeIds);
     const scraperInput = createApifyScraperInput(recipeUrls);

@@ -1,14 +1,17 @@
 const ISODuration = require('iso8601-duration');
 
-const { AMOUNT_UNIT } = require('./consts');
+const { AMOUNT_UNIT, QUOTE, AMOUNT_REGEX } = require('./constants');
 
 const { parse } = ISODuration;
 
 const getStructuredRecipeInfo = (recipe) => {
     const recipeInfo = {
         time: getStructuredPrepTime(recipe),
+        servings: parseServings(recipe),
         tags: getStructuredTags(recipe),
+        rating: getStructuredRating(recipe),
         nutritionInfo: getStructuredNutritionInfo(recipe),
+        ingredients: getStructuredIngredients(recipe),
     };
 
     return recipeInfo;
@@ -26,13 +29,10 @@ const normalizeObject = (object) => {
         let normalizedValue = object[key];
 
         if (typeof value === 'string') {
-            // log.info(`Normalizing string...`);
             normalizedValue = normalizeText(value);
         } else if (Array.isArray(value)) {
-            // log.info(`Normalizing array...`);
             normalizedValue = value.map((val) => normalizeObject(val));
         } else if (value !== null && typeof value === 'object') {
-            // log.info(`Normalizing object...`);
             normalizedValue = normalizeObject(value);
         }
 
@@ -43,11 +43,6 @@ const normalizeObject = (object) => {
 };
 
 const normalizeText = (text) => {
-    const QUOTE = {
-        ESCAPE: '&quot;',
-        CHAR: '"',
-    };
-
     const normalized = text.normalize();
     const quotesEscaped = normalized.replaceAll(QUOTE.ESCAPE, QUOTE.CHAR).trim();
 
@@ -55,6 +50,8 @@ const normalizeText = (text) => {
 };
 
 const getParsedDuration = (duration) => {
+    if (!duration) return null;
+
     const parsedDuration = parse(duration);
     const filteredDuration = {};
 
@@ -70,9 +67,9 @@ const getParsedDuration = (duration) => {
 };
 
 const getStructuredPrepTime = ({ cookTime, prepTime, totalTime }) => {
-    const cooking = cookTime ? getParsedDuration(cookTime) : cookTime;
-    const preparation = prepTime ? getParsedDuration(prepTime) : prepTime;
-    const total = totalTime ? getParsedDuration(totalTime) : totalTime;
+    const cooking = cookTime ? getParsedDuration(cookTime) : null;
+    const preparation = prepTime ? getParsedDuration(prepTime) : null;
+    const total = totalTime ? getParsedDuration(totalTime) : null;
 
     const time = { cooking, preparation, total };
 
@@ -116,6 +113,46 @@ const getStructuredNutritionInfo = ({ nutrition }) => {
     };
 
     return structuredNutrition;
+};
+
+const getStructuredRating = ({ aggregateRating }) => {
+    const { ratingValue, reviewCount } = aggregateRating;
+
+    const rating = {
+        value: parseFloat(ratingValue),
+        reviews: parseInt(reviewCount, 10),
+    };
+
+    return rating;
+};
+
+const parseServings = ({ recipeYield }) => {
+    return parseQuantity(recipeYield);
+};
+
+const parseQuantity = (ingredient) => {
+    const amountMatches = ingredient.match(AMOUNT_REGEX);
+
+    if (!amountMatches || !amountMatches.length || !amountMatches[0]) {
+        return null;
+    }
+
+    return amountMatches[0].replaceAll(' -', '-').trim();
+};
+
+const parseIngredientText = (ingredient) => {
+    return ingredient.replace(AMOUNT_REGEX, '').trim();
+};
+
+const getStructuredIngredients = ({ recipeIngredient }) => {
+    const structuredIngredients = recipeIngredient.map((ingredient) => {
+        const amount = parseQuantity(ingredient);
+        const text = parseIngredientText(ingredient);
+
+        return { amount, text };
+    });
+
+    return structuredIngredients;
 };
 
 module.exports = {

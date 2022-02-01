@@ -2,14 +2,13 @@ const Apify = require('apify');
 const cheerio = require('cheerio');
 const uuid = require('uuid');
 
+const { NAMESPACE_UUID } = require('./constants');
 const { normalizeObject, getStructuredRecipeInfo } = require('./parser');
 
 const { utils: { log } } = Apify;
 
 exports.handleDetail = async (context, recipes) => {
     const { request: { url } } = context;
-
-    const identifier = uuid.v1();
 
     const JSON_LD_SELECTOR = 'script[type="application/ld+json"]';
 
@@ -22,17 +21,27 @@ exports.handleDetail = async (context, recipes) => {
 
     const normalizedJsonld = normalizeObject(recipeJsonLd);
 
+    const identifier = uuid.v5(normalizedJsonld.name, NAMESPACE_UUID);
+
     const recipe = {
         jsonld: {
             ...normalizedJsonld,
             url,
             identifier,
         },
-        structured: getStructuredRecipeInfo(normalizedJsonld),
+        structured: {
+            foodComId: getRecipeId(url),
+            ...getStructuredRecipeInfo(normalizedJsonld),
+        },
     };
 
     recipes.push(recipe);
 
     log.info(`Saved ${recipes.length} recipes in jsonld format into dataset`);
-    log.info(`jsonld: ${JSON.stringify(recipe, null, 2)}`);
+    // log.info(`jsonld: ${JSON.stringify(recipe, null, 2)}`);
+};
+
+const getRecipeId = (url) => {
+    const urlSplits = url.split('/');
+    return urlSplits[urlSplits.length - 1];
 };
