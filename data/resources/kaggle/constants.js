@@ -7,5 +7,13 @@ exports.GENERATED_DATASET_PATH = './recipes/RECIPES.json'; // can be replaced di
 exports.EXTENDED_RECIPES_PATH = './recipes/extended_recipes.json' // generated recipes extended by ingredient ids and normalized names extracted from Kaggle dataset
 exports.INGR_MAP_PATH = './ingredients/ingr_map.csv' // ingredient ids with normalized name and raw text
 exports.UNIQUE_INGR_WITH_IDS_PATH = './ingredients/unique_ingr_map.json' // unique ingredient ids with normalized names
+exports.RDF_INGREDIENTS_PATH = './rdf-data/ingredients.ttl';
+
+exports.FILE_ENCODING = 'utf8';
 
 exports.NAMESPACE_UUID = '6ad552f0-7f96-11ec-82d2-0d4c9c611065';
+
+exports.RDF_PREFIXES = {
+    INGREDIENT_PREFIX: `http://example.org/ingredients#`,
+    RDFS_PREFIX: 'http://www.w3.org/2000/01/rdf-schema#',
+}

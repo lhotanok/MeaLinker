@@ -2,11 +2,19 @@ const fs = require('fs');
 const uuid = require('uuid');
 const csv = require("csvtojson");
 
-const { GENERATED_DATASET_PATH, TOKENIZED_RECIPES_PATH, EXTENDED_RECIPES_PATH, UNIQUE_INGR_WITH_IDS_PATH, INGR_MAP_PATH } = require('./constants');
+const {
+    GENERATED_DATASET_PATH,
+    TOKENIZED_RECIPES_PATH,
+    EXTENDED_RECIPES_PATH,
+    UNIQUE_INGR_WITH_IDS_PATH,
+    INGR_MAP_PATH,
+    FILE_ENCODING
+} = require('./constants');
+
 const { NAMESPACE_UUID } = require('./constants');
 
-function loadGeneratedRecipes() {
-    return JSON.parse(fs.readFileSync(GENERATED_DATASET_PATH, 'utf8'));
+function loadJsonFromFile(filePath) {
+    return JSON.parse(fs.readFileSync(filePath, FILE_ENCODING));
 }
 
 async function loadJsonFromCsv(csvFilePath) {
@@ -79,7 +87,7 @@ function getUniqueIngredients(mappedIngredients) {
 async function main() {
     const extendedRecipes = [];
 
-    const generatedRecipes = loadGeneratedRecipes();
+    const generatedRecipes = loadJsonFromFile(GENERATED_DATASET_PATH);
     const tokenizedRecipes = await loadJsonFromCsv(TOKENIZED_RECIPES_PATH);
     const mappedIngredients = await loadJsonFromCsv(INGR_MAP_PATH);
 

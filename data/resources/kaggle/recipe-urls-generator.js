@@ -1,8 +1,8 @@
 const fs = require('fs');
-const { APIFY_SCRAPER_INPUT_PATH, JSON_RECIPES_PATH, URL_BASE } = require('./constants');
+const { APIFY_SCRAPER_INPUT_PATH, JSON_RECIPES_PATH, URL_BASE, FILE_ENCODING } = require('./constants');
 
 function getRecipeIds(jsonRecipesPath) {
-    const recipes = JSON.parse(fs.readFileSync(jsonRecipesPath, 'utf8'));
+    const recipes = JSON.parse(fs.readFileSync(jsonRecipesPath, FILE_ENCODING));
     const recipeIds = recipes.map((recipe) => recipe.id);
 
     return recipeIds;
