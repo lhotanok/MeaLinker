@@ -110,6 +110,8 @@ async function main() {
         extendedRecipes.push(extendedRecipe);
     });
 
+    console.log(`${extendedRecipes.length} recipes merged with extended ingredients info`);
+
     fs.writeFileSync(EXTENDED_RECIPES_PATH, JSON.stringify(extendedRecipes));
 }
 

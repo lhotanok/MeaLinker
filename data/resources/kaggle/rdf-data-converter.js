@@ -40,6 +40,8 @@ function serializeIngredientsToRdf(ingredients) {
         ));
     });
 
+    console.log(`Serialized ${Object.keys(ingredients).length} ingredients from json to rdf format`);
+
     dumpRdfToFile(writer, RDF_INGREDIENTS_PATH);
 }
 
