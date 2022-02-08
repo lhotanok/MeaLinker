@@ -1,34 +1,59 @@
-# CheerioCrawler project
+# Food.com Apify actor based on CheerioCrawler
 
-This template is a production ready boilerplate for developing with `CheerioCrawler`.
-Use this to bootstrap your projects using the most up-to-date code.
+This actor receives start urls pointing to the Food.com recipes detail pages in the input. It sends http request to each of these urls and extracts jsonld data from the html header.
 
-If you're looking for examples or want to learn more visit:
+## Run this actor
 
-- [Tutorial](https://sdk.apify.com/docs/guides/getting-started#cheeriocrawler-aka-jquery-crawler)
-- [Documentation](https://sdk.apify.com/docs/api/cheerio-crawler)
-- [Examples](https://sdk.apify.com/docs/examples/cheerio-crawler)
+### Prerequisities
 
-## Documentation reference
+- Node.js server with npm package manager installed
+- [Apify CLI](https://docs.apify.com/cli) installed
+
+```bash
+cd food-com-scraper
+npm install
+apify init
+```
+
+Apify actor should be initialized properly by now. `apify_storage` directory should be generated with `datasets` and `key_value_stores` directories in it. 
+
+### Input
+
+Default input file was generated in `apify_storage/key_value_stores/default/INPUT.json`. Add all recipe detail urls you want to scrape using the following pattern (with url format`https://www.food.com/recipe/${RECIPE_ID}`):
+
+```json
+{
+  "startUrls": [
+    {
+      "url": "https://www.food.com/recipe/137739"
+    },
+    {
+      "url": "https://www.food.com/recipe/63793"
+    },
+    {
+      "url": "https://www.food.com/recipe/207525"
+    },
+    {
+      "url": "https://www.food.com/recipe/259784"
+    }
+  ]
+}
+```
+
+Once you've initialized actor's directory and input file, you can proceed with the following command:
+
+```bash
+apify run -p
+```
+
+- `-p` flag stands for `--purge` and it's needed for each run as it clears all states from the previous run
+
+Wait for the log signalization `Crawl finished` or stop scraping whenever you want by pressing `Ctrl + C`.
+
+> NOTE: Actor uses Apify proxy by default which requires to be logged in Apify platform. You can run the scraper without proxy as well but you might get blocked if you send too many requests from the same IP address. To run without proxy, simply remove `proxyConfiguration` from `CheerioCrawler` constructor in `src/main.js`. You can also decrease `maxConcurrency` to improve your chance of not getting blocked.
+
+## Apify documentation reference
 
 - [Apify SDK](https://sdk.apify.com/)
 - [Apify Actor documentation](https://docs.apify.com/actor)
 - [Apify CLI](https://docs.apify.com/cli)
-
-## Writing a README
-
-See our tutorial on [writing READMEs for your actors](https://help.apify.com/en/articles/2912548-how-to-write-great-readme-for-your-actors) if you need more inspiration.
-
-### Table of contents
-
-If your README requires a table of contents, use the template below and make sure to keep the `<!-- toc start -->` and `<!-- toc end -->` markers.
-
-<!-- toc start -->
-- Introduction
-- Use Cases
-  - Case 1
-  - Case 2
-- Input
-- Output
-- Miscellaneous
- <!-- toc end -->
