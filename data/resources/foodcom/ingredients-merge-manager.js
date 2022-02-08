@@ -42,13 +42,15 @@ function getDbpediaIrisMappedToIngredientIds() {
 function mergeIngredientsWithJsonlds(irisWithIds, jsonlds) {
     const uniqueIngredients = readJsonFromFile(UNIQUE_INGR_WITH_IDS_PATH);
 
-    const mergedIngredients = jsonlds.map((jsonld) => {
+    const mergedIngredients = {};
+
+    jsonlds.forEach((jsonld) => {
         const iri = jsonld['@id'];
         const foodComId = irisWithIds[iri];
         const ingredient = uniqueIngredients[foodComId];
         const { identifier, name } = ingredient;
 
-        return {
+        mergedIngredients[foodComId] = {
             identifier,
             foodComId,
             name,
@@ -56,7 +58,7 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds) {
         }
     })
 
-    return mergedIngredients;
+    return Object.values(mergedIngredients);
 }
 
 function main() {
