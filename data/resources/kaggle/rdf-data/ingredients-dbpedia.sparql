@@ -1,19 +1,93 @@
-# Match ingredient entities with descriptions from dbpedia.
-
-PREFIX owl: <http://www.w3.org/2002/07/owl#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://dbpedia.org/property/>
+PREFIX dbr: <http://dbpedia.org/resource/>
 
 CONSTRUCT {
-    ?ingredient rdfs:comment ?comment .
+    ?ingredient rdfs:comment ?comment ;
+                rdfs:label ?label ;
+                dbo:abstract ?abstract ;
+                dbp:text ?text ;
+                foaf:isPrimaryTopicOf ?page ;
+                dbo:thumbnail ?thumbnail ;
+                dbp:imageCaption ?imageCaption ;
+
+                dct:subject ?categories ;
+                dbo:ingredient ?consistOf ;
+
+                ##LOCATION##
+                dbp:country ?country ;
+                dbp:region ?region ;
+                ##LOCATION##
+
+                ##NUTRITION##
+                dbp:kcal ?kcal ;
+                dbp:kj ?kj ;
+                dbp:fat ?fat ;
+                dbp:carbs ?carbs ;
+                dbp:cholesterol ?cholesterol ;
+                dbp:protein ?protein ;
+                dbp:fiber ?fiber ;
+                dbp:sugars ?sugars .
+                ##NUTRITION##
 }
 WHERE {
-    ?ingredient owl:sameAs ?sameIngredient .
+    VALUES ?ingredient { 
+        ##INGREDIENTS## 
+        # Replace this section with ingredient resources in the following format: dbr:Cheddar_cheese dbr:Mayonnaise
+        ##INGREDIENTS##
+    }
 
-    BIND(URI(STR(?sameIngredient)) as ?ingr) .
+    ?ingredient rdfs:label ?label .
+    FILTER (LANG(?label) = "en")
+    
+    OPTIONAL {
+        ?ingredient rdfs:comment ?comment .
+        FILTER (LANG(?comment) = "en")
+    }
 
-    SERVICE <https://dbpedia.org/sparql> {
-            ?ingr rdfs:comment ?comment .
+    OPTIONAL {
+        ?ingredient dbo:abstract ?abstract .
+        FILTER (LANG(?abstract) = "en")
+    }
+
+    OPTIONAL {
+        ?ingredient dbp:text ?text .
+        FILTER (LANG(?text) = "en")
+    }
+
+    # Link to wikipedia entity
+    OPTIONAL {?page foaf:primaryTopic ?ingredient .}
+    OPTIONAL {?ingredient foaf:isPrimaryTopicOf ?page .}
+
+    # Image with description(s)
+    OPTIONAL {?ingredient dbo:thumbnail ?thumbnail .}
+    OPTIONAL {{ 
+        {
+            ?ingredient dbp:imageCaption ?imageCaption
         }
+        UNION {
+            ?ingredient dbp:caption ?imageCaption
+        } 
+    }}
 
-    FILTER (LANG(?comment) = "en")
+    OPTIONAL {?ingredient dct:subject ?categories .}
+    OPTIONAL {?ingredient dbo:ingredient ?consistOf .}
+
+    ##LOCATION##
+    OPTIONAL {?ingredient dbp:country ?country .}
+    OPTIONAL {?ingredient dbp:region ?region .}
+    ##LOCATION##
+    
+    ##NUTRITION##
+    OPTIONAL {?ingredient dbp:kcal ?kcal .}
+    OPTIONAL {?ingredient dbp:kj ?kj .}
+    OPTIONAL {?ingredient dbp:fat ?fat .}
+    OPTIONAL {?ingredient dbp:carbs ?carbs .}
+    OPTIONAL {?ingredient dbp:cholesterol ?cholesterol .}
+    OPTIONAL {?ingredient dbp:protein ?protein .}
+    OPTIONAL {?ingredient dbp:fiber ?fiber .}
+    OPTIONAL {?ingredient dbp:sugars ?sugars .}
+    ##NUTRITION##
 }
