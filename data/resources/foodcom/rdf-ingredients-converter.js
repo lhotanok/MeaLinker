@@ -6,8 +6,12 @@ const { namedNode, literal, quad } = DataFactory;
 const { UNIQUE_INGR_WITH_IDS_PATH, RDF_PREFIXES, FILE_ENCODING, RDF_INGREDIENTS_PATH } = require('./constants');
 const { INGREDIENT_PREFIX, RDFS_PREFIX } = RDF_PREFIXES;
 
+function readFileFromCurrentDir(filePath) {
+    return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
+}
+
 function loadJsonFromFile(filePath) {
-    return JSON.parse(fs.readFileSync(filePath, FILE_ENCODING));
+    return JSON.parse(readFileFromCurrentDir(filePath));
 }
 
 function dumpRdfToFile(writer, filePath) {

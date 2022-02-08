@@ -2,7 +2,6 @@ PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX dbo: <http://dbpedia.org/ontology/>
 PREFIX dbp: <http://dbpedia.org/property/>
-PREFIX dbr: <http://dbpedia.org/resource/>
 
 CONSTRUCT {
     ?ingredient rdfs:comment ?comment ;
@@ -35,7 +34,9 @@ CONSTRUCT {
 WHERE {
     VALUES ?ingredient { 
         ##INGREDIENTS## 
-        # Replace this section with ingredient resources in the following format: dbr:Cheddar_cheese dbr:Mayonnaise
+        # Replace this section with ingredient resources in the following format:
+        # <http://dbpedia.org/resource/Avocado> <http://dbpedia.org/resource/Almond>
+        # Don't use prefix format (dbr:Avocado) as it fails for some cases such as dbr:Lime_(fruit)
         ##INGREDIENTS##
     }
 

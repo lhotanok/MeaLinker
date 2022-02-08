@@ -11,7 +11,7 @@ const {
 } = require('./constants');
 
 function readFile(filePath) {
-    return fs.readFileSync(filePath, FILE_ENCODING)
+    return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
 function readJsonFromFile(filePath) {

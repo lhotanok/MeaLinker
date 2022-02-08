@@ -3,9 +3,7 @@ const Apify = require('apify')
 
 const { FILE_ENCODING } = require('../constants');
 const {
-    IRI_DEREFERENCE_REGEX,
     FOOD_DBPEDIA_INGREDIENTS_PATH,
-    DBPEDIA_RESOURCE_PREFIX,
     INGREDIENTS_SECTION_REGEX,
     DBPEDIA_INGREDIENTS_QUERY,
     DBPEDIA_SPARQL_QUERY_PREFIX,
@@ -16,20 +14,18 @@ const {
     DBPEDIA_INGREDIENT_TYPE
 } = require('./constants');
 
-function readSameDirFile(filename) {
-    const filePath = `${__dirname}/${filename}`
-    return fs.readFileSync(filePath, FILE_ENCODING)
+function readFileFromCurrentDir(filePath) {
+    return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
-function writeSameDirFile(filename, content) {
-    const filePath = `${__dirname}/${filename}`
-    return fs.writeFileSync(filePath, content);
+function writeFileFromCurrentDir(filePath, content) {
+    return fs.writeFileSync(`${__dirname}/${filePath}`, content);
 }
 
 function getDbpediaIngredientIris() {
     const ingredientIris = [];
 
-    const ingredientLinks = readSameDirFile(FOOD_DBPEDIA_INGREDIENTS_PATH).split('\n');
+    const ingredientLinks = readFileFromCurrentDir(FOOD_DBPEDIA_INGREDIENTS_PATH).split('\n');
 
     ingredientLinks.forEach((link) => {
         const triple = link.split(' ');
@@ -41,16 +37,6 @@ function getDbpediaIngredientIris() {
 
     console.log(`Found ${ingredientIris.length} ingredient IRIs`);
     return ingredientIris;
-}
-
-function createPrefixedDbpediaResources(iris, prefix = DBPEDIA_RESOURCE_PREFIX) {
-    return iris.map((iri) => {
-        const dereferencedIri = iri.replace(IRI_DEREFERENCE_REGEX, '');
-        const iriSplits = dereferencedIri.split('/');
-        const resourceName = iriSplits[iriSplits.length - 1];
-
-        return `${prefix}${resourceName}`;
-    });
 }
 
 function createIngredientGroups(resources) {
@@ -77,7 +63,7 @@ function buildDbpediaIngredientsFetchRequests(resources) {
     const ingredientGroups = createIngredientGroups(resources);
     console.log(`Created ${ingredientGroups.length} ingredient groups`);
 
-    const sparqlQuery = readSameDirFile(DBPEDIA_INGREDIENTS_QUERY);
+    const sparqlQuery = readFileFromCurrentDir(DBPEDIA_INGREDIENTS_QUERY);
 
     for (const group of ingredientGroups) {
         const joinedIngredients = group.join(' ');
@@ -154,14 +140,11 @@ function mergeIngredientWithContext(ingredient, commonContext) {
 
 async function main() {
     const ingredientIris = getDbpediaIngredientIris();
-
-    // fails for cases such as dbr:Lime_(fruit)
-    // const prefixedResources = createPrefixedDbpediaResources(ingredientIris);
     
     const fetchRequests = buildDbpediaIngredientsFetchRequests(ingredientIris);
     const ingredients = await fetchDbpediaIngredients(fetchRequests);
 
-    writeSameDirFile(DBPEDIA_INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2))
+    writeFileFromCurrentDir(DBPEDIA_INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2))
 }
 
 (async () => {

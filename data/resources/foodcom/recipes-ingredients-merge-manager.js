@@ -9,17 +9,20 @@ const {
     UNIQUE_INGR_WITH_IDS_PATH,
     INGR_MAP_PATH,
     FILE_ENCODING,
-    INGR_UUID_MAP_PATH
 } = require('./constants');
 
 const { NAMESPACE_UUID } = require('./constants');
 
+function readFileFromCurrentDir(filePath) {
+    return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
+}
+
 function loadJsonFromFile(filePath) {
-    return JSON.parse(fs.readFileSync(filePath, FILE_ENCODING));
+    return JSON.parse(readFileFromCurrentDir(filePath));
 }
 
 async function loadJsonFromCsv(csvFilePath) {
-    const json = await csv().fromFile(csvFilePath);
+    const json = await csv().fromFile(`${__dirname}/${csvFilePath}`);
     return json;
 }
 
