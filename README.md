@@ -1,6 +1,6 @@
 # MeaLinker
 
-`ASP.NET` `React` `SPARQL` `SQL`
+`Node.js` `React` `SPARQL` `CouchDB` `Apache Solr`
 
 Web application for recipe searching. Choose ingredients and get recipe links sorted by the best matches.
 
