@@ -91,6 +91,8 @@ function buildDbpediaIngredientsFetchRequests(resources) {
 async function fetchDbpediaIngredients(fetchRequests) {
     const ingredients = [];
 
+    console.log('Fetching ingredients from DBpedia sparql endpoint...');
+
     for (const request of fetchRequests) {
         try {
             const { body } = await Apify.utils.requestAsBrowser({ url: request });
