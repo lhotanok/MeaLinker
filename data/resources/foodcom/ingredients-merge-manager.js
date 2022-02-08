@@ -7,7 +7,8 @@ const {
     NON_DIGIT_REGEX,
     IRI_DEREFERENCE_REGEX,
     UNIQUE_INGR_WITH_IDS_PATH,
-    EXTENDED_INGREDIENTS_PATH
+    EXTENDED_INGREDIENTS_PATH,
+    EXTENDED_RECIPES_PATH
 } = require('./constants');
 
 function readFile(filePath) {
@@ -50,7 +51,7 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds) {
         const ingredient = uniqueIngredients[foodComId];
         const { identifier, name } = ingredient;
 
-        mergedIngredients[foodComId] = {
+        mergedIngredients[identifier] = {
             identifier,
             foodComId,
             name,
@@ -58,15 +59,45 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds) {
         }
     })
 
-    return Object.values(mergedIngredients);
+    return mergedIngredients;
+}
+
+function extendRecipesByIngredientThumbnails(recipes, jsonldIngredients) {
+    const extendedRecipes = recipes.map((recipe) => {
+        const { structured: { ingredients } } = recipe;
+
+        const extendedIngredients = ingredients.map((ingredient) => {
+            const { identifier } = ingredient;
+            if (identifier && jsonldIngredients[identifier]) {
+                const jsonldIngredient = jsonldIngredients[identifier];
+                const { jsonld: { thumbnail } } = jsonldIngredient;
+                
+                return thumbnail ? { ...ingredient, thumbnail } : ingredient;
+            }
+
+            return ingredient;
+        });
+
+        const extendedRecipe = recipe;
+        extendedRecipe.structured.ingredients = extendedIngredients;
+
+        return extendedRecipe;
+    });
+
+    return extendedRecipes;
 }
 
 function main() {
     const irisWithIds = getDbpediaIrisMappedToIngredientIds();
+
     const dbpediaIngredients = readJsonFromFile(DBPEDIA_INGREDIENTS_PATH);
+    const extendedRecipes = readJsonFromFile(EXTENDED_RECIPES_PATH);
 
     const mergedIngredients = mergeIngredientsWithJsonlds(irisWithIds, dbpediaIngredients);
-    fs.writeFileSync(EXTENDED_INGREDIENTS_PATH, JSON.stringify(mergedIngredients, null, 2));
+    const mergedRecipes = extendRecipesByIngredientThumbnails(extendedRecipes, mergedIngredients);
+
+    fs.writeFileSync(EXTENDED_INGREDIENTS_PATH, JSON.stringify(Object.values(mergedIngredients), null, 2));
+    fs.writeFileSync(EXTENDED_RECIPES_PATH, JSON.stringify(mergedRecipes));
 }
 
 main ();

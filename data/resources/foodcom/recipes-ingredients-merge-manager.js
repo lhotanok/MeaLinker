@@ -76,7 +76,8 @@ function getUniqueIngredients(mappedIngredients) {
     const uniqueIngredients = {};
 
     mappedIngredients.forEach((ingredient) => {
-        const { id, name } = ingredient;
+        const { id, replaced } = ingredient;
+        const name = replaced;
         const identifier = uuid.v5(name || id, NAMESPACE_UUID);
 
         uniqueIngredients[id] = {
@@ -101,7 +102,7 @@ async function main() {
     fs.writeFileSync(UNIQUE_INGR_WITH_IDS_PATH, JSON.stringify(uniqueIngredients, null, 2));
     
     generatedRecipes.forEach((recipe) => {
-        const { structured } = recipe;
+        const { structured, jsonld } = recipe;
         const { foodComId, ingredients } = structured;
 
         const ingredientIds = recipeIdsWithIngrIds[foodComId];
@@ -110,7 +111,10 @@ async function main() {
         const extendedIngredients = mergeRawIngrWithNormalizedIngr(ingredients, mergedIngredients);
 
         const extendedRecipe = recipe;
+
         extendedRecipe.structured.ingredients = extendedIngredients;
+        extendedRecipe.structured.stepsCount = jsonld.recipeInstructions.length;
+
         extendedRecipes.push(extendedRecipe);
     });
 

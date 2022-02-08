@@ -5,6 +5,14 @@ const { DATABASE_NAME, FILE_ENCODING, RECIPES_PATH, INGREDIENTS_PATH } = require
 
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
+function readFileFromCurrentDir(filePath) {
+    return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
+}
+
+function loadJsonFromFile(filePath) {
+    return JSON.parse(readFileFromCurrentDir(filePath));
+}
+
 async function createDatabase(dbName) {
     console.log(`Creating ${dbName} database...`);
 
@@ -27,15 +35,7 @@ async function destroyDatabase(dbName) {
     }
 }
 
-function readFileFromCurrentDir(filePath) {
-    return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
-}
-
-function loadJsonFromFile(filePath) {
-    return JSON.parse(readFileFromCurrentDir(filePath));
-}
-
-async function tryInsertItem(mealinkerDb, item, identifier) {
+async function tryInsertItem(mealinkerDb, identifier, item) {
     try {
         const itemToInsert = { _id: identifier, ...item };
         delete itemToInsert.identifier; // avoid redundancy with _id
@@ -53,7 +53,7 @@ async function insertRecipes(mealinkerDb) {
 
     for (const recipe of recipes) {
         const { jsonld: { identifier } } = recipe;
-        await tryInsertItem(mealinkerDb, recipe, identifier);
+        await tryInsertItem(mealinkerDb, identifier, recipe);
     }
 }
 
@@ -64,7 +64,7 @@ async function insertIngredients(mealinkerDb) {
 
     for (const ingredient of ingredients) {
         const { identifier } = ingredient;
-        await tryInsertItem(mealinkerDb, ingredient, identifier);
+        await tryInsertItem(mealinkerDb, identifier, ingredient);
     }
 }
 
