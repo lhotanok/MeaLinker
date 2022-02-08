@@ -8,7 +8,8 @@ const {
     EXTENDED_RECIPES_PATH,
     UNIQUE_INGR_WITH_IDS_PATH,
     INGR_MAP_PATH,
-    FILE_ENCODING
+    FILE_ENCODING,
+    INGR_UUID_MAP_PATH
 } = require('./constants');
 
 const { NAMESPACE_UUID } = require('./constants');
@@ -42,15 +43,7 @@ function mergeRawIngrWithNormalizedIngr(ingredients, normalizedIngredients) {
 
     for (let i = 0; i < ingredients.length; i++) {
         const ingredient = ingredients[i];
-        const { id, name } = normalizedIngredients[i];
-
-        let identifier = uuid.v5(ingredient.text, NAMESPACE_UUID);
-
-        try {
-            identifier = uuid.v5(name || id, NAMESPACE_UUID);
-        } catch (e) {
-            console.warn(`Ingredient uuid identifier had to be generated from raw text (id, name, text):`, id, name, ingredient.text);
-        }
+        const { id, identifier, name } = normalizedIngredients[i];
 
         mergedIngredients.push({
             identifier,
@@ -63,11 +56,14 @@ function mergeRawIngrWithNormalizedIngr(ingredients, normalizedIngredients) {
     return mergedIngredients;
 }
 
-function mergeIngredientIdsWithNames(ingredientIds, ingrIdsWithNames) {
+function mergeIngredientIdsWithNames(ingredientIds, uniqueIngredients) {
     const ingrIds = ingredientIds || [];
 
     const mergedIngredients = ingrIds.map((id) => {
-        return { id, name: ingrIdsWithNames[id] };
+        const uniqueIngredient = uniqueIngredients[id];
+        const { identifier, name } = uniqueIngredient;
+
+        return { id, identifier, name };
     })
 
     return mergedIngredients;
@@ -77,8 +73,13 @@ function getUniqueIngredients(mappedIngredients) {
     const uniqueIngredients = {};
 
     mappedIngredients.forEach((ingredient) => {
-        const { id, replaced } = ingredient;
-        uniqueIngredients[id] = replaced;
+        const { id, name } = ingredient;
+        const identifier = uuid.v5(name || id, NAMESPACE_UUID);
+
+        uniqueIngredients[id] = {
+            identifier,
+            name,
+        };
     })
 
     return uniqueIngredients;
@@ -94,7 +95,7 @@ async function main() {
     const uniqueIngredients = getUniqueIngredients(mappedIngredients);
     const recipeIdsWithIngrIds = filterRecipeIdsWithIngredientIds(tokenizedRecipes);
 
-    fs.writeFileSync(UNIQUE_INGR_WITH_IDS_PATH, JSON.stringify(uniqueIngredients));
+    fs.writeFileSync(UNIQUE_INGR_WITH_IDS_PATH, JSON.stringify(uniqueIngredients, null, 2));
     
     generatedRecipes.forEach((recipe) => {
         const { structured } = recipe;

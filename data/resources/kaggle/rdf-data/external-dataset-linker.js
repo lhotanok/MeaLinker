@@ -12,7 +12,8 @@ const {
     DBPEDIA_JSONLD_QUERY_PARAM,
     INGREDIENTS_GROUP_SIZE,
     DBPEDIA_INGREDIENTS_PATH,
-    CONTEXT_KEY_DATATYPE_REGEX
+    CONTEXT_KEY_DATATYPE_REGEX,
+    DBPEDIA_INGREDIENT_TYPE
 } = require('./constants');
 
 function readSameDirFile(filename) {
@@ -20,16 +21,20 @@ function readSameDirFile(filename) {
     return fs.readFileSync(filePath, FILE_ENCODING)
 }
 
+function writeSameDirFile(filename, content) {
+    const filePath = `${__dirname}/${filename}`
+    return fs.writeFileSync(filePath, content);
+}
+
 function getDbpediaIngredientIris() {
     const ingredientIris = [];
 
-    const ingredientLinks = readSameDirFile(FOOD_DBPEDIA_INGREDIENTS_PATH);
-    const lines = ingredientLinks.split('\n');
+    const ingredientLinks = readSameDirFile(FOOD_DBPEDIA_INGREDIENTS_PATH).split('\n');
 
-    lines.forEach((line) => {
-        const lineSplits = line.split(' ');
-        if (lineSplits.length >= 3) {
-            const dbpediaIri = lineSplits[2];
+    ingredientLinks.forEach((link) => {
+        const triple = link.split(' ');
+        if (triple.length >= 3) {
+            const dbpediaIri = triple[2];
             ingredientIris.push(dbpediaIri);
         }
     })
@@ -94,48 +99,23 @@ async function fetchDbpediaIngredients(fetchRequests) {
     console.log('Fetching ingredients from DBpedia sparql endpoint...');
 
     for (const request of fetchRequests) {
-        try {
-            const { body } = await Apify.utils.requestAsBrowser({ url: request });
-            const jsonld = JSON.parse(body);
+        const { body } = await Apify.utils.requestAsBrowser({ url: request });
+        const jsonld = JSON.parse(body);
 
-            if (jsonld['@graph']) {
-                ingredients.push(jsonld);
-                console.log(`Fetched ${jsonld['@graph'].length} ingredients`);
-            } 
-        } catch (e) {
-            throw new Error(e);
-        }
+        const jsonldIngredients = jsonld['@graph'];
+        console.log(`Fetched ${jsonldIngredients.length} ingredients`);
+
+        if (jsonldIngredients) {
+            const commonContext = jsonld['@context'];
+
+            const mergedIngredients = jsonldIngredients.map((ingredient) => mergeIngredientWithContext(ingredient, commonContext));
+            ingredients.push(...mergedIngredients);
+        } 
     }
 
+    console.log(`Fetched ${ingredients.length} DBpedia ingredients in total`);
+
     return ingredients;
-}
-
-function buildCommonContext(jsonlds) {
-    const context = {};
-
-    jsonlds.forEach((jsonld) => {
-        const currentContext = jsonld['@context'];
-        Object.keys(currentContext).forEach((key) => {
-            if (!context[key]) {
-                context[key] = currentContext[key];
-            }
-        })
-    })
-
-    return context;
-}
-
-function mergeGraphs(jsonlds) {
-    const graph = [];
-
-    jsonlds.forEach((jsonld) => {
-        const currentGraph = jsonld['@graph'];
-        graph.push(...currentGraph);
-    })
-
-    console.log(`Fetched ${graph.length} DBpedia ingredients in total`);
-
-    return graph;
 }
 
 function renameContextKeys(object) {
@@ -167,23 +147,9 @@ function mergeIngredientWithContext(ingredient, commonContext) {
 
     return {
         '@context': normalizedContext,
-        '@type': commonContext.ingredient['@id'],
+        '@type': DBPEDIA_INGREDIENT_TYPE,
         ...normalizedIngredient,
     }
-}
-
-function mergeIngredients(commonContext, mergedGraph) {
-    const mergedIngredients = [];
-
-    mergedGraph.forEach((ingredient) => {
-        const mergedIngredient = {
-            jsonld: mergeIngredientWithContext(ingredient, commonContext),
-        };
-
-        mergedIngredients.push(mergedIngredient);
-    });
-
-    return mergedIngredients;
 }
 
 async function main() {
@@ -194,12 +160,8 @@ async function main() {
     
     const fetchRequests = buildDbpediaIngredientsFetchRequests(ingredientIris);
     const ingredients = await fetchDbpediaIngredients(fetchRequests);
-    
-    const commonContext = buildCommonContext(ingredients);
-    const mergedGraph = mergeGraphs(ingredients);
 
-    const mergedIngredients = mergeIngredients(commonContext, mergedGraph);
-    fs.writeFileSync(DBPEDIA_INGREDIENTS_PATH, JSON.stringify(mergedIngredients, null, 2));
+    writeSameDirFile(DBPEDIA_INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2))
 }
 
 (async () => {

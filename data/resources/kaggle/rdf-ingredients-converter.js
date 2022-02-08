@@ -31,7 +31,7 @@ function serializeIngredientsToRdf(ingredients) {
     Object.keys(ingredients).forEach((id) => {
         const iri = `${INGREDIENT_PREFIX}${id}`;
         const property = `${RDFS_PREFIX}label`
-        const label = ingredients[id];
+        const label = ingredients[id].name;
         
         writer.addQuad(quad(
             namedNode(iri),
