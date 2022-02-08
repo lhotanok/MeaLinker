@@ -1,4 +1,4 @@
-## Search process
+# Search process
 
 User adds the ingredients from the list of predefined ingredients or specifies their own.
 
@@ -14,34 +14,34 @@ Matched recipes are displayed in a grid with cover image, recipe name and perhap
 
 At this point, more than 170 000 tokenized recipes with ingredient IDs are available. Free datasets from kaggle.com are used.
 
-### Recipe display
+## Recipe display
 
 Once the recipe is clicked, the searching grid is replaced with the recipe description
 
-#### Cover image on the top
+### Cover image on the top
 
-* Extracted dynamically from the source Food.com to avoid redundant image storage 
+- Extracted dynamically from the source Food.com to avoid redundant image storage 
 
-#### Ingredients
+### Ingredients
 
-* The list of matched ingredient names
-* Does not include measures
-* If matched with Wikidata ingredient, the ingredient image is shown on mouse hover
-  * Can be clicked for redirection to the ingredient info page (with data extracted from Wikidata)
+- The list of matched ingredient names
+- Does not include measures
+- If matched with Wikidata ingredient, the ingredient image is shown on mouse hover
+  - Can be clicked for redirection to the ingredient info page (with data extracted from Wikidata)
 
-#### Steps
+### Steps
 
-* Individual recipe directions as they were extracted from the database
+- Individual recipe directions as they were extracted from the database
 
-#### Additional info
+### Additional info
 
-* Preparation time (in minutes)
-* Tags
-* Description
-* Rating
-* Review text
+- Preparation time (in minutes)
+- Tags
+- Description
+- Rating
+- Review text
 
-#### Link to the source
+### Link to the source
 
-* Currently all the recipes are crawled from Food.com
+- Currently all the recipes are crawled from Food.com
 
