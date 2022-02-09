@@ -1,7 +1,7 @@
 const fs = require('fs');
-const csv = require("csvtojson");
+const csv = require('csvtojson');
 
-const { RAW_RECIPES_CSV_PATH, RECIPES_TO_CONVERT, RAW_RECIPES_JSON_PATH, JSON_PRETTY_PRINT } = require("./constants");
+const { RAW_RECIPES_CSV_PATH, RECIPES_TO_CONVERT, RAW_RECIPES_JSON_PATH, JSON_PRETTY_PRINT } = require('./constants');
 
 async function loadJsonFromCsv(csvFilePath) {
     const json = await csv().fromFile(`${__dirname}/${csvFilePath}`);

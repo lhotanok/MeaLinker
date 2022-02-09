@@ -20,4 +20,4 @@ for item in data:
     print('The data ', cnt, ' is : ', item)
     cnt += 1
 
-data.to_csv ('./ingredients/ingr_map.csv', index = False, header=True)
+data.to_csv ('ingr_map.csv', index=False, header=True)
