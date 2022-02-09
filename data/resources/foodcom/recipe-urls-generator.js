@@ -1,4 +1,8 @@
 const fs = require('fs');
+const log4js = require('log4js');
+const log = log4js.getLogger('Recipe urls generator');
+log.level = 'debug';
+
 const { APIFY_SCRAPER_INPUT_PATH, JSON_RECIPES_PATH, URL_BASE, FILE_ENCODING } = require('./constants');
 
 function getRecipeIds(jsonRecipesPath) {
@@ -22,14 +26,14 @@ function createApifyScraperInput(recipeUrls) {
 }
 
 function main() {
-    console.log(`Preparing recipe details start urls...`);
+    log.info(`Preparing recipe details start urls...`);
     
     const recipeIds = getRecipeIds(JSON_RECIPES_PATH);
     const recipeUrls = createUrlsFromRecipeIds(recipeIds);
     const scraperInput = createApifyScraperInput(recipeUrls);
 
-    console.log(`Extracted ${recipeIds.length} recipe ids.`);
-    console.log(`Recipe url format: ${recipeUrls[0]}`);
+    log.info(`Extracted ${recipeIds.length} recipe ids.`);
+    log.info(`Recipe url format: ${recipeUrls[0]}`);
 
     fs.writeFileSync(APIFY_SCRAPER_INPUT_PATH, JSON.stringify(scraperInput, null, 2));
 }

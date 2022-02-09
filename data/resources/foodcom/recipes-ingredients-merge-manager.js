@@ -1,6 +1,9 @@
 const fs = require('fs');
 const uuid = require('uuid');
-const csv = require("csvtojson");
+const csv = require('csvtojson');
+const log4js = require('log4js');
+const log = log4js.getLogger('Recipes-ingredients manager');
+log.level = 'debug';
 
 const {
     GENERATED_DATASET_PATH,

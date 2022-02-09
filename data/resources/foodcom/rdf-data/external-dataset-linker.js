@@ -1,5 +1,8 @@
 const fs = require('fs');
-const Apify = require('apify')
+const Apify = require('apify');
+const log4js = require('log4js');
+const log = log4js.getLogger('RDF dataset linker');
+log.level = 'debug';
 
 const { FILE_ENCODING } = require('./constants');
 const {
@@ -35,7 +38,7 @@ function getDbpediaIngredientIris() {
         }
     })
 
-    console.log(`Found ${ingredientIris.length} ingredient IRIs`);
+    log.info(`Found ${ingredientIris.length} ingredient IRIs`);
     return ingredientIris;
 }
 
@@ -61,7 +64,7 @@ function buildDbpediaIngredientsFetchRequests(resources) {
     const fetchRequests = [];
 
     const ingredientGroups = createIngredientGroups(resources);
-    console.log(`Created ${ingredientGroups.length} ingredient groups`);
+    log.info(`Created ${ingredientGroups.length} ingredient groups`);
 
     const sparqlQuery = readFileFromCurrentDir(DBPEDIA_INGREDIENTS_QUERY);
 
@@ -75,21 +78,21 @@ function buildDbpediaIngredientsFetchRequests(resources) {
         fetchRequests.push(fetchRequest);
     }
 
-    console.log(`Created ${fetchRequests.length} fetch requests`);
+    log.info(`Created ${fetchRequests.length} fetch requests`);
     return fetchRequests;
 }
 
 async function fetchDbpediaIngredients(fetchRequests) {
     const ingredients = [];
 
-    console.log('Fetching ingredients from DBpedia sparql endpoint...');
+    log.info('Fetching ingredients from DBpedia sparql endpoint...');
 
     for (const request of fetchRequests) {
         const { body } = await Apify.utils.requestAsBrowser({ url: request });
         const jsonld = JSON.parse(body);
 
         const jsonldIngredients = jsonld['@graph'];
-        console.log(`Fetched ${jsonldIngredients.length} ingredients`);
+        log.info(`Fetched ${jsonldIngredients.length} ingredients`);
 
         if (jsonldIngredients) {
             const commonContext = jsonld['@context'];
@@ -99,7 +102,7 @@ async function fetchDbpediaIngredients(fetchRequests) {
         } 
     }
 
-    console.log(`Fetched ${ingredients.length} DBpedia ingredients in total`);
+    log.info(`Fetched ${ingredients.length} DBpedia ingredients in total`);
 
     return ingredients;
 }

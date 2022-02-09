@@ -1,7 +1,10 @@
 const fs = require('fs');
+const log4js = require('log4js');
+const log = log4js.getLogger('CouchDB manager');
+log.level = 'debug';
 
 const { PORT, USERNAME, PASSWORD } = require('./config');
-const { DATABASE_NAME, FILE_ENCODING, RECIPES_PATH, INGREDIENTS_PATH } = require('./constants');
+const { DATABASE_NAME, FILE_ENCODING, FOOD_COM_RECIPES_PATH, FOOD_COM_INGREDIENTS_PATH } = require('./constants');
 
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -14,22 +17,22 @@ function loadJsonFromFile(filePath) {
 }
 
 async function createDatabase(dbName) {
-    console.log(`Creating ${dbName} database...`);
+    log.info(`Creating ${dbName} database...`);
 
     try {
         const response = await nano.db.create(dbName);
-        console.log(response);
+        log.info(response);
     } catch (e) {
         console.error(e);
     }
 }
 
 async function destroyDatabase(dbName) {
-    console.log(`Destroying ${dbName} database...`);
+    log.info(`Destroying ${dbName} database...`);
 
     try {
         const response = await nano.db.destroy(dbName);
-        console.log(response);
+        log.info(response);
     } catch (e) {
         console.error(e);
     }
@@ -47,9 +50,9 @@ async function tryInsertItem(mealinkerDb, identifier, item) {
 }
 
 async function insertRecipes(mealinkerDb) {
-    const recipes = loadJsonFromFile(RECIPES_PATH);
+    const recipes = loadJsonFromFile(FOOD_COM_RECIPES_PATH);
 
-    console.log(`Inserting ${recipes.length} recipes into ${DATABASE_NAME} database...`);
+    log.info(`Inserting ${recipes.length} recipes into ${DATABASE_NAME} database...`);
 
     for (const recipe of recipes) {
         const { jsonld: { identifier } } = recipe;
@@ -58,9 +61,9 @@ async function insertRecipes(mealinkerDb) {
 }
 
 async function insertIngredients(mealinkerDb) {
-    const ingredients = loadJsonFromFile(INGREDIENTS_PATH);
+    const ingredients = loadJsonFromFile(FOOD_COM_INGREDIENTS_PATH);
 
-    console.log(`Inserting ${ingredients.length} ingredients into ${DATABASE_NAME} database...`);
+    log.info(`Inserting ${ingredients.length} ingredients into ${DATABASE_NAME} database...`);
 
     for (const ingredient of ingredients) {
         const { identifier } = ingredient;

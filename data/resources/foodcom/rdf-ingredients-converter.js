@@ -1,5 +1,9 @@
 const fs = require('fs');
 const N3 = require('n3');
+const log4js = require('log4js');
+const log = log4js.getLogger('RDF ingredients converter');
+log.level = 'debug';
+
 const { DataFactory } = N3;
 const { namedNode, literal, quad } = DataFactory;
 
@@ -44,7 +48,7 @@ function serializeIngredientsToRdf(ingredients) {
         ));
     });
 
-    console.log(`Serialized ${Object.keys(ingredients).length} ingredients from json to rdf format`);
+    log.info(`Serialized ${Object.keys(ingredients).length} ingredients from json to rdf format`);
 
     dumpRdfToFile(writer, RDF_INGREDIENTS_PATH);
 }
