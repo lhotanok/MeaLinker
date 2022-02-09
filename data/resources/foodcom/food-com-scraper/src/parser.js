@@ -77,7 +77,7 @@ const getStructuredPrepTime = ({ cookTime, prepTime, totalTime }) => {
 };
 
 const getStructuredTags = ({ keywords }) => {
-    return keywords.split(',');
+    return keywords ? keywords.split(',') : [];
 };
 
 const parseFloatValue = (textValue, unit) => {
@@ -116,11 +116,18 @@ const getStructuredNutritionInfo = ({ nutrition }) => {
 };
 
 const getStructuredRating = ({ aggregateRating }) => {
+    if (!aggregateRating) {
+        return {
+            value: null,
+            reviews: null,
+        };
+    }
+
     const { ratingValue, reviewCount } = aggregateRating;
 
     const rating = {
-        value: parseFloat(ratingValue),
-        reviews: parseInt(reviewCount, 10),
+        value: ratingValue ? parseFloat(ratingValue) : null,
+        reviews: reviewCount ? parseInt(reviewCount, 10) : null,
     };
 
     return rating;

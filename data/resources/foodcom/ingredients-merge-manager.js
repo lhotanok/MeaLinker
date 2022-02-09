@@ -15,6 +15,10 @@ function readFile(filePath) {
     return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
+function writeFileFromCurrentDir(filePath, content) {
+    return fs.writeFileSync(`${__dirname}/${filePath}`, content);
+}
+
 function readJsonFromFile(filePath) {
     return JSON.parse(readFile(filePath));
 }
@@ -96,8 +100,8 @@ function main() {
     const mergedIngredients = mergeIngredientsWithJsonlds(irisWithIds, dbpediaIngredients);
     const mergedRecipes = extendRecipesByIngredientThumbnails(extendedRecipes, mergedIngredients);
 
-    fs.writeFileSync(EXTENDED_INGREDIENTS_PATH, JSON.stringify(Object.values(mergedIngredients), null, 2));
-    fs.writeFileSync(EXTENDED_RECIPES_PATH, JSON.stringify(mergedRecipes));
+    writeFileFromCurrentDir(EXTENDED_INGREDIENTS_PATH, JSON.stringify(Object.values(mergedIngredients), null, 2));
+    writeFileFromCurrentDir(EXTENDED_RECIPES_PATH, JSON.stringify(mergedRecipes));
 }
 
 main ();

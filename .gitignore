@@ -1,1 +1,8 @@
 node_modules
+/data/resources/foodcom/recipes/*.json
+/data/resources/foodcom/recipes/*.csv
+/data/resources/foodcom/ingredients/*.json
+/data/resources/foodcom/ingredients/*.csv
+/data/resources/foodcom/rdf-data/*.ttl
+/data/resources/foodcom/rdf-data/*.json
+/data/resources/foodcom/rdf-data/*.nt

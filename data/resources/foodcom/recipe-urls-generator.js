@@ -22,6 +22,8 @@ function createApifyScraperInput(recipeUrls) {
 }
 
 function main() {
+    console.log(`Preparing recipe details start urls...`);
+    
     const recipeIds = getRecipeIds(JSON_RECIPES_PATH);
     const recipeUrls = createUrlsFromRecipeIds(recipeIds);
     const scraperInput = createApifyScraperInput(recipeUrls);

@@ -17,6 +17,10 @@ function readFileFromCurrentDir(filePath) {
     return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
+function writeFileFromCurrentDir(filePath, content) {
+    return fs.writeFileSync(`${__dirname}/${filePath}`, content);
+}
+
 function loadJsonFromFile(filePath) {
     return JSON.parse(readFileFromCurrentDir(filePath));
 }
@@ -98,8 +102,6 @@ async function main() {
 
     const uniqueIngredients = getUniqueIngredients(mappedIngredients);
     const recipeIdsWithIngrIds = filterRecipeIdsWithIngredientIds(tokenizedRecipes);
-
-    fs.writeFileSync(UNIQUE_INGR_WITH_IDS_PATH, JSON.stringify(uniqueIngredients, null, 2));
     
     generatedRecipes.forEach((recipe) => {
         const { structured, jsonld } = recipe;
@@ -120,7 +122,8 @@ async function main() {
 
     console.log(`${extendedRecipes.length} recipes merged with extended ingredients info`);
 
-    fs.writeFileSync(EXTENDED_RECIPES_PATH, JSON.stringify(extendedRecipes));
+    writeFileFromCurrentDir(UNIQUE_INGR_WITH_IDS_PATH, JSON.stringify(uniqueIngredients, null, 2));
+    writeFileFromCurrentDir(EXTENDED_RECIPES_PATH, JSON.stringify(extendedRecipes));
 }
 
 (async () => {

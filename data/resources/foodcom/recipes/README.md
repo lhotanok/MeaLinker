@@ -1,8 +1,8 @@
-PP_recipes.csv and RAW_recipes.csv were downloaded from Kaggle (https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions).
+`RAW_recipes.csv` and `PP_recipes.csv` datasets should be downloaded to the cloned repository manually from Kaggle: 
+https://www.kaggle.com/shuyangli94/food-com-recipes-and-user-interactions.
+You might be required to log in Kaggle to be able to download the datasets. Both datasets are expected to be stored
+in the current directory.
 
-Their size exceeds GitHub limit of 100 MB so they're only stored locally
-and should be downloaded manually to the cloned repository.
-
-RAW_recipes.json is a testing subset of the original RAW_recipes.csv converted into json format.
-It can be easily replaced with a json file containing more recipes from RAW_recipes.csv to build
-richer recipes database.
+Once `RAW_recipes.csv` file is downloaded, `run.bat` script can be invoked to convert csv recipes to json
+format stored in `RAW_recipes.json` file. The number of converted recipes can be easily specified in
+`constants.js`, namely through `RECIPES_TO_CONVERT` value.

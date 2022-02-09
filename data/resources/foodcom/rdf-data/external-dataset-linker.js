@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Apify = require('apify')
 
-const { FILE_ENCODING } = require('../constants');
+const { FILE_ENCODING } = require('./constants');
 const {
     FOOD_DBPEDIA_INGREDIENTS_PATH,
     INGREDIENTS_SECTION_REGEX,
