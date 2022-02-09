@@ -10,35 +10,22 @@ Application's main goal is to provide advanced recipe searching with many differ
 
 ### Indexed fields
 
-- **identifier** (`string`)
+- **id** (`string`)
 - **name** (`string`)
 - **ingredients** (`array<any>`)
-    - identifier (`string`)
-    - name (`string`)
-- **servings** (`string`)
+    - id (`string`)
+    - ingredientName (`string`)
 - **recipeCategory** (`string`)
 - **tags** (`array<string>`)
 - **rating** (`float`)
-- **reviews** (`int`)
+- **reviewsCount** (`int`)
 - **stepsCount** (`int`)
 
-#### Preparation time fields
+#### Preparation time in minutes fields
 
-- **cooking**
-    - minutes (`int`)
-    - hours (`int`)
-    - days (`int`)
-    - weeks (`int`)
-- **preparation**
-    - minutes (`int`)
-    - hours (`int`)
-    - days (`int`)
-    - weeks (`int`)
-- **total**
-    - minutes (`int`)
-    - hours (`int`)
-    - days (`int`)
-    - weeks (`int`)
+- **cooking** (`int`)
+- **preparation** (`int`)
+- **total** (`int`)
 
 #### Nutrition fields
 
@@ -59,6 +46,6 @@ Indexing of recipe ingredients can be used for fast searching through all known 
 
 ### Indexed fields
 
-- **identifier** (`string`)
+- **id** (`string`)
 - **label** (`string`)
 - **thumbnail** (`string`)
