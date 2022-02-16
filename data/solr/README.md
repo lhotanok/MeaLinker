@@ -1,8 +1,12 @@
 # Setup
 
+## Prerequisite
+
+Docker installed: Docker - Get Started
+
 ## Solr server in Docker
 
-There are multiple ways how to run Solr in Docker container.  We're using manual settings as described at [Solr Docker Github](https://github.com/docker-solr/docker-solr#getting-started-with-the-docker-image).
+There are multiple ways how to run Solr in a Docker container. We'll use manual settings as described at [Solr Docker Github](https://github.com/docker-solr/docker-solr#getting-started-with-the-docker-image).
 
 ```bash
 docker run -d -p 8983:8983 --name solr-mealinker solr:8 
@@ -10,7 +14,7 @@ docker exec -it solr-mealinker solr create_core -c recipes
 docker exec -it solr-mealinker solr create_core -c ingredients
 ```
 
-Once the commands finish successfully, we should have a Solr instance with 2 cores (recipes and ingredients) running on `localhost:8983`. When the Solr container is stopped (e.g. after device restart), we can run it again with command:
+Once all of the above commands finish successfully, we should have a Solr instance with 2 cores (recipes and ingredients) running on `localhost:8983`. When the Solr container has stopped (e.g. after device restart), we can run it again using command:
 
 ```bash
 docker start solr-mealinker

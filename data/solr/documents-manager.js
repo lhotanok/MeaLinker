@@ -1,7 +1,6 @@
 const fs = require('fs');
 const log4js = require('log4js');
 const solr = require('solr-client');
-const SolrNode = require('solr-node');
 const { COUCHDB: { DB_NAME, USERNAME, PASSWORD, PORT }, SOLR } = require('./config');
 const { RECIPE_JSONLD_TYPE, INGREDIENT_JSONLD_TYPE, RECIPES_PATH, INGREDIENTS_PATH } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
@@ -11,6 +10,21 @@ log.level = 'debug';
 
 function writeFileFromCurrentDir(filePath, content) {
     return fs.writeFileSync(`${__dirname}/${filePath}`, content);
+}
+
+async function fillWithDatabaseDocuments(recipes, ingredients) {
+    const database = nano.use(DB_NAME);
+
+    const documents = await database.list({include_docs: true})
+    documents.rows.forEach(({ doc }) => {
+        const { jsonld } = doc;
+
+        if (jsonld['@type'] === RECIPE_JSONLD_TYPE) {
+            recipes.push(filterRecipeIndexedFields(doc));
+        } else if (jsonld['@type'] === INGREDIENT_JSONLD_TYPE) {
+            ingredients.push(filterIngredientIndexedFields(doc));
+        }
+    });
 }
 
 function getFilteredIngredients(ingredients) {
@@ -84,55 +98,28 @@ function filterIngredientIndexedFields(ingredient) {
     return filteredIngredient;
 }
 
-// async function pushDocumentsToSolr(documents) {
-//     const { HOST, PORT, CORE, PATH } = SOLR;
-
-//     const client = solr.createClient({
-//         host: HOST,
-//         port: PORT,
-//         core: CORE,
-//         path: PATH,
-//     });
-
-//     const addResponse = await client.add(documents);
-//     log.info(`Add documents response: ${JSON.stringify(addResponse, null, 2)}`);
-
-//     const commitResponse = await client.commit();
-//     log.info(`Commit response: ${JSON.stringify(commitResponse, null, 2)}`);
-// }
-
 async function pushDocumentsToSolr(documents, core) {
-    const { HOST, PORT, PROTOCOL } = SOLR;
+    const { HOST, PORT, SECURE } = SOLR;
 
-    const client = new SolrNode({
+    const client = solr.createClient({
         host: HOST,
         port: PORT,
         core,
-        protocol: PROTOCOL
+        secure: SECURE,
     });
 
-    log.info(`Pushing recipe: ${JSON.stringify(documents[1], null, 2)}`);
+    const addResponse = await client.add(documents);
+    log.info(`Add documents response: ${JSON.stringify(addResponse, null, 2)}`);
 
-    const response = await client.update(documents[1]);
-    log.info(`Response: ${JSON.stringify(response, null, 2)}`);
+    const commitResponse = await client.commit();
+    log.info(`Commit response: ${JSON.stringify(commitResponse, null, 2)}`);
 }
 
 async function main() {
-    const database = nano.use(DB_NAME);
-
     const recipes = [];
     const ingredients = [];
 
-    const documents = await database.list({include_docs: true})
-    documents.rows.forEach(({ doc }) => {
-        const { jsonld } = doc;
-
-        if (jsonld['@type'] === RECIPE_JSONLD_TYPE) {
-            recipes.push(filterRecipeIndexedFields(doc));
-        } else if (jsonld['@type'] === INGREDIENT_JSONLD_TYPE) {
-            ingredients.push(filterIngredientIndexedFields(doc));
-        }
-    });
+    await fillWithDatabaseDocuments(recipes, ingredients);
 
     log.info(`Extracted ${recipes.length} recipes and ${ingredients.length} ingredients from ${DB_NAME} DB`);
 
@@ -142,8 +129,9 @@ async function main() {
     log.info(`Saved recipes and ingredients prepared for Solr into documents directory`);
 
     const { CORES: { RECIPES, INGREDIENTS } } = SOLR;
+
     await pushDocumentsToSolr(recipes, RECIPES);
-    await pushDocumentsToSolr(INGREDIENTS);
+    await pushDocumentsToSolr(ingredients, INGREDIENTS);
 }
 
 (async () => {

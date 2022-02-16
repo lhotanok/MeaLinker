@@ -12,7 +12,8 @@ const SOLR = {
         RECIPES: 'recipes',
         INGREDIENTS: 'ingredients',
     },
-    PROTOCOL: 'https',
+    PROTOCOL: 'http',
+    SECURE: false,
 };
 
 const SOLR_RECIPES_SCHEMA = `http://${SOLR.HOST}:${SOLR.PORT}/solr/${SOLR.CORES.RECIPES}/schema`;
