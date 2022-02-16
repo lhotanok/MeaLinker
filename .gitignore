@@ -7,3 +7,4 @@ node_modules
 /data/resources/foodcom/rdf-data/*.ttl
 /data/resources/foodcom/rdf-data/*.json
 /data/resources/foodcom/rdf-data/*.nt
+/data/solr/*.json

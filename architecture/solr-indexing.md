@@ -12,20 +12,17 @@ Application's main goal is to provide advanced recipe searching with many differ
 
 - **id** (`string`)
 - **name** (`string`)
-- **ingredients** (`array<any>`)
-    - id (`string`)
-    - ingredientName (`string`)
+- **ingredients** (`array<string>`)
 - **recipeCategory** (`string`)
 - **tags** (`array<string>`)
 - **rating** (`float`)
-- **reviewsCount** (`int`)
 - **stepsCount** (`int`)
 
-#### Preparation time in minutes fields
+#### Preparation time fields
 
-- **cooking** (`int`)
-- **preparation** (`int`)
-- **total** (`int`)
+- **cookMinutes** (`int`)
+- **prepMinutes** (`int`)
+- **totalMinutes** (`int`)
 
 #### Nutrition fields
 
