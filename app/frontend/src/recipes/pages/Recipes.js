@@ -1,5 +1,6 @@
 import React from 'react';
+import RecipesGrid from '../components/RecipesGrid';
 
 export default function Recipes() {
-  return <h1>Recipes</h1>;
+  return <RecipesGrid />;
 }
