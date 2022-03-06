@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Footer from '../../shared/Footer';
-import RecipeCard from './RecipeCard';
+import RecipeCard from './RecipeCard/RecipeCard';
 import Header from '../../shared/Header';
 
 const DUMMY_CARDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
