@@ -5,9 +5,13 @@ import {
   Redirect,
   Switch,
 } from 'react-router-dom';
-import Ingredients from './ingredients/pages/Ingredients';
 import Recipes from './recipes/pages/Recipes';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import Header from './shared/Header';
+import Footer from './shared/Footer';
+import IngredientDetail from './ingredients/pages/IngredientDetail';
+import RecipeDetail from './recipes/pages/RecipeDetail';
 
 const theme = createTheme({
   palette: {
@@ -23,17 +27,25 @@ const theme = createTheme({
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
-      <Router>
-        <Switch>
-          <Route path='/recipes' exact>
-            <Recipes />
-          </Route>
-          <Route path='/ingredients' exact>
-            <Ingredients />
-          </Route>
-          <Redirect to='/' />
-        </Switch>
-      </Router>
+      <CssBaseline />
+      <Header />
+      <main>
+        <Router>
+          <Switch>
+            <Route path='/recipes' exact>
+              <Recipes />
+            </Route>
+            <Route path='/recipes/:recipeId' exact>
+              <RecipeDetail />
+            </Route>
+            <Route path='/ingredients/:ingredientId' exact>
+              <IngredientDetail />
+            </Route>
+            <Redirect to='/' />
+          </Switch>
+        </Router>
+      </main>
+      <Footer />
     </ThemeProvider>
   );
 }
