@@ -7,14 +7,22 @@ const getIngredientElements = (ingredients, searchedIngredients) => {
   return ingredients.map((ingredient) => {
     let emphasize = false;
     searchedIngredients.forEach((searched) => {
-      if (ingredient.toLocaleLowerCase().includes(searched)) {
+      if (
+        ingredient
+          .toLocaleLowerCase()
+          .includes(searched.label.toLocaleLowerCase())
+      ) {
         emphasize = true;
       }
     });
 
-    const ingredientItem = <li>{ingredient}</li>;
+    const ingredientItem = emphasize ? (
+      <strong>{ingredient}</strong>
+    ) : (
+      ingredient
+    );
 
-    return emphasize ? <strong>{ingredientItem}</strong> : ingredientItem;
+    return <li key={Math.random()}>{ingredientItem}</li>;
   });
 };
 
