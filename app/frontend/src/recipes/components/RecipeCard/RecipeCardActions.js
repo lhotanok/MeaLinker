@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
-import IconButton from '@mui/material/IconButton';
 
 /**
  * Snippet from MUI documentation.
@@ -12,13 +11,18 @@ import IconButton from '@mui/material/IconButton';
 const ExpandMore = styled((props) => {
   const { expand, ...other } = props;
 
-  return <IconButton {...other} />;
+  return <ExpandMoreIcon {...other} />;
 })(({ theme, expand }) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
   transition: theme.transitions.create('transform', {
     duration: theme.transitions.duration.shortest,
   }),
 }));
+
+const IngredientsButton = styled(Button)({
+  paddingLeft: 15,
+  paddingRight: 10,
+});
 
 export default function RecipeCardActions(props) {
   const { expanded, onExpandClick } = props;
@@ -27,15 +31,22 @@ export default function RecipeCardActions(props) {
     <CardActions disableSpacing>
       <Button size='small'>View</Button>
       <Stack direction='row' marginLeft='auto'>
-        <Button size='small' onClick={onExpandClick} color='secondary'>
-          Ingredients<ExpandMore
-            expand={expanded}
-            aria-expanded={expanded}
-            aria-label='show more'
-          >
-            <ExpandMoreIcon />
-          </ExpandMore>
-        </Button>
+        <IngredientsButton
+          size='small'
+          color='secondary'
+          onClick={onExpandClick}
+          endIcon={
+            <ExpandMore
+              expand={expanded}
+              aria-expanded={expanded}
+              aria-label='show ingredients'
+            >
+              <ExpandMoreIcon />
+            </ExpandMore>
+          }
+        >
+          Ingredients
+        </IngredientsButton>
       </Stack>
     </CardActions>
   );
