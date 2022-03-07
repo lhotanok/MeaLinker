@@ -5,13 +5,12 @@ import CardMedia from '@mui/material/CardMedia';
 import RecipeCardContent from './RecipeCardContent';
 import RecipeCardCollapse from './RecipeCardCollapse';
 import RecipeCardActions from './RecipeCardActions';
+import { useHistory } from 'react-router-dom';
 
 export default function RecipeReviewCard(props) {
   const [expanded, setExpanded] = React.useState(false);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
+  const history = useHistory();
 
   const {
     id,
@@ -25,6 +24,14 @@ export default function RecipeReviewCard(props) {
     searchedIngredients,
   } = props;
 
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  const handleViewClick = () => {
+    history.push(`/recipes/${id}`);
+  };
+
   return (
     <Card sx={{ maxWidth: 350, margin: 'auto' }}>
       <CardHeader title={title} subheader={date} />
@@ -37,6 +44,7 @@ export default function RecipeReviewCard(props) {
       <RecipeCardActions
         expanded={expanded}
         onExpandClick={handleExpandClick}
+        onViewClick={handleViewClick}
       />
       <RecipeCardCollapse
         expanded={expanded}

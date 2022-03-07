@@ -25,11 +25,13 @@ const IngredientsButton = styled(Button)({
 });
 
 export default function RecipeCardActions(props) {
-  const { expanded, onExpandClick } = props;
+  const { expanded, onExpandClick, onViewClick } = props;
 
   return (
     <CardActions disableSpacing>
-      <Button size='small'>View</Button>
+      <Button size='small' onClick={onViewClick}>
+        View
+      </Button>
       <Stack direction='row' marginLeft='auto'>
         <IngredientsButton
           size='small'
