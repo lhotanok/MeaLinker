@@ -3,12 +3,12 @@ const SolrModel = require('../solr/solr-model');
 
 const router = express.Router();
 
-router.get('/recipes', async (req, res) => {
+router.get('/', async (req, res) => {
   const recipes = await SolrModel.getAllRecipes();
   res.status(200).json(recipes);
 });
 
-router.get('/recipes/:recipeId', async (req, res) => {
+router.get('/:recipeId', async (req, res) => {
   const { params: { recipeId } } = req;
 
   const recipe = await SolrModel.getRecipeById(recipeId);

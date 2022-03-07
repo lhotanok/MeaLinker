@@ -6,7 +6,7 @@ const ingredientsRoutes = require('./routes/ingredients-routes');
 
 const app = express();
 
-app.use(recipesRoutes);
-app.use(ingredientsRoutes);
+app.use('/api/recipes', recipesRoutes);
+app.use('/api/ingredients', ingredientsRoutes);
 
 app.listen(5000);
