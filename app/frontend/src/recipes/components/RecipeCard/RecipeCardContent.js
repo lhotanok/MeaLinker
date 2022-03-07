@@ -2,7 +2,7 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
-import HeartRating from '../../../shared/HeartRating';
+import HeartRating from '../../../shared/components/HeartRating';
 
 export default function RecipeCardContent(props) {
   const { rating, description, mins } = props;

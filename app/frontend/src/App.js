@@ -1,15 +1,10 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Redirect,
-  Switch,
-} from 'react-router-dom';
+import { Route, Redirect, Switch } from 'react-router-dom';
 import Recipes from './recipes/pages/Recipes';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Header from './shared/Header';
-import Footer from './shared/Footer';
+import Header from './shared/components/Header';
+import Footer from './shared/components/Footer';
 import IngredientDetail from './ingredients/pages/IngredientDetail';
 import RecipeDetail from './recipes/pages/RecipeDetail';
 

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import RemovableChips from '../../shared/RemovableChips';
+import RemovableChips from '../../shared/components/RemovableChips';
 
 export default function SearchIngredients(props) {
   const { ingredients, onRemove } = props;
