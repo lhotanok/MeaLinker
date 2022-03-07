@@ -6,6 +6,23 @@ const ingredientsRoutes = require('./routes/ingredients-routes');
 
 const app = express();
 
+app.use(function(req, res, next) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+
+  // Request headers that should be allowed
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-Requested-With,content-type',
+  );
+
+  // Set to true if cookies should be used in the requests sent
+  // to the API (with sessions)
+  // res.setHeader('Access-Control-Allow-Credentials', true);
+
+  next();
+});
+
 app.use('/api/recipes', recipesRoutes);
 app.use('/api/ingredients', ingredientsRoutes);
 
