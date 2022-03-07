@@ -23,9 +23,11 @@ const DUMMY_SEARCHED_INGREDIENTS = [
 const DUMMY_RECIPE = {
   searchedIngredients: DUMMY_SEARCHED_INGREDIENTS,
   title: 'Slow Cooked Bacon Cheese Potatoes',
+  id: '027754f4-4280-51f0-ab17-4e035721da31',
   description: `Honestly don't know how I came be this recipe other than I printed it out because I thought it looked good and it gave the alternative of cooking in the oven.`,
   date: 'February 27, 2014',
   rating: 4.5,
+  totalMins: 620,
   image:
     'https://img.sndimg.com/food/image/upload/q_92,fl_progressive,w_1200,c_scale/v1/img/recipes/51/37/69/QjAmeeCQKGquX87Uf9zM_0S9A2936.jpg',
   ingredients: [

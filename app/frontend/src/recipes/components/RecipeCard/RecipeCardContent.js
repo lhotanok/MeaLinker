@@ -1,14 +1,22 @@
 import React from 'react';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
+import Stack from '@mui/material/Stack';
 import HeartRating from '../../../shared/HeartRating';
 
 export default function RecipeCardContent(props) {
+  const { rating, description, mins } = props;
   return (
     <CardContent>
-      <HeartRating value={props.rating} />
+      <Stack direction='row'>
+        <HeartRating value={rating} />
+        <Typography
+          marginLeft='auto'
+          color='#00cb0f'
+        >{`${mins} mins`}</Typography>
+      </Stack>
       <Typography variant='body2' color='text.secondary'>
-        {props.description}
+        {description}
       </Typography>
     </CardContent>
   );
