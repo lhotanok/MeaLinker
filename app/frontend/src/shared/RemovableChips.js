@@ -1,12 +1,7 @@
 import React from 'react';
-import { styled } from '@mui/material/styles';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
-
-const ListItem = styled('li')(({ theme }) => ({
-  margin: theme.spacing(0.5),
-}));
 
 export default function RemovableChips(props) {
   const { chips, onRemove } = props;

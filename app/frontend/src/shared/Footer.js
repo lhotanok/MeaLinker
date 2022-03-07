@@ -27,8 +27,8 @@ export default function Footer() {
         color='text.secondary'
         component='p'
       >
-        Recipes were collected from various websites. You can get to their
-        source pages from recipe details.
+        Recipes were collected from various websites. You can find their source
+        pages in recipe details.
       </Typography>
       <Copyright />
     </Box>

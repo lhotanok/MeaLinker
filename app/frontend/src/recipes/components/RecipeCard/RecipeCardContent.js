@@ -11,6 +11,7 @@ export default function RecipeCardContent(props) {
       <Stack direction='row'>
         <HeartRating value={rating} />
         <Typography
+          textAlign='right'
           marginLeft='auto'
           color='#00cb0f'
         >{`${mins} mins`}</Typography>

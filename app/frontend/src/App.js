@@ -30,20 +30,16 @@ export default function App() {
       <CssBaseline />
       <Header />
       <main>
-        <Router>
-          <Switch>
-            <Route path='/recipes' exact>
-              <Recipes />
-            </Route>
-            <Route path='/recipes/:recipeId' exact>
-              <RecipeDetail />
-            </Route>
-            <Route path='/ingredients/:ingredientId' exact>
-              <IngredientDetail />
-            </Route>
-            <Redirect to='/' />
-          </Switch>
-        </Router>
+        <Switch>
+          <Route exact path='/recipes' component={Recipes} />
+          <Route exact path='/recipes/:recipeId' component={RecipeDetail} />
+          <Route
+            exact
+            path='/ingredients/:ingredientId'
+            component={IngredientDetail}
+          />
+          <Redirect to='/recipes' />
+        </Switch>
       </main>
       <Footer />
     </ThemeProvider>

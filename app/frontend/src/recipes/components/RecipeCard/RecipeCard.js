@@ -26,7 +26,7 @@ export default function RecipeReviewCard(props) {
   } = props;
 
   return (
-    <Card sx={{ maxWidth: 350 }}>
+    <Card sx={{ maxWidth: 350, margin: 'auto' }}>
       <CardHeader title={title} subheader={date} />
       <CardMedia component='img' height='194' image={image} alt={title} />
       <RecipeCardContent

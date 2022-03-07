@@ -12,12 +12,8 @@ const DUMMY_CARDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 const DUMMY_SEARCHED_INGREDIENTS = [
   { key: 1, label: 'bacon' },
   { key: 2, label: 'cheddar' },
-  { key: 3, label: 'cheddar' },
-  { key: 4, label: 'cheddar' },
-  { key: 5, label: 'cheddar' },
-  { key: 6, label: 'cheddar' },
-  { key: 7, label: 'cheddar' },
-  { key: 8, label: 'cheddar' },
+  { key: 3, label: 'potato' },
+  { key: 4, label: 'butter' },
 ];
 
 const DUMMY_RECIPE = {
@@ -56,7 +52,7 @@ export default function RecipesGrid() {
           pb: 6,
         }}
       >
-        <Container maxWidth='sm'>
+        <Container>
           <Typography
             component='h1'
             variant='h2'
