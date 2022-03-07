@@ -1,6 +1,10 @@
-import { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import LoadingProgress from '../../shared/components/LoadingProgress';
 import useHttp from '../../shared/hooks/use-http';
+import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState({});
@@ -27,9 +31,29 @@ export default function RecipeDetail() {
     [recipeId, fetchRecipe],
   );
 
+  let headlineText = recipe.name;
+  if (error) headlineText = 'Recipe could not be loaded';
+  if (isLoading) headlineText = 'Loading recipe...';
+
   return (
-    <section>
-      <h1>{recipe.name}</h1>
-    </section>
+    <Box
+      sx={{
+        bgcolor: 'background.paper',
+        pt: 2,
+      }}
+    >
+      <Container>
+        <Typography
+          component='h1'
+          variant='h4'
+          align='center'
+          color='text.primary'
+          gutterBottom
+        >
+          {headlineText}
+        </Typography>
+      </Container>
+      {isLoading && <LoadingProgress />}
+    </Box>
   );
 }
