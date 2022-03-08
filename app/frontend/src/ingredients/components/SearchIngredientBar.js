@@ -1,0 +1,33 @@
+import React, { useEffect, useState } from 'react';
+import AutocompleteSearchBar from '../../shared/components/AutocompleteSearchBar';
+import useHttp from '../../shared/hooks/use-http';
+
+export default function SearchIngredientBar() {
+  const [ingredients, setIngredients] = useState([]);
+
+  const { sendRequest: fetchIngredients } = useHttp();
+
+  useEffect(
+    () => {
+      const requestConfig = {
+        url: `http://localhost:5000/api/ingredients`,
+      };
+
+      const fetchedIngredientsHandler = (ingredientsObj) => {
+        setIngredients(ingredientsObj.response.docs);
+      };
+
+      fetchIngredients(requestConfig, fetchedIngredientsHandler);
+    },
+    [fetchIngredients],
+  );
+
+  const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
+
+  return (
+    <AutocompleteSearchBar
+      hints={ingredientLabels}
+      label='Search by ingredients'
+    />
+  );
+}

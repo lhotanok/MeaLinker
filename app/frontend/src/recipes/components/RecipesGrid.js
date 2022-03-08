@@ -1,11 +1,11 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import RecipeCard from './RecipeCard/RecipeCard';
 import SearchIngredients from '../../ingredients/components/SearchIngredients';
+import SearchIngredientBar from '../../ingredients/components/SearchIngredientBar';
 
 const DUMMY_CARDS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -48,31 +48,26 @@ export default function RecipesGrid() {
       <Box
         sx={{
           bgcolor: 'background.paper',
-          pt: 8,
+          pt: 4,
           pb: 6,
         }}
       >
         <Container>
+          <SearchIngredientBar />
           <Typography
             component='h1'
             variant='h2'
             align='center'
             color='text.primary'
+            marginTop='5%'
             gutterBottom
           >
             Found {DUMMY_CARDS.length} recipes
           </Typography>
-          <Stack
-            sx={{ pt: 4 }}
-            direction='row'
-            spacing={2}
-            justifyContent='center'
-          >
-            <SearchIngredients
-              ingredients={DUMMY_SEARCHED_INGREDIENTS}
-              onRemove={searchIngredientRemoveHandler}
-            />
-          </Stack>
+          <SearchIngredients
+            ingredients={DUMMY_SEARCHED_INGREDIENTS}
+            onRemove={searchIngredientRemoveHandler}
+          />
         </Container>
       </Box>
       <Container maxWidth='md'>
