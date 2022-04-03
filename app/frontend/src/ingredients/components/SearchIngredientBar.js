@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import AutocompleteSearchBar from '../../shared/components/AutocompleteSearchBar';
 import useHttp from '../../shared/hooks/use-http';
 
-export default function SearchIngredientBar() {
+export default function SearchIngredientBar(props) {
+  const { onSearch } = props;
+
   const [ingredients, setIngredients] = useState([]);
 
   const { sendRequest: fetchIngredients } = useHttp();
@@ -27,7 +29,8 @@ export default function SearchIngredientBar() {
   return (
     <AutocompleteSearchBar
       hints={ingredientLabels}
-      label='Search by ingredients'
+      label='Add ingredients'
+      onSearch={onSearch}
     />
   );
 }

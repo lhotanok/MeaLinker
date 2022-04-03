@@ -33,7 +33,7 @@ export default function RecipeDetail() {
 
   let headlineText = recipe.name;
   if (error) headlineText = 'Recipe could not be loaded';
-  if (isLoading) headlineText = 'Loading recipe...';
+  if (isLoading) headlineText = ''; // 'Loading recipe...';
 
   return (
     <Box

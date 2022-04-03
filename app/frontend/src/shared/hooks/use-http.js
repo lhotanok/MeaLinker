@@ -19,14 +19,13 @@ export default function useHttp() {
         headers,
         body,
       });
-      console.log(`Response fetched: ${JSON.stringify(response)}`);
 
       if (!response.ok) {
         throw new Error('Request failed!');
       }
 
       const data = await response.json();
-      console.log(`Fetched data: ${JSON.stringify(data, null, 2)}`);
+      // console.log(`Fetched data: ${JSON.stringify(data, null, 2)}`);
       processDataFn(data);
     } catch (err) {
       console.log(`Error catched: ${JSON.stringify(err)}`);

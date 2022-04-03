@@ -1,21 +1,16 @@
-import React from 'react';
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 
 export default function RemovableChips(props) {
   const { chips, onRemove } = props;
-  const [removableChips, setRemovableChips] = React.useState(chips);
   console.log(`Chips: ${JSON.stringify(chips)}`);
 
   const handleRemove = (chipToRemove) => () => {
-    setRemovableChips((chips) =>
-      chips.filter((chip) => chip.key !== chipToRemove.key),
-    );
     onRemove(chipToRemove);
   };
 
-  const listItems = removableChips.map((data) => {
+  const listItems = chips.map((data) => {
     return (
       <Grid item key={data.key}>
         <Chip
@@ -26,8 +21,6 @@ export default function RemovableChips(props) {
       </Grid>
     );
   });
-
-  console.log(`List items: ${listItems.length}`);
 
   return (
     <Container maxWidth='md'>

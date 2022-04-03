@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,7 +7,16 @@ import { Avatar } from '@mui/material';
 import { IconButton } from '@mui/material';
 
 export default function AutocompleteSearchBar(props) {
-  const { hints, label } = props;
+  const { hints, label, onSearch } = props;
+
+  const [searchIngredients, setSearchIngredients] = useState([]);
+
+  const onChangeHandler = (_ev, value) => setSearchIngredients(value);
+
+  const searchHandler = () => {
+    onSearch(searchIngredients);
+    setSearchIngredients([]);
+  };
 
   return (
     <Autocomplete
@@ -18,7 +27,7 @@ export default function AutocompleteSearchBar(props) {
       options={hints}
       renderInput={(params) => (
         <Stack direction='row' spacing={1.5}>
-          <IconButton size='large'>
+          <IconButton size='large' onClick={searchHandler}>
             <Avatar sx={{ bgcolor: '#548664' }}>
               <SearchIcon />
             </Avatar>
@@ -26,6 +35,8 @@ export default function AutocompleteSearchBar(props) {
           <TextField {...params} label={label} />
         </Stack>
       )}
+      onChange={onChangeHandler}
+      value={searchIngredients}
     />
   );
 }
