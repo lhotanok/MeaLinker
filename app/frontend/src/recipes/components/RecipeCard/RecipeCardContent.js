@@ -10,11 +10,13 @@ export default function RecipeCardContent(props) {
     <CardContent>
       <Stack direction='row'>
         <HeartRating value={rating} />
-        <Typography
-          textAlign='right'
-          marginLeft='auto'
-          color='#00cb0f'
-        >{`${mins} mins`}</Typography>
+        {mins && (
+          <Typography
+            textAlign='right'
+            marginLeft='auto'
+            color='#00cb0f'
+          >{`${mins} mins`}</Typography>
+        )}
       </Stack>
       <Typography variant='body2' color='text.secondary'>
         {description}

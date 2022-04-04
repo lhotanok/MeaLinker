@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useState, useEffect, useCallback } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -6,28 +6,29 @@ import Container from '@mui/material/Container';
 import SearchIngredients from '../../ingredients/components/SearchIngredients';
 import SearchIngredientBar from '../../ingredients/components/SearchIngredientBar';
 import RecipesGrid from '../components/RecipesGrid';
+import useHttp from '../../shared/hooks/use-http';
 
-const DUMMY_RECIPE = {
-  searchedIngredients: [],
-  title: 'Slow Cooked Bacon Cheese Potatoes',
-  id: '027754f4-4280-51f0-ab17-4e035721da31',
-  description: `Honestly don't know how I came be this recipe other than I printed it out because I thought it looked good and it gave the alternative of cooking in the oven.`,
-  date: 'February 27, 2014',
-  rating: 4.5,
-  totalMins: 620,
-  image:
-    'https://img.sndimg.com/food/image/upload/q_92,fl_progressive,w_1200,c_scale/v1/img/recipes/51/37/69/QjAmeeCQKGquX87Uf9zM_0S9A2936.jpg',
-  ingredients: [
-    '200 g bacon (diced)',
-    '2 medium onions (thinly sliced)',
-    '4 medium potatoes (thinly sliced)',
-    '225 g cheddar cheese (thinly sliced)',
-    'salt (to taste)',
-    'pepper (to taste)',
-    'butter (use your discretion)',
-    'spring onion (green onions) (optional)',
-  ],
-};
+// const DUMMY_RECIPE = {
+//   id: '027754f4-4280-51f0-ab17-4e035721da31',
+//   searchedIngredients: [],
+//   name: 'Slow Cooked Bacon Cheese Potatoes',
+//   description: `Honestly don't know how I came be this recipe other than I printed it out because I thought it looked good and it gave the alternative of cooking in the oven.`,
+//   date: 'February 27, 2014',
+//   rating: 4.5,
+//   totalMinutes: 620,
+//   image:
+//     'https://img.sndimg.com/food/image/upload/q_92,fl_progressive,w_1200,c_scale/v1/img/recipes/51/37/69/QjAmeeCQKGquX87Uf9zM_0S9A2936.jpg',
+//   ingredients: [
+//     '200 g bacon (diced)',
+//     '2 medium onions (thinly sliced)',
+//     '4 medium potatoes (thinly sliced)',
+//     '225 g cheddar cheese (thinly sliced)',
+//     'salt (to taste)',
+//     'pepper (to taste)',
+//     'butter (use your discretion)',
+//     'spring onion (green onions) (optional)',
+//   ],
+// };
 
 export default function Recipes() {
   const history = useHistory();
@@ -38,7 +39,37 @@ export default function Recipes() {
   const queryParams = new URLSearchParams(decodeURI(search));
   const ingredients = getIngredients(queryParams);
 
-  const recipes = [{ ...DUMMY_RECIPE, searchedIngredients: ingredients }];
+  // { ...DUMMY_RECIPE, searchedIngredients: ingredients }
+  const [recipes, setRecipes] = useState([]);
+
+  const { sendRequest: fetchRecipes } = useHttp();
+
+  useEffect(
+    () => {
+      if (search) {
+        const requestConfig = {
+          url: `http://localhost:5000/api/recipes?${search}`,
+        };
+
+        const searchedIngredients = getIngredients(
+          new URLSearchParams(decodeURI(search)),
+        );
+
+        const fetchedRecipesHandler = (recipesObj) => {
+          const recipeDocs = recipesObj.response.docs;
+          console.log(
+            `First recipe: ${JSON.stringify(recipeDocs[0], null, 2)}`,
+          );
+          setRecipes(
+            prepareRecipes(recipeDocs, searchedIngredients).slice(0, 30),
+          );
+        };
+
+        fetchRecipes(requestConfig, fetchedRecipesHandler);
+      }
+    },
+    [fetchRecipes, search],
+  );
 
   const searchByIngredientsHandler = (searchIngredients) => {
     const mergedIngredients = mergeSearchIngredients(
@@ -169,4 +200,17 @@ const mergeSearchIngredients = (originalIngredients, newIngredients) => {
   });
 
   return mergedIngredients;
+};
+
+const prepareRecipes = (recipeDocs, searchedIngredients) => {
+  return recipeDocs.map((recipeDoc) => {
+    const dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
+    const date = new Date(recipeDoc.date);
+
+    return {
+      ...recipeDoc,
+      date: date.toLocaleDateString('en', dateOptions),
+      searchedIngredients,
+    };
+  });
 };

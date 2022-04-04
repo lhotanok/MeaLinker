@@ -14,14 +14,14 @@ export default function RecipeReviewCard(props) {
 
   const {
     id,
-    title,
-    description,
+    name,
+    description = 'Dummy description',
     rating,
-    totalMins,
-    date,
+    totalMinutes,
+    date = '',
     image,
-    ingredients,
-    searchedIngredients,
+    ingredients = [],
+    searchedIngredients = [],
   } = props;
 
   const handleExpandClick = () => {
@@ -34,12 +34,12 @@ export default function RecipeReviewCard(props) {
 
   return (
     <Card sx={{ maxWidth: 350, margin: 'auto' }}>
-      <CardHeader title={title} subheader={date} />
-      <CardMedia component='img' height='194' image={image} alt={title} />
+      <CardHeader title={name} subheader={date} />
+      <CardMedia component='img' height='194' image={image} alt={name} />
       <RecipeCardContent
         rating={rating}
         description={description}
-        mins={totalMins}
+        mins={totalMinutes}
       />
       <RecipeCardActions
         expanded={expanded}
