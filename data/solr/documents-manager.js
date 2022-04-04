@@ -80,14 +80,13 @@ function getParsedDate(datePublished) {
 function filterRecipeIndexedFields(recipe) {
     const { _id, jsonld, structured } = recipe;
 
-    const { name, image, description, recipeCategory } = jsonld;
+    const { name, image, description, recipeCategory, datePublished } = jsonld;
     const {
         tags,
         rating,
         stepsCount,
         ingredients,
         time,
-        datePublished,
         nutritionInfo,
     } = structured;
     const {
