@@ -1,12 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+import express from 'express';
+import bodyParser from 'body-parser';
 
-const recipesRoutes = require('./routes/recipes-routes');
-const ingredientsRoutes = require('./routes/ingredients-routes');
+import recipesRoutes from './routes/recipes-routes';
+import ingredientsRoutes from './routes/ingredients-routes';
 
 const app = express();
 
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 

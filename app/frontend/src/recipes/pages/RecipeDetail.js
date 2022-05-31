@@ -20,10 +20,9 @@ export default function RecipeDetail() {
         url: `http://localhost:5000/api/recipes/${recipeId}`,
       };
 
-      const fetchedRecipeHandler = (recipeObj) => {
-        console.log(JSON.stringify(recipeObj, null, 2));
-        const recipeDocument = recipeObj.response.docs[0];
-        setRecipe(recipeDocument);
+      const fetchedRecipeHandler = (recipe) => {
+        console.log(JSON.stringify(recipe, null, 2));
+        setRecipe(recipe);
       };
 
       fetchRecipe(requestConfig, fetchedRecipeHandler);

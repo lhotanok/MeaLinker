@@ -1,6 +1,7 @@
-const log4js = require('log4js');
+import log4js from 'log4js';
 
-const { DATABASE_NAME, PORT, USERNAME, PASSWORD } = require('./config');
+import { DATABASE_NAME, PORT, USERNAME, PASSWORD } from './config';
+import NanoDbFactory, { NanoDb } from './nano-db-factory';
 const nano = require('nano')(
   `http://${USERNAME}:${PASSWORD}@localhost:${PORT}`,
 );
@@ -13,17 +14,21 @@ log.level = 'debug';
  * json documents from CouchDB.
  */
 class CouchDbModel {
-  static database = nano.use(DATABASE_NAME);
+  private database: NanoDb;
 
-  static async getRecipeById(recipeId) {
+  constructor() {
+    this.database = NanoDbFactory.getDatabase();
+  }
+
+  async getRecipeById(recipeId: string) {
     const recipe = await this.database.get(recipeId);
     return recipe;
   }
 
-  static async getIngredientById(ingredientId) {
+  async getIngredientById(ingredientId: string) {
     const ingredient = await this.database.get(ingredientId);
     return ingredient;
   }
 }
 
-module.exports = CouchDbModel;
+export default CouchDbModel;

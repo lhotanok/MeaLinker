@@ -55,14 +55,9 @@ export default function Recipes() {
           new URLSearchParams(decodeURI(search)),
         );
 
-        const fetchedRecipesHandler = (recipesObj) => {
-          const recipeDocs = recipesObj.response.docs;
-          console.log(
-            `First recipe: ${JSON.stringify(recipeDocs[0], null, 2)}`,
-          );
-          setRecipes(
-            prepareRecipes(recipeDocs, searchedIngredients).slice(0, 30),
-          );
+        const fetchedRecipesHandler = (recipes) => {
+          console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
+          setRecipes(prepareRecipes(recipes, searchedIngredients));
         };
 
         fetchRecipes(requestConfig, fetchedRecipesHandler);

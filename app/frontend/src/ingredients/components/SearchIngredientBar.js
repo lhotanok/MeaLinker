@@ -15,8 +15,8 @@ export default function SearchIngredientBar(props) {
         url: `http://localhost:5000/api/ingredients`,
       };
 
-      const fetchedIngredientsHandler = (ingredientsObj) => {
-        setIngredients(ingredientsObj.response.docs);
+      const fetchedIngredientsHandler = (ingredients) => {
+        setIngredients(ingredients);
       };
 
       fetchIngredients(requestConfig, fetchedIngredientsHandler);
