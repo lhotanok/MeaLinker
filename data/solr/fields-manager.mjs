@@ -73,6 +73,7 @@ async function postRecipesAddFields() {
         image: { type: STRING },
         date: { type: STRING },
         calories: { type: INT },
+        fat: { type: FLOAT },
         saturatedFat: { type: FLOAT },
         cholesterol: { type: FLOAT },
         sodium: { type: FLOAT },
