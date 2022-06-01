@@ -2,10 +2,13 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import RecipeCard from './RecipeCard/RecipeCard';
+import { SearchedRecipe } from '../types/SearchedRecipe';
 
-export default function RecipesGrid(props) {
-  const { recipes } = props;
+type RecipesGridProps = {
+  recipes: SearchedRecipe[];
+};
 
+export default function RecipesGrid({ recipes }: RecipesGridProps) {
   return (
     <React.Fragment>
       <Container maxWidth='md'>

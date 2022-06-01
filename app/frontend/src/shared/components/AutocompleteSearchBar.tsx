@@ -6,16 +6,27 @@ import Stack from '@mui/material/Stack';
 import { Avatar } from '@mui/material';
 import { IconButton } from '@mui/material';
 
-export default function AutocompleteSearchBar(props) {
-  const { hints, label, onSearch } = props;
+type AutocompleteSearchBarProps = {
+  hints: string[];
+  label: string;
+  onSearch: (searchedItems: string[]) => void;
+};
 
-  const [searchIngredients, setSearchIngredients] = useState([]);
+export default function AutocompleteSearchBar({
+  hints,
+  label,
+  onSearch,
+}: AutocompleteSearchBarProps) {
+  const [searchedItems, setSearchedItems] = useState<string[]>([]);
 
-  const onChangeHandler = (_ev, value) => setSearchIngredients(value);
+  const onChangeHandler = (
+    _ev: React.SyntheticEvent<Element, Event>,
+    value: string[],
+  ) => setSearchedItems(value);
 
   const searchHandler = () => {
-    onSearch(searchIngredients);
-    setSearchIngredients([]);
+    onSearch(searchedItems);
+    setSearchedItems([]);
   };
 
   return (
@@ -36,7 +47,7 @@ export default function AutocompleteSearchBar(props) {
         </Stack>
       )}
       onChange={onChangeHandler}
-      value={searchIngredients}
+      value={searchedItems}
     />
   );
 }

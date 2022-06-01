@@ -1,7 +1,7 @@
 import log4js from 'log4js';
 
 import { CORES } from './config';
-import { Ingredient } from './ingredient';
+import { Ingredient } from './types/ingredient';
 import SolrModel from './solr-model';
 const { INGREDIENTS } = CORES;
 

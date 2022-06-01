@@ -4,8 +4,6 @@ import { HOST, PORT, SECURE } from './config';
 class SolrClientFactory {
   private static coreClients: Record<string, Client> = {};
 
-  private constructor() {}
-
   public static getClient(core: string): Client {
     if (!this.coreClients[core]) {
       this.coreClients[core] = createClient({

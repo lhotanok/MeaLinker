@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
@@ -11,12 +10,16 @@ const StyledRating = styled(Rating)({
   },
 });
 
-export default function HeartRating(props) {
+type HeartRatingProps = {
+  value: number;
+};
+
+export default function HeartRating({ value }: HeartRatingProps) {
   return (
     <Box>
       <StyledRating
         name='customized-color'
-        value={props.value}
+        value={value}
         precision={0.5}
         readOnly
         icon={<FavoriteIcon fontSize='inherit' />}

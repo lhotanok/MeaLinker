@@ -5,12 +5,15 @@ import CardMedia from '@mui/material/CardMedia';
 import RecipeCardContent from './RecipeCardContent';
 import RecipeCardCollapse from './RecipeCardCollapse';
 import RecipeCardActions from './RecipeCardActions';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { SearchedRecipe } from '../../types/SearchedRecipe';
 
-export default function RecipeReviewCard(props) {
+interface RecipeReviewCardProps extends SearchedRecipe {}
+
+export default function RecipeReviewCard(props: RecipeReviewCardProps) {
   const [expanded, setExpanded] = React.useState(false);
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const {
     id,
@@ -29,7 +32,7 @@ export default function RecipeReviewCard(props) {
   };
 
   const handleViewClick = () => {
-    history.push(`/recipes/${id}`);
+    navigate(`/recipes/${id}`);
   };
 
   return (

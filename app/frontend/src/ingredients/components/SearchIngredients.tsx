@@ -1,10 +1,16 @@
-import * as React from 'react';
 import RemovableChips from '../../shared/components/RemovableChips';
 import Stack from '@mui/material/Stack';
+import { SearchedIngredient } from '../../recipes/types/SearchedIngredient';
 
-export default function SearchIngredients(props) {
-  const { ingredients, onRemove } = props;
+type SearchIngredientsProps = {
+  ingredients: SearchedIngredient[];
+  onRemove: (event: any) => void;
+};
 
+export default function SearchIngredients({
+  ingredients,
+  onRemove,
+}: SearchIngredientsProps) {
   return (
     <Stack sx={{ pt: 4 }} direction='row' spacing={2} justifyContent='center'>
       <RemovableChips chips={ingredients} onRemove={onRemove} />{' '}

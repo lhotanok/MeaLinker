@@ -1,4 +1,3 @@
-import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -6,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Icon from './Icon';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const pages = [
   {
@@ -20,7 +19,7 @@ const pages = [
 ];
 
 export default function Header() {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const menuItems = pages.map((page) => (
     <Button
@@ -29,7 +28,7 @@ export default function Header() {
       variant='contained'
       disableElevation
       onClick={() => {
-        history.push(page.path);
+        navigate(page.path);
       }}
       sx={{ padding: 2.5, color: 'inherit' }}
     >

@@ -1,7 +1,6 @@
-import React from 'react';
-import { Route, Redirect, Switch } from 'react-router-dom';
+import { Route, Navigate, Routes } from 'react-router-dom';
 import Recipes from './recipes/pages/Recipes';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { createTheme, ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import Header from './shared/components/Header';
 import Footer from './shared/components/Footer';
@@ -25,16 +24,15 @@ export default function App() {
       <CssBaseline />
       <Header />
       <main>
-        <Switch>
-          <Route exact path='/recipes' component={Recipes} />
-          <Route exact path='/recipes/:recipeId' component={RecipeDetail} />
+        <Routes>
+          <Route path='/recipes' element={<Recipes />} />
+          <Route path='/recipes/:recipeId' element={<RecipeDetail />} />
           <Route
-            exact
             path='/ingredients/:ingredientId'
-            component={IngredientDetail}
+            element={<IngredientDetail />}
           />
-          <Redirect to='/recipes' />
-        </Switch>
+          <Route path='/' element={<Navigate to='/recipes' />} />
+        </Routes>
       </main>
       <Footer />
     </ThemeProvider>

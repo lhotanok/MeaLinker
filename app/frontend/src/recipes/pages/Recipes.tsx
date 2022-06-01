@@ -1,5 +1,5 @@
-import { Fragment, useState, useEffect, useCallback } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Fragment, useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -7,6 +7,9 @@ import SearchIngredients from '../../ingredients/components/SearchIngredients';
 import SearchIngredientBar from '../../ingredients/components/SearchIngredientBar';
 import RecipesGrid from '../components/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
+import { SimpleRecipe } from '../types/SimpleRecipe';
+import { SearchedRecipe } from '../types/SearchedRecipe';
+import { SearchedIngredient } from '../types/SearchedIngredient';
 
 // const DUMMY_RECIPE = {
 //   id: '027754f4-4280-51f0-ab17-4e035721da31',
@@ -31,7 +34,7 @@ import useHttp from '../../shared/hooks/use-http';
 // };
 
 export default function Recipes() {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const { pathname, search } = location;
@@ -40,7 +43,7 @@ export default function Recipes() {
   const ingredients = getIngredients(queryParams);
 
   // { ...DUMMY_RECIPE, searchedIngredients: ingredients }
-  const [recipes, setRecipes] = useState([]);
+  const [recipes, setRecipes] = useState<SearchedRecipe[]>([]);
 
   const { sendRequest: fetchRecipes } = useHttp();
 
@@ -55,7 +58,7 @@ export default function Recipes() {
           new URLSearchParams(decodeURI(search)),
         );
 
-        const fetchedRecipesHandler = (recipes) => {
+        const fetchedRecipesHandler = (recipes: SimpleRecipe[]) => {
           console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
           setRecipes(prepareRecipes(recipes, searchedIngredients));
         };
@@ -66,21 +69,23 @@ export default function Recipes() {
     [fetchRecipes, search],
   );
 
-  const searchByIngredientsHandler = (searchIngredients) => {
+  const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
     const mergedIngredients = mergeSearchIngredients(
       ingredients,
-      searchIngredients,
+      searchIngredientLabels,
     );
 
-    history.push(buildCurrentUrl(pathname, queryParams, mergedIngredients));
+    navigate(buildCurrentUrl(pathname, queryParams, mergedIngredients));
   };
 
-  const searchIngredientRemoveHandler = (removedIngredient) => {
+  const searchIngredientRemoveHandler = (
+    removedIngredient: SearchedIngredient,
+  ) => {
     const filteredIngredients = ingredients.filter(
       (ingredient) => ingredient.label !== removedIngredient.label,
     );
 
-    history.push(buildCurrentUrl(pathname, queryParams, filteredIngredients));
+    navigate(buildCurrentUrl(pathname, queryParams, filteredIngredients));
   };
 
   return (
@@ -115,13 +120,7 @@ export default function Recipes() {
   );
 }
 
-/** @typedef {{ key: string, label: string}[]} Ingredients */
-
-/**
- *
- * @param {URLSearchParams} queryParams
- */
-const getIngredients = (queryParams) => {
+const getIngredients = (queryParams: URLSearchParams) => {
   const joinedIngredients = queryParams.get('ingredients');
   const ingredients = joinedIngredients ? joinedIngredients.split(';') : [];
 
@@ -138,17 +137,14 @@ const getIngredients = (queryParams) => {
     )}`,
   );
 
-  return uniqueIngredients;
+  return uniqueIngredients as SearchedIngredient[];
 };
 
-/**
- *
- * @param {string} pathname
- * @param {URLSearchParams} queryParams
- * @param {Ingredients} ingredients
- * @returns
- */
-const buildCurrentUrl = (pathname, queryParams, ingredients) => {
+const buildCurrentUrl = (
+  pathname: string,
+  queryParams: URLSearchParams,
+  ingredients: SearchedIngredient[],
+) => {
   const updatedQueryParams = queryParams;
 
   const encodedIngredients = encodeIngredientsToQueryParam(ingredients);
@@ -157,12 +153,7 @@ const buildCurrentUrl = (pathname, queryParams, ingredients) => {
   return `${pathname}?${updatedQueryParams.toString()}`;
 };
 
-/**
- *
- * @param {Ingredients} ingredients
- * @returns {string}
- */
-const encodeIngredientsToQueryParam = (ingredients) => {
+const encodeIngredientsToQueryParam = (ingredients: SearchedIngredient[]) => {
   const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
   const joinedIngredients = ingredientLabels.join(';');
   const encodedIngredients = encodeURIComponent(joinedIngredients);
@@ -170,20 +161,17 @@ const encodeIngredientsToQueryParam = (ingredients) => {
   return encodedIngredients;
 };
 
-/**
- *
- * @param {Ingredients} originalIngredients
- * @param {Ingredients} newIngredients
- * @returns {Ingredients}
- */
-const mergeSearchIngredients = (originalIngredients, newIngredients) => {
+const mergeSearchIngredients = (
+  originalIngredients: SearchedIngredient[],
+  newIngredientLabels: string[],
+) => {
   const ingredientLabels = originalIngredients.map(
     (original) => original.label,
   );
 
-  newIngredients.forEach((ingredient) => {
-    if (!ingredientLabels.includes(ingredient)) {
-      ingredientLabels.push(ingredient);
+  newIngredientLabels.forEach((ingredientLabel) => {
+    if (!ingredientLabels.includes(ingredientLabel)) {
+      ingredientLabels.push(ingredientLabel);
     }
   });
 
@@ -194,18 +182,26 @@ const mergeSearchIngredients = (originalIngredients, newIngredients) => {
     };
   });
 
-  return mergedIngredients;
+  return mergedIngredients as SearchedIngredient[];
 };
 
-const prepareRecipes = (recipeDocs, searchedIngredients) => {
-  return recipeDocs.map((recipeDoc) => {
-    const dateOptions = { month: 'long', day: 'numeric', year: 'numeric' };
-    const date = new Date(recipeDoc.date);
+const prepareRecipes = (
+  recipeDocs: SimpleRecipe[],
+  searchedIngredients: SearchedIngredient[],
+) => {
+  const searchedRecipes = recipeDocs.map((recipeDoc) => {
+    const date = new Intl.DateTimeFormat('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(recipeDoc.date));
 
     return {
       ...recipeDoc,
-      date: date.toLocaleDateString('en', dateOptions),
+      date,
       searchedIngredients,
     };
-  });
+  }) as SearchedRecipe[];
+
+  return searchedRecipes;
 };

@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import AutocompleteSearchBar from '../../shared/components/AutocompleteSearchBar';
 import useHttp from '../../shared/hooks/use-http';
+import { SimpleIngredient } from '../types/SimpleIngredient';
 
-export default function SearchIngredientBar(props) {
-  const { onSearch } = props;
+type SearchIngredientBarProps = {
+  onSearch: (searchedItems: string[]) => void;
+};
 
-  const [ingredients, setIngredients] = useState([]);
+export default function SearchIngredientBar({
+  onSearch,
+}: SearchIngredientBarProps) {
+  const [ingredients, setIngredients] = useState<SimpleIngredient[]>([]);
 
   const { sendRequest: fetchIngredients } = useHttp();
 
@@ -15,7 +20,7 @@ export default function SearchIngredientBar(props) {
         url: `http://localhost:5000/api/ingredients`,
       };
 
-      const fetchedIngredientsHandler = (ingredients) => {
+      const fetchedIngredientsHandler = (ingredients: SimpleIngredient[]) => {
         setIngredients(ingredients);
       };
 
