@@ -14,10 +14,7 @@ export default function RecipeCardCollapse({
   ingredients,
   searchedIngredients,
 }: RecipeCardCollapseProps) {
-  const ingredientElements = getIngredientElements(
-    ingredients,
-    searchedIngredients,
-  );
+  const ingredientElements = getIngredientElements(ingredients, searchedIngredients);
 
   return (
     <Collapse in={expanded} timeout='auto' unmountOnExit>
@@ -38,20 +35,12 @@ const getIngredientElements = (
   return ingredients.map((ingredient) => {
     let emphasize = false;
     searchedIngredients.forEach((searched) => {
-      if (
-        ingredient
-          .toLocaleLowerCase()
-          .includes(searched.label.toLocaleLowerCase())
-      ) {
+      if (ingredient.toLocaleLowerCase().includes(searched.label.toLocaleLowerCase())) {
         emphasize = true;
       }
     });
 
-    const ingredientItem = emphasize ? (
-      <strong>{ingredient}</strong>
-    ) : (
-      ingredient
-    );
+    const ingredientItem = emphasize ? <strong>{ingredient}</strong> : ingredient;
 
     return <li key={Math.random()}>{ingredientItem}</li>;
   });

@@ -11,7 +11,7 @@ type RecipesGridProps = {
 export default function RecipesGrid({ recipes }: RecipesGridProps) {
   return (
     <React.Fragment>
-      <Container maxWidth='md'>
+      <Container>
         <Grid container spacing={4}>
           {recipes.map((recipe) => (
             <Grid item key={recipe.id} xs={12} sm={6} md={4}>

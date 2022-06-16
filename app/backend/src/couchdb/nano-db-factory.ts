@@ -1,19 +1,21 @@
-import { DATABASE_NAME, PORT, USERNAME, PASSWORD } from './config';
+import { PORT, USERNAME, PASSWORD } from './config';
 import nanoRoot from 'nano';
+import { FullRecipe } from './types/FullRecipe';
 
 const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
-export interface NanoDb extends nanoRoot.DocumentScope<unknown> {}
+export interface NanoDb extends nanoRoot.DocumentScope<any> {}
+export interface RecipeNanoDb extends nanoRoot.DocumentScope<FullRecipe> {}
 
 class NanoDbFactory {
-  private static database: NanoDb | null;
+  private static databases: Record<string, NanoDb> = {};
 
-  public static getDatabase(): NanoDb {
-    if (!this.database) {
-      this.database = nano.use(DATABASE_NAME);
+  public static getDatabase<T>(name: string): NanoDb {
+    if (!this.databases[name]) {
+      this.databases[name] = nano.use<T>(name);
     }
 
-    return this.database;
+    return this.databases[name];
   }
 }
 

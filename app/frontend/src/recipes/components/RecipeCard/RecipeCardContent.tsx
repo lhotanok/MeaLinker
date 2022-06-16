@@ -4,12 +4,14 @@ import Stack from '@mui/material/Stack';
 import HeartRating from '../../../shared/components/HeartRating';
 
 type RecipeCardProps = {
+  name: string;
   rating: number;
   description: string;
   mins: number;
 };
 
 export default function RecipeCardContent({
+  name,
   rating,
   description,
   mins,
@@ -26,6 +28,9 @@ export default function RecipeCardContent({
           >{`${mins} mins`}</Typography>
         )}
       </Stack>
+      <Typography variant='h5' component='div'>
+        {name}
+      </Typography>
       <Typography variant='body2' color='text.secondary'>
         {description}
       </Typography>

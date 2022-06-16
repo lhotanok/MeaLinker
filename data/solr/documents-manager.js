@@ -2,18 +2,11 @@ const fs = require('fs');
 const log4js = require('log4js');
 const solr = require('solr-client');
 const {
-  COUCHDB: { DB_NAME, USERNAME, PASSWORD, PORT },
+  COUCHDB: { RECIPES_DB_NAME, INGREDIENTS_DB_NAME, USERNAME, PASSWORD, PORT },
   SOLR,
 } = require('./config');
-const {
-  RECIPE_JSONLD_TYPE,
-  INGREDIENT_JSONLD_TYPE,
-  RECIPES_PATH,
-  INGREDIENTS_PATH,
-} = require('./constants');
-const nano = require('nano')(
-  `http://${USERNAME}:${PASSWORD}@localhost:${PORT}`,
-);
+const { RECIPES_PATH, INGREDIENTS_PATH } = require('./constants');
+const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
 const log = log4js.getLogger('Solr documents manager');
 log.level = 'debug';
@@ -23,18 +16,16 @@ function writeFileFromCurrentDir(filePath, content) {
 }
 
 async function fillWithDatabaseDocuments(recipes, ingredients) {
-  const database = nano.use(DB_NAME);
+  const recipesDatabase = nano.use(RECIPES_DB_NAME);
+  const ingredientsDatabase = nano.use(INGREDIENTS_DB_NAME);
 
-  const documents = await database.list({ include_docs: true });
-  documents.rows.forEach(({ doc }) => {
-    const { jsonld } = doc;
+  const recipeDocuments = await recipesDatabase.list({ include_docs: true });
+  const ingredientDocuments = await ingredientsDatabase.list({ include_docs: true });
 
-    if (jsonld['@type'] === RECIPE_JSONLD_TYPE) {
-      recipes.push(filterRecipeIndexedFields(doc));
-    } else if (jsonld['@type'] === INGREDIENT_JSONLD_TYPE) {
-      ingredients.push(filterIngredientIndexedFields(doc));
-    }
-  });
+  recipeDocuments.rows.forEach(({ doc }) => recipes.push(filterRecipeIndexedFields(doc)));
+  ingredientDocuments.rows.forEach(({ doc }) =>
+    ingredients.push(filterIngredientIndexedFields(doc)),
+  );
 }
 
 function getDescriptionPreview(description) {
@@ -83,14 +74,7 @@ function filterRecipeIndexedFields(recipe) {
   const { _id, jsonld, structured } = recipe;
 
   const { name, image, description, recipeCategory, datePublished } = jsonld;
-  const {
-    tags,
-    rating,
-    stepsCount,
-    ingredients,
-    time,
-    nutritionInfo,
-  } = structured;
+  const { tags, rating, stepsCount, ingredients, time, nutritionInfo } = structured;
   const {
     calories,
     fat,
@@ -168,18 +152,13 @@ async function main() {
   await fillWithDatabaseDocuments(recipes, ingredients);
 
   log.info(
-    `Extracted ${recipes.length} recipes and ${ingredients.length} ingredients from ${DB_NAME} DB`,
+    `Extracted ${recipes.length} recipes and ${ingredients.length} ingredients from CouchDB`,
   );
 
   writeFileFromCurrentDir(RECIPES_PATH, JSON.stringify(recipes, null, 2));
-  writeFileFromCurrentDir(
-    INGREDIENTS_PATH,
-    JSON.stringify(ingredients, null, 2),
-  );
+  writeFileFromCurrentDir(INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2));
 
-  log.info(
-    `Saved recipes and ingredients prepared for Solr into documents directory`,
-  );
+  log.info(`Saved recipes and ingredients prepared for Solr into documents directory`);
 
   const { CORES: { RECIPES, INGREDIENTS } } = SOLR;
 

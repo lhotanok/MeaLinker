@@ -28,14 +28,16 @@ export default function Recipes() {
 
   useEffect(
     () => {
-      if (search) {
+      const searchParams = new URLSearchParams(decodeURI(search));
+
+      if (searchParams.get('ingredients')) {
+        searchParams.set('rows', PAGINATION_RESULTS_COUNT.toString());
+
         const requestConfig = {
           url: `http://localhost:5000/api/recipes${search}`,
         };
 
-        const searchedIngredients = getIngredients(
-          new URLSearchParams(decodeURI(search)),
-        );
+        const searchedIngredients = getIngredients(searchParams);
 
         const fetchedRecipesHandler = (recipes: SimpleRecipe[]) => {
           console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
@@ -50,23 +52,25 @@ export default function Recipes() {
   );
 
   const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
-    const mergedIngredients = mergeSearchIngredients(
-      ingredients,
-      searchIngredientLabels,
-    );
+    const mergedIngredients = mergeSearchIngredients(ingredients, searchIngredientLabels);
 
     navigate(buildCurrentUrl(pathname, queryParams, mergedIngredients));
   };
 
-  const searchIngredientRemoveHandler = (
-    removedIngredient: SearchedIngredient,
-  ) => {
+  const searchIngredientRemoveHandler = (removedIngredient: SearchedIngredient) => {
     const filteredIngredients = ingredients.filter(
       (ingredient) => ingredient.label !== removedIngredient.label,
     );
 
     navigate(buildCurrentUrl(pathname, queryParams, filteredIngredients));
   };
+
+  let searchingHeader = `Found ${recipesCount} recipe${recipes.length === 1 ? '' : 's'}`;
+  if (ingredients.length > 0 && recipesCount === 0) {
+    searchingHeader = 'Searching recipes...';
+  } else if (ingredients.length === 0) {
+    searchingHeader = 'Add some ingredients';
+  }
 
   return (
     <Fragment>
@@ -87,7 +91,7 @@ export default function Recipes() {
             marginTop='5%'
             gutterBottom
           >
-            Found {recipesCount} recipe{recipes.length === 1 ? '' : 's'}
+            {searchingHeader}
           </Typography>
           <SearchIngredients
             ingredients={ingredients}
@@ -112,9 +116,7 @@ const getIngredients = (queryParams: URLSearchParams) => {
   });
 
   console.log(
-    `Ingredients extracted from query params: ${JSON.stringify(
-      uniqueIngredients,
-    )}`,
+    `Ingredients extracted from query params: ${JSON.stringify(uniqueIngredients)}`,
   );
 
   return uniqueIngredients as SearchedIngredient[];
@@ -145,9 +147,7 @@ const mergeSearchIngredients = (
   originalIngredients: SearchedIngredient[],
   newIngredientLabels: string[],
 ) => {
-  const ingredientLabels = originalIngredients.map(
-    (original) => original.label,
-  );
+  const ingredientLabels = originalIngredients.map((original) => original.label);
 
   newIngredientLabels.forEach((ingredientLabel) => {
     if (!ingredientLabels.includes(ingredientLabel)) {

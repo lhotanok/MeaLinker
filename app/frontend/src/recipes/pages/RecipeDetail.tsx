@@ -31,7 +31,7 @@ export default function RecipeDetail() {
     [recipeId, fetchRecipe],
   );
 
-  let headlineText = recipe.jsonld.name;
+  let headlineText = recipe.jsonld ? recipe.jsonld.name : '';
   if (error) headlineText = 'Recipe could not be loaded';
   if (isLoading) headlineText = ''; // 'Loading recipe...';
 

@@ -1,6 +1,6 @@
 import log4js from 'log4js';
 
-import { CORES } from './config';
+import { CORES, DEFAULT_MAX_RESULTS_COUNT } from './config';
 import SolrModel from './solr-model';
 import { Recipe } from './types/recipe';
 const { RECIPES } = CORES;
@@ -24,14 +24,22 @@ class SolrRecipesModel extends SolrModel {
 
   public async getRecipesByIngredients(
     ingredients: string[],
+    rows = DEFAULT_MAX_RESULTS_COUNT,
   ): Promise<Recipe[]> {
+    if (ingredients.length === 0) {
+      return [];
+    }
+
     const ingredientFilters = ingredients.map((ingredient) => ({
       field: 'ingredients',
       value: ingredient,
     }));
-    const query = this.client.query().q({ '*': '*' }).fq(ingredientFilters);
+    const query = this.client.query().q({ '*': '*' }).fq(ingredientFilters).rows(rows);
 
-    return this.fetchDocumentsByQuery(query);
+    const recipes = await this.fetchDocumentsByQuery<Recipe>(query);
+
+    log.info(`Fetched ${recipes.length} recipes for ingredients: ${ingredients}`);
+    return recipes;
   }
 
   public async getRecipeById(recipeId: string): Promise<Recipe> {
