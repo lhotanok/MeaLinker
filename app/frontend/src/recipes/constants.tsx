@@ -1,0 +1,1 @@
+export const PAGINATION_RESULTS_COUNT = 30;
