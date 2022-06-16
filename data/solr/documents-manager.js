@@ -1,9 +1,19 @@
 const fs = require('fs');
 const log4js = require('log4js');
 const solr = require('solr-client');
-const { COUCHDB: { DB_NAME, USERNAME, PASSWORD, PORT }, SOLR } = require('./config');
-const { RECIPE_JSONLD_TYPE, INGREDIENT_JSONLD_TYPE, RECIPES_PATH, INGREDIENTS_PATH } = require('./constants');
-const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
+const {
+    COUCHDB: { DB_NAME, USERNAME, PASSWORD, PORT },
+    SOLR,
+} = require('./config');
+const {
+    RECIPE_JSONLD_TYPE,
+    INGREDIENT_JSONLD_TYPE,
+    RECIPES_PATH,
+    INGREDIENTS_PATH,
+} = require('./constants');
+const nano = require('nano')(
+    `http://${USERNAME}:${PASSWORD}@localhost:${PORT}`,
+);
 
 const log = log4js.getLogger('Solr documents manager');
 log.level = 'debug';
@@ -15,7 +25,7 @@ function writeFileFromCurrentDir(filePath, content) {
 async function fillWithDatabaseDocuments(recipes, ingredients) {
     const database = nano.use(DB_NAME);
 
-    const documents = await database.list({include_docs: true})
+    const documents = await database.list({ include_docs: true });
     documents.rows.forEach(({ doc }) => {
         const { jsonld } = doc;
 
@@ -27,8 +37,15 @@ async function fillWithDatabaseDocuments(recipes, ingredients) {
     });
 }
 
+function getDescriptionPreview(description) {
+    const FIRST_TWO_SENTENCES_REGEX = /[^.!?]*(\.|\?|!)([^.!?]*(\.|\?|!))?/gi;
+    const descMatches = FIRST_TWO_SENTENCES_REGEX.exec(description);
+
+    return descMatches ? descMatches[0].trim() : '';
+}
+
 function getFilteredIngredients(ingredients) {
-    return ingredients.map(({ name, text }) => name || text );
+    return ingredients.map(({ amount, text }) => `${amount} ${text}`.trim());
 }
 
 function getDurationInMinutes(duration) {
@@ -53,16 +70,42 @@ function getDurationInMinutes(duration) {
     return minutesDuration;
 }
 
+function getParsedDate(datePublished) {
+    const DATE_REGEX = /\d{4}-\d{2}-\d{2}/gi;
+    const dateMatches = DATE_REGEX.exec(datePublished);
+
+    return dateMatches ? dateMatches[0] : '';
+}
+
 function filterRecipeIndexedFields(recipe) {
     const { _id, jsonld, structured } = recipe;
 
-    const { name, recipeCategory } = jsonld;
-    const { tags, rating, stepsCount, ingredients, time, nutritionInfo } = structured;
-    const { calories, fat, saturatedFat, cholesterol, sodium, carbohydrate, fiber, sugar, protein } = nutritionInfo;
+    const { name, image, description, recipeCategory, datePublished } = jsonld;
+    const {
+        tags,
+        rating,
+        stepsCount,
+        ingredients,
+        time,
+        nutritionInfo,
+    } = structured;
+    const {
+        calories,
+        fat,
+        saturatedFat,
+        cholesterol,
+        sodium,
+        carbohydrate,
+        fiber,
+        sugar,
+        protein,
+    } = nutritionInfo;
 
     const filteredRecipe = {
         id: _id,
         name,
+        image,
+        description: getDescriptionPreview(description),
         recipeCategory,
         stepsCount,
         rating: rating.value,
@@ -71,6 +114,7 @@ function filterRecipeIndexedFields(recipe) {
         cookMinutes: getDurationInMinutes(time.cooking),
         prepMinutes: getDurationInMinutes(time.preparation),
         totalMinutes: getDurationInMinutes(time.total),
+        date: getParsedDate(datePublished),
         calories: calories.value,
         fat: fat.value,
         saturatedFat: saturatedFat.value,
@@ -93,7 +137,7 @@ function filterIngredientIndexedFields(ingredient) {
         id: _id,
         label: label['@value'],
         thumbnail,
-    }
+    };
 
     return filteredIngredient;
 }
@@ -121,12 +165,19 @@ async function main() {
 
     await fillWithDatabaseDocuments(recipes, ingredients);
 
-    log.info(`Extracted ${recipes.length} recipes and ${ingredients.length} ingredients from ${DB_NAME} DB`);
+    log.info(
+        `Extracted ${recipes.length} recipes and ${ingredients.length} ingredients from ${DB_NAME} DB`,
+    );
 
     writeFileFromCurrentDir(RECIPES_PATH, JSON.stringify(recipes, null, 2));
-    writeFileFromCurrentDir(INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2));
+    writeFileFromCurrentDir(
+        INGREDIENTS_PATH,
+        JSON.stringify(ingredients, null, 2),
+    );
 
-    log.info(`Saved recipes and ingredients prepared for Solr into documents directory`);
+    log.info(
+        `Saved recipes and ingredients prepared for Solr into documents directory`,
+    );
 
     const { CORES: { RECIPES, INGREDIENTS } } = SOLR;
 

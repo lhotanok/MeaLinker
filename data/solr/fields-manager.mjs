@@ -8,7 +8,12 @@ const { getLogger } = pkg;
 const log = getLogger('Solr document fields manager');
 log.level = 'debug';
 
-function createAddField({ name, type = FIELD_TYPES.TEXT, indexed = true, multiValued = false }) {
+function createAddField({
+    name,
+    type = FIELD_TYPES.TEXT,
+    indexed = true,
+    multiValued = false,
+}) {
     return {
         name,
         type,
@@ -25,13 +30,24 @@ async function postAddFields(addFields, schemaUrl) {
 
     for (const name of fieldNames) {
         try {
-            const result = await got.post(schemaUrl, {
-                json: {
-                    'add-field': createAddField({ name, ...addFields[name] }),
-                }
-            }).json();
-    
-            log.info(`${name} Add Field response: ${JSON.stringify(result, null, 2)}`);
+            const result = await got
+                .post(schemaUrl, {
+                    json: {
+                        'add-field': createAddField({
+                            name,
+                            ...addFields[name],
+                        }),
+                    },
+                })
+                .json();
+
+            log.info(
+                `${name} Add Field response: ${JSON.stringify(
+                    result,
+                    null,
+                    2,
+                )}`,
+            );
         } catch (e) {
             // field has already been added
         }
@@ -41,10 +57,11 @@ async function postAddFields(addFields, schemaUrl) {
 }
 
 async function postRecipesAddFields() {
-    const { INT, FLOAT } = FIELD_TYPES;
+    const { INT, FLOAT, STRING } = FIELD_TYPES;
 
     const addFields = {
         name: {},
+        description: {},
         recipeCategory: {},
         ingredients: { multiValued: true },
         tags: { multiValued: true },
@@ -53,7 +70,10 @@ async function postRecipesAddFields() {
         cookMinutes: { type: INT },
         prepMinutes: { type: INT },
         totalMinutes: { type: INT },
+        image: { type: STRING },
+        date: { type: STRING },
         calories: { type: INT },
+        fat: { type: FLOAT },
         saturatedFat: { type: FLOAT },
         cholesterol: { type: FLOAT },
         sodium: { type: FLOAT },
@@ -61,7 +81,7 @@ async function postRecipesAddFields() {
         fiber: { type: FLOAT },
         sugar: { type: FLOAT },
         protein: { type: FLOAT },
-    }
+    };
 
     await postAddFields(addFields, SOLR_RECIPES_SCHEMA);
 }
@@ -72,12 +92,12 @@ async function postIngredientsAddFields() {
     const addFields = {
         label: {},
         thumbnail: { type: STRING, indexed: false },
-    }
+    };
 
     await postAddFields(addFields, SOLR_INGREDIENTS_SCHEMA);
 }
 
-async function main () {
+async function main() {
     await postRecipesAddFields();
     await postIngredientsAddFields();
 }
