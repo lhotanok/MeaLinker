@@ -30,7 +30,7 @@ export default function Recipes() {
     () => {
       if (search) {
         const requestConfig = {
-          url: `http://localhost:5000/api/recipes?${search}`,
+          url: `http://localhost:5000/api/recipes${search}`,
         };
 
         const searchedIngredients = getIngredients(
@@ -136,7 +136,7 @@ const buildCurrentUrl = (
 const encodeIngredientsToQueryParam = (ingredients: SearchedIngredient[]) => {
   const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
   const joinedIngredients = ingredientLabels.join(';');
-  const encodedIngredients = encodeURIComponent(joinedIngredients);
+  const encodedIngredients = encodeURI(joinedIngredients);
 
   return encodedIngredients;
 };

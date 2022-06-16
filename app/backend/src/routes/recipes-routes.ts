@@ -7,10 +7,13 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const recipesModel = new SolrRecipesModel();
 
-  const ingredients = decodeURI(req.query.ingredients as string);
-  console.log(`Ingredients from ${req.url}: ${ingredients}`);
+  const ingredientsText = decodeURI(req.query.ingredients as string);
+  const ingredients = ingredientsText.split(';');
+  console.log(`Extracted ingredients from ${req.url} request: ${ingredients}`);
 
-  const recipes = await recipesModel.getAllRecipes();
+  const recipes = await recipesModel.getRecipesByIngredients(ingredients);
+
+  // const recipes = await recipesModel.getAllRecipes();
   res.status(200).json(recipes);
 });
 

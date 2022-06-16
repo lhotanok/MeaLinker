@@ -16,13 +16,25 @@ class SolrRecipesModel extends SolrModel {
     super(RECIPES);
   }
 
-  public async getAllRecipes() {
+  public async getAllRecipes(): Promise<Recipe[]> {
     const recipes = await this.fetchAllDocuments<Recipe>();
     log.info(`Fetched ${recipes.length} recipes`);
     return recipes;
   }
 
-  public async getRecipeById(recipeId: string) {
+  public async getRecipesByIngredients(
+    ingredients: string[],
+  ): Promise<Recipe[]> {
+    const ingredientFilters = ingredients.map((ingredient) => ({
+      field: 'ingredients',
+      value: ingredient,
+    }));
+    const query = this.client.query().q({ '*': '*' }).fq(ingredientFilters);
+
+    return this.fetchDocumentsByQuery(query);
+  }
+
+  public async getRecipeById(recipeId: string): Promise<Recipe> {
     const recipe = await this.fetchDocumentById<Recipe>(recipeId);
     log.info(
       `Fetched recipe ${recipe.id}: ${recipe.name} with ingredients: ${JSON.stringify(

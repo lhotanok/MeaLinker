@@ -1,4 +1,4 @@
-import { Client } from 'solr-client';
+import { Client, Query } from 'solr-client';
 import log4js from 'log4js';
 
 import SolrClientFactory from './solr-client-factory';
@@ -11,7 +11,7 @@ log.level = 'debug';
  * Provides methods for fetching json documents from Solr.
  */
 class SolrModel {
-  private client: Client;
+  protected client: Client;
 
   constructor(core: string) {
     this.client = SolrClientFactory.getClient(core);
@@ -19,14 +19,18 @@ class SolrModel {
 
   protected async fetchAllDocuments<T>(): Promise<T[]> {
     const query = this.client.query().q('*').rows(DEFAULT_MAX_RESULTS_COUNT);
-    const searchResponse = await this.client.search<T>(query);
-    return searchResponse.response.docs;
+    return this.fetchDocumentsByQuery<T>(query);
   }
 
   protected async fetchDocumentById<T>(documentId: string): Promise<T> {
     const query = this.client.query().q(documentId).df('id');
+    const documents = await this.fetchDocumentsByQuery<T>(query);
+    return documents[0];
+  }
+
+  protected async fetchDocumentsByQuery<T>(query: Query): Promise<T[]> {
     const searchResponse = await this.client.search<T>(query);
-    return searchResponse.response.docs[0];
+    return searchResponse.response.docs;
   }
 }
 
