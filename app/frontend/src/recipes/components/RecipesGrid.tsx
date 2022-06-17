@@ -14,7 +14,7 @@ export default function RecipesGrid({ recipes }: RecipesGridProps) {
       <Container>
         <Grid container spacing={4}>
           {recipes.map((recipe) => (
-            <Grid item key={recipe.id} xs={12} sm={6} md={4}>
+            <Grid item key={recipe.id} xs={12} md={4}>
               <RecipeCard {...recipe} />
             </Grid>
           ))}

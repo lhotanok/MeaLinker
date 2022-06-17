@@ -3,12 +3,7 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
-import {
-  IconButton,
-  IconButtonProps,
-  SvgIcon,
-  SvgIconProps,
-} from '@mui/material';
+import { IconButton, IconButtonProps, SvgIcon, SvgIconProps } from '@mui/material';
 
 type RecipeCardActionsProps = {
   expanded: boolean;
@@ -22,7 +17,7 @@ export default function RecipeCardActions({
   onViewClick,
 }: RecipeCardActionsProps) {
   return (
-    <CardActions disableSpacing>
+    <CardActions sx={{ marginTop: 'auto' }} disableSpacing>
       <Button size='small' onClick={onViewClick}>
         View
       </Button>

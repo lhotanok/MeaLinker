@@ -40,7 +40,7 @@ export default function Recipes() {
         const searchedIngredients = getIngredients(searchParams);
 
         const fetchedRecipesHandler = (recipes: SimpleRecipe[]) => {
-          console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
+          // console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
           setRecipesCount(recipes.length);
           setRecipes(prepareRecipes(recipes, searchedIngredients));
         };
@@ -104,7 +104,7 @@ export default function Recipes() {
   );
 }
 
-const getIngredients = (queryParams: URLSearchParams) => {
+const getIngredients = (queryParams: URLSearchParams): SearchedIngredient[] => {
   const joinedIngredients = queryParams.get('ingredients');
   const ingredients = joinedIngredients ? joinedIngredients.split(';') : [];
 
@@ -126,7 +126,7 @@ const buildCurrentUrl = (
   pathname: string,
   queryParams: URLSearchParams,
   ingredients: SearchedIngredient[],
-) => {
+): string => {
   const updatedQueryParams = queryParams;
 
   const encodedIngredients = encodeIngredientsToQueryParam(ingredients);
@@ -135,7 +135,7 @@ const buildCurrentUrl = (
   return `${pathname}?${updatedQueryParams.toString()}`;
 };
 
-const encodeIngredientsToQueryParam = (ingredients: SearchedIngredient[]) => {
+const encodeIngredientsToQueryParam = (ingredients: SearchedIngredient[]): string => {
   const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
   const joinedIngredients = ingredientLabels.join(';');
   const encodedIngredients = encodeURI(joinedIngredients);
@@ -146,7 +146,7 @@ const encodeIngredientsToQueryParam = (ingredients: SearchedIngredient[]) => {
 const mergeSearchIngredients = (
   originalIngredients: SearchedIngredient[],
   newIngredientLabels: string[],
-) => {
+): SearchedIngredient[] => {
   const ingredientLabels = originalIngredients.map((original) => original.label);
 
   newIngredientLabels.forEach((ingredientLabel) => {
@@ -169,7 +169,7 @@ const prepareRecipes = (
   recipeDocs: SimpleRecipe[],
   searchedIngredients: SearchedIngredient[],
   offset: number = 0,
-) => {
+): SearchedRecipe[] => {
   const searchedRecipes = recipeDocs
     .slice(offset, PAGINATION_RESULTS_COUNT)
     .map((recipeDoc) => {

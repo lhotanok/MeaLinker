@@ -28,13 +28,6 @@ async function fillWithDatabaseDocuments(recipes, ingredients) {
   );
 }
 
-function getDescriptionPreview(description) {
-  const FIRST_TWO_SENTENCES_REGEX = /[^.!?]*(\.|\?|!)([^.!?]*(\.|\?|!))?/gi;
-  const descMatches = FIRST_TWO_SENTENCES_REGEX.exec(description);
-
-  return descMatches ? descMatches[0].trim() : '';
-}
-
 function getFilteredIngredients(ingredients) {
   return ingredients.map(({ amount, text }) =>
     `${amount ? amount + ' ' : ''}${text}`.trim(),
@@ -91,7 +84,7 @@ function filterRecipeIndexedFields(recipe) {
     id: _id,
     name,
     image,
-    description: getDescriptionPreview(description),
+    description,
     recipeCategory,
     stepsCount,
     rating: rating.value,

@@ -1,1 +1,2 @@
 export const PAGINATION_RESULTS_COUNT = 30;
+export const MAX_DESCRIPTION_CHARS = 190;
