@@ -6,6 +6,7 @@ import { MenuBookTwoTone } from '@mui/icons-material';
 import { Fragment } from 'react';
 import reactStringReplace from 'react-string-replace';
 import { CONTINUOUS_HIGHLIGHTINGS_REGEX, HIGHLIGHTED_ITEM_REGEX } from '../../constants';
+import IngredientIcon from './IngredientIcon';
 
 type RecipeCardCollapseProps = {
   expanded: boolean;
@@ -57,7 +58,8 @@ const getIngredientElements = (ingredients: string[]) => {
       <Fragment key={Math.random()}>
         <ListItem>
           <ListItemIcon>
-            <MenuBookTwoTone fontSize='small' />
+            <IngredientIcon />
+            {/* <MenuBookTwoTone fontSize='small' /> */}
           </ListItemIcon>
           <ListItemText secondary={ingredientItem} />
         </ListItem>

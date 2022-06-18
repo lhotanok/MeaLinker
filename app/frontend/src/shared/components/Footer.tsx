@@ -20,14 +20,17 @@ export default function Footer() {
       <Typography variant='h6' align='center' gutterBottom>
         Bon Appétit!
       </Typography>
-      <Typography
-        variant='subtitle1'
-        align='center'
-        color='text.secondary'
-        component='p'
-      >
-        Recipes were collected from various websites. You can find their source
-        pages in recipe details.
+      <Typography variant='subtitle1' align='center' color='text.secondary' component='p'>
+        Recipes were collected from various websites. You can find their source pages in
+        recipe details.
+      </Typography>
+      <Typography align='center'>
+        <Link
+          style={{ color: 'secondary' }}
+          href='https://www.flaticon.com/free-icons/ingredients'
+        >
+          Ingredients icons created by Freepik - Flaticon
+        </Link>
       </Typography>
       <Copyright />
     </Box>

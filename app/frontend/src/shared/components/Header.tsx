@@ -4,7 +4,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import Icon from './Icon';
+import Icon from './MealinkerIcon';
 import { useNavigate } from 'react-router-dom';
 
 const pages = [
