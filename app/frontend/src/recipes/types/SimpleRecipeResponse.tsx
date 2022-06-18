@@ -23,3 +23,12 @@ export type SimpleRecipe = {
   protein: number;
   _version_: number;
 };
+
+export type HighlightedFields = {
+  ingredients?: string[];
+};
+
+export type SimpleRecipeResponse = {
+  docs: SimpleRecipe[];
+  highlighting?: Record<string, HighlightedFields>;
+};

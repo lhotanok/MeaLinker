@@ -7,8 +7,7 @@ import SearchIngredients from '../../ingredients/components/SearchIngredients';
 import SearchIngredientBar from '../../ingredients/components/SearchIngredientBar';
 import RecipesGrid from '../components/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
-import { SimpleRecipe } from '../types/SimpleRecipe';
-import { SearchedRecipe } from '../types/SearchedRecipe';
+import { SimpleRecipe, SimpleRecipeResponse } from '../types/SimpleRecipeResponse';
 import { SearchedIngredient } from '../types/SearchedIngredient';
 import { PAGINATION_RESULTS_COUNT } from '../constants';
 
@@ -21,7 +20,7 @@ export default function Recipes() {
   const queryParams = new URLSearchParams(decodeURI(search));
   const ingredients = getIngredients(queryParams);
 
-  const [recipes, setRecipes] = useState<SearchedRecipe[]>([]);
+  const [recipes, setRecipes] = useState<SimpleRecipe[]>([]);
   const [recipesCount, setRecipesCount] = useState<number | null>(null);
 
   const { sendRequest: fetchRecipes } = useHttp();
@@ -36,14 +35,13 @@ export default function Recipes() {
         url: `http://localhost:5000/api/recipes${search}`,
       };
 
-      const searchedIngredients = getIngredients(searchParams);
-
-      const fetchedRecipesHandler = (recipes: SimpleRecipe[]) => {
+      const fetchedRecipesHandler = (recipesResponse: SimpleRecipeResponse) => {
         // console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
-        setRecipesCount(recipes.length);
-        setRecipes(prepareRecipes(recipes, searchedIngredients));
+        setRecipesCount(recipesResponse.docs.length);
+        setRecipes(prepareRecipes(recipesResponse));
       };
 
+      setRecipesCount(null);
       fetchRecipes(requestConfig, fetchedRecipesHandler);
     },
     [fetchRecipes, search],
@@ -172,11 +170,12 @@ const mergeSearchIngredients = (
 };
 
 const prepareRecipes = (
-  recipeDocs: SimpleRecipe[],
-  searchedIngredients: SearchedIngredient[],
+  recipeResponse: SimpleRecipeResponse,
   offset: number = 0,
-): SearchedRecipe[] => {
-  const searchedRecipes = recipeDocs
+): SimpleRecipe[] => {
+  const { docs, highlighting = {} } = recipeResponse;
+
+  const searchedRecipes = docs
     .slice(offset, PAGINATION_RESULTS_COUNT)
     .map((recipeDoc) => {
       const date = new Intl.DateTimeFormat('en-US', {
@@ -185,12 +184,21 @@ const prepareRecipes = (
         year: 'numeric',
       }).format(new Date(recipeDoc.date)); // example date format: June 5, 2022
 
-      return {
+      const { id } = recipeDoc;
+      const recipeHighlighting = highlighting[id];
+      const ingredients =
+        recipeHighlighting && recipeHighlighting.ingredients
+          ? recipeHighlighting.ingredients
+          : recipeDoc.ingredients;
+
+      const searchedRecipe: SimpleRecipe = {
         ...recipeDoc,
+        ingredients,
         date,
-        searchedIngredients,
       };
-    }) as SearchedRecipe[];
+
+      return searchedRecipe;
+    });
 
   return searchedRecipes;
 };

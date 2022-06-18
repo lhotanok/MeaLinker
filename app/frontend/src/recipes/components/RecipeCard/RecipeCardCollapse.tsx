@@ -1,25 +1,24 @@
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
 import CardContent from '@mui/material/CardContent';
-import { SearchedIngredient } from '../../types/SearchedIngredient';
 import { Card, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { MenuBookTwoTone } from '@mui/icons-material';
 import { Fragment } from 'react';
+import reactStringReplace from 'react-string-replace';
+import { CONTINUOUS_HIGHLIGHTINGS_REGEX, HIGHLIGHTED_ITEM_REGEX } from '../../constants';
 
 type RecipeCardCollapseProps = {
   expanded: boolean;
   ingredients: string[];
-  searchedIngredients: SearchedIngredient[];
   cardWidth: number;
 };
 
 export default function RecipeCardCollapse({
   expanded,
   ingredients,
-  searchedIngredients,
   cardWidth,
 }: RecipeCardCollapseProps) {
-  const ingredientElements = getIngredientElements(ingredients, searchedIngredients);
+  const ingredientElements = getIngredientElements(ingredients);
 
   return (
     <Collapse in={expanded} timeout='auto' unmountOnExit>
@@ -41,19 +40,18 @@ export default function RecipeCardCollapse({
   );
 }
 
-const getIngredientElements = (
-  ingredients: string[],
-  searchedIngredients: SearchedIngredient[],
-) => {
+const getIngredientElements = (ingredients: string[]) => {
   return ingredients.map((ingredient) => {
-    let emphasize = false;
-    searchedIngredients.forEach((searched) => {
-      if (ingredient.toLocaleLowerCase().includes(searched.label.toLocaleLowerCase())) {
-        emphasize = true;
-      }
-    });
+    const mergedHighlightsIngredient = ingredient.replace(
+      CONTINUOUS_HIGHLIGHTINGS_REGEX,
+      ' ',
+    );
 
-    const ingredientItem = emphasize ? <strong>{ingredient}</strong> : ingredient;
+    const ingredientItem = reactStringReplace(
+      mergedHighlightsIngredient,
+      HIGHLIGHTED_ITEM_REGEX,
+      (match, i) => <strong key={i}>{match}</strong>,
+    );
 
     return (
       <Fragment key={Math.random()}>

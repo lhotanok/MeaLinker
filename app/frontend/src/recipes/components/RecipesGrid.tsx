@@ -2,10 +2,10 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import RecipeCard from './RecipeCard/RecipeCard';
-import { SearchedRecipe } from '../types/SearchedRecipe';
+import { SimpleRecipe } from '../types/SimpleRecipeResponse';
 
 type RecipesGridProps = {
-  recipes: SearchedRecipe[];
+  recipes: SimpleRecipe[];
 };
 
 export default function RecipesGrid({ recipes }: RecipesGridProps) {

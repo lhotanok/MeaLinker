@@ -4,10 +4,10 @@ import RecipeCardContent from './RecipeCardContent';
 import RecipeCardCollapse from './RecipeCardCollapse';
 import RecipeCardActions from './RecipeCardActions';
 import { useNavigate } from 'react-router-dom';
-import { SearchedRecipe } from '../../types/SearchedRecipe';
 import { useEffect, useRef, useState } from 'react';
+import { SimpleRecipe } from '../../types/SimpleRecipeResponse';
 
-interface RecipeReviewCardProps extends SearchedRecipe {}
+interface RecipeReviewCardProps extends SimpleRecipe {}
 
 export default function RecipeReviewCard(props: RecipeReviewCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -24,7 +24,6 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
     totalMinutes,
     image,
     ingredients = [],
-    searchedIngredients = [],
   } = props;
 
   const handleExpandClick = () => {
@@ -76,7 +75,6 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
       <RecipeCardCollapse
         expanded={expanded}
         ingredients={ingredients}
-        searchedIngredients={searchedIngredients}
         cardWidth={width}
       />
     </Card>

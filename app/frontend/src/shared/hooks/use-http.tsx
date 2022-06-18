@@ -12,11 +12,7 @@ export default function useHttp() {
   const [error, setError] = useState<string | null>(null);
 
   const sendRequest = useCallback(
-    async (
-      requestConfig: RequestConfig,
-      processDataFn: (data: any) => void,
-    ) => {
-      console.log(`Sending request (wrapped in useCallback)`);
+    async (requestConfig: RequestConfig, processDataFn: (data: any) => void) => {
       setIsLoading(true);
       setError(null);
 
@@ -38,7 +34,6 @@ export default function useHttp() {
         }
 
         const data = await response.json();
-        // console.log(`Fetched data: ${JSON.stringify(data, null, 2)}`);
         processDataFn(data);
       } catch (err) {
         console.log(`Error catched: ${JSON.stringify(err)}`);

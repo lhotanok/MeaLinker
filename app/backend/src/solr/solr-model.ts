@@ -3,6 +3,7 @@ import log4js from 'log4js';
 
 import SolrClientFactory from './solr-client-factory';
 import { DEFAULT_MAX_RESULTS_COUNT } from './config';
+import { ExtendedSearchResponse } from './types/search-response';
 
 const log = log4js.getLogger('SolrModel');
 log.level = 'debug';
@@ -17,20 +18,35 @@ class SolrModel {
     this.client = SolrClientFactory.getClient(core);
   }
 
-  protected async fetchAllDocuments<T>(): Promise<T[]> {
+  protected async fetchAllDocuments<SolrDocument>(): Promise<SolrDocument[]> {
     const query = this.client.query().q('*').rows(DEFAULT_MAX_RESULTS_COUNT);
-    return this.fetchDocumentsByQuery<T>(query);
+    return this.fetchDocumentsByQuery<SolrDocument>(query);
   }
 
-  protected async fetchDocumentById<T>(documentId: string): Promise<T> {
+  protected async fetchDocumentById<SolrDocument>(
+    documentId: string,
+  ): Promise<SolrDocument> {
     const query = this.client.query().q(documentId).df('id');
-    const documents = await this.fetchDocumentsByQuery<T>(query);
+    const documents = await this.fetchDocumentsByQuery<SolrDocument>(query);
     return documents[0];
   }
 
-  protected async fetchDocumentsByQuery<T>(query: Query): Promise<T[]> {
-    const searchResponse = await this.client.search<T>(query);
+  protected async fetchDocumentsByQuery<SolrDocument>(
+    query: Query,
+  ): Promise<SolrDocument[]> {
+    const searchResponse = await this.client.search<SolrDocument>(query);
+
     return searchResponse.response.docs;
+  }
+
+  protected async fetchHighlightedDocumentsByQuery<SolrDocument>(
+    query: Query,
+  ): Promise<ExtendedSearchResponse<SolrDocument>> {
+    const searchResponse = (await this.client.search<SolrDocument>(
+      query,
+    )) as ExtendedSearchResponse<SolrDocument>;
+
+    return searchResponse;
   }
 }
 

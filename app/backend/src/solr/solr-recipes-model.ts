@@ -3,6 +3,7 @@ import log4js from 'log4js';
 import { CORES, DEFAULT_MAX_RESULTS_COUNT } from './config';
 import SolrModel from './solr-model';
 import { Recipe } from './types/recipe';
+import { SolrResponse } from './types/search-response';
 const { RECIPES } = CORES;
 
 const log = log4js.getLogger('SolrRecipesModel');
@@ -25,21 +26,31 @@ class SolrRecipesModel extends SolrModel {
   public async getRecipesByIngredients(
     ingredients: string[],
     rows = DEFAULT_MAX_RESULTS_COUNT,
-  ): Promise<Recipe[]> {
-    if (ingredients.length === 0) {
-      return [];
-    }
+  ): Promise<SolrResponse<Recipe>> {
+    const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
 
-    const ingredientFilters = ingredients.map((ingredient) => ({
-      field: 'ingredients',
-      value: ingredient,
-    }));
-    const query = this.client.query().q({ '*': '*' }).fq(ingredientFilters).rows(rows);
+    const query = this.client
+      .query()
+      .q(ingredientsQuery)
+      .qop('AND')
+      // .mm(ingredients.length)
+      .hl({
+        fl: 'ingredients',
+        preserveMulti: true,
+      })
+      .rows(rows);
 
-    const recipes = await this.fetchDocumentsByQuery<Recipe>(query);
+    const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
+    const solrResponse: SolrResponse<Recipe> = {
+      docs: searchResponse.response.docs,
+      highlighting: searchResponse.highlighting,
+    };
 
-    log.info(`Fetched ${recipes.length} recipes for ingredients: ${ingredients}`);
-    return recipes;
+    log.info(
+      `Fetched ${searchResponse.response.docs
+        .length} recipes for ingredients: ${ingredients}`,
+    );
+    return solrResponse;
   }
 
   public async getRecipeById(recipeId: string): Promise<Recipe> {
@@ -52,6 +63,16 @@ class SolrRecipesModel extends SolrModel {
       )}`,
     );
     return recipe;
+  }
+
+  private buildIngredientsPhraseQuery(ingredients: string[]): string {
+    let searchQuery = '';
+
+    ingredients.forEach((ingredient) => {
+      searchQuery += `\ningredients: "${ingredient}"`;
+    });
+
+    return searchQuery.trim();
   }
 }
 

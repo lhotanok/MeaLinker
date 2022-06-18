@@ -2,6 +2,8 @@ import express from 'express';
 import { DEFAULT_PAGINATION_RESULTS_COUNT } from '../constants';
 import CouchDbRecipesModel from '../couchdb/couchdb-recipes-model';
 import SolrRecipesModel from '../solr/solr-recipes-model';
+import { Recipe } from '../solr/types/recipe';
+import { SolrResponse } from '../solr/types/search-response';
 
 const router = express.Router();
 
@@ -18,10 +20,9 @@ router.get('/', async (req, res) => {
 
   //const rows = Number(requestedRows.toString()) || DEFAULT_PAGINATION_RESULTS_COUNT;
 
-  const recipes =
-    ingredients.length === 0
-      ? []
-      : await recipesModel.getRecipesByIngredients(ingredients);
+  const recipes: SolrResponse<Recipe> = await recipesModel.getRecipesByIngredients(
+    ingredients,
+  );
 
   // const recipes = await recipesModel.getAllRecipes();
   res.status(200).json(recipes);
