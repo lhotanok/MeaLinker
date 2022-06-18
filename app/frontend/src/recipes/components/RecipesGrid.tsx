@@ -2,7 +2,7 @@ import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import RecipeCard from './RecipeCard/RecipeCard';
-import { SimpleRecipe } from '../types/SimpleRecipeResponse';
+import { SimpleRecipe } from '../types/SimpleRecipesResponse';
 
 type RecipesGridProps = {
   recipes: SimpleRecipe[];

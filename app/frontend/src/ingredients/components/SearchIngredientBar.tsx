@@ -7,9 +7,7 @@ type SearchIngredientBarProps = {
   onSearch: (searchedItems: string[]) => void;
 };
 
-export default function SearchIngredientBar({
-  onSearch,
-}: SearchIngredientBarProps) {
+export default function SearchIngredientBar({ onSearch }: SearchIngredientBarProps) {
   const [ingredients, setIngredients] = useState<SimpleIngredient[]>([]);
 
   const { sendRequest: fetchIngredients } = useHttp();
@@ -34,7 +32,7 @@ export default function SearchIngredientBar({
   return (
     <AutocompleteSearchBar
       hints={ingredientLabels}
-      label='Add ingredients'
+      label='Add ingredients (choose from the list or use your own)'
       onSearch={onSearch}
     />
   );

@@ -28,7 +28,7 @@ export type HighlightedFields = {
   ingredients?: string[];
 };
 
-export type SimpleRecipeResponse = {
+export type SimpleRecipesResponse = {
   docs: SimpleRecipe[];
   highlighting?: Record<string, HighlightedFields>;
 };

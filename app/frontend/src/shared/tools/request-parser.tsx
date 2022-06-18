@@ -1,0 +1,58 @@
+import { QUERY_PARAM_NAMES } from '../../recipes/constants';
+import { SearchedIngredient } from '../../recipes/types/SearchedIngredient';
+
+export const parseIngredients = (queryParams: URLSearchParams): SearchedIngredient[] => {
+  const joinedIngredients = queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS);
+  const ingredients = joinedIngredients ? joinedIngredients.split(';') : [];
+
+  const uniqueIngredients = ingredients.map((ingredient, index) => {
+    return {
+      key: index,
+      label: ingredient,
+    };
+  });
+
+  console.log(
+    `Ingredients extracted from query params: ${JSON.stringify(uniqueIngredients)}`,
+  );
+
+  return uniqueIngredients as SearchedIngredient[];
+};
+
+const setOrDelete = (
+  queryParams: URLSearchParams,
+  paramKey: string,
+  paramValue: string,
+) => {
+  if (paramValue) {
+    queryParams.set(paramKey, paramValue);
+  } else {
+    queryParams.delete(paramKey);
+  }
+};
+
+export const buildUrl = (
+  pathname: string,
+  currentQueryParams: URLSearchParams,
+  updatedParamValues: { ingredients: SearchedIngredient[]; page?: number },
+): string => {
+  const { ingredients, page = 1 } = updatedParamValues;
+  const queryParams = currentQueryParams;
+
+  const encodedIngredients = encodeIngredientsToQueryParam(ingredients);
+
+  setOrDelete(queryParams, QUERY_PARAM_NAMES.INGREDIENTS, encodedIngredients);
+  setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');
+
+  return `${pathname}?${queryParams.toString()}`;
+};
+
+export const encodeIngredientsToQueryParam = (
+  ingredients: SearchedIngredient[],
+): string => {
+  const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
+  const joinedIngredients = ingredientLabels.join(';');
+  const encodedIngredients = encodeURI(joinedIngredients);
+
+  return encodedIngredients;
+};

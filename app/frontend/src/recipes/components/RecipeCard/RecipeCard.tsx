@@ -5,7 +5,7 @@ import RecipeCardCollapse from './RecipeCardCollapse';
 import RecipeCardActions from './RecipeCardActions';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { SimpleRecipe } from '../../types/SimpleRecipeResponse';
+import { SimpleRecipe } from '../../types/SimpleRecipesResponse';
 
 interface RecipeReviewCardProps extends SimpleRecipe {}
 

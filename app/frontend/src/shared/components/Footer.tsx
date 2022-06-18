@@ -6,7 +6,7 @@ const Copyright = () => {
   return (
     <Typography variant='body2' color='text.secondary' align='center'>
       {'Copyright © '}
-      <Link color='inherit' href='localhost:3000/recipes'>
+      <Link color='inherit' href='https://github.com/lhotanok/MeaLinker'>
         MeaLinker
       </Link>
       {` ${new Date().getFullYear()}.`}
@@ -26,10 +26,10 @@ export default function Footer() {
       </Typography>
       <Typography align='center'>
         <Link
-          style={{ color: 'secondary' }}
-          href='https://www.flaticon.com/free-icons/ingredients'
+          style={{ color: 'primary' }}
+          href='https://www.flaticon.com/free-icons/vegetable'
         >
-          Ingredients icons created by Freepik - Flaticon
+          Vegetable icons created by justicon - Flaticon
         </Link>
       </Typography>
       <Copyright />

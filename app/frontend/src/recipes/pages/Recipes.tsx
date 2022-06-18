@@ -1,15 +1,17 @@
 import { Fragment, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import SearchIngredients from '../../ingredients/components/SearchIngredients';
 import SearchIngredientBar from '../../ingredients/components/SearchIngredientBar';
 import RecipesGrid from '../components/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
-import { SimpleRecipe, SimpleRecipeResponse } from '../types/SimpleRecipeResponse';
+import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
 import { SearchedIngredient } from '../types/SearchedIngredient';
-import { PAGINATION_RESULTS_COUNT } from '../constants';
+import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../constants';
+import { buildUrl, parseIngredients } from '../../shared/tools/request-parser';
+import SearchHeader from '../components/SearchHeader';
+import RecipesPagination from '../components/RecipesPagination';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -18,30 +20,38 @@ export default function Recipes() {
   const { pathname, search } = location;
 
   const queryParams = new URLSearchParams(decodeURI(search));
-  const ingredients = getIngredients(queryParams);
+  const ingredients = parseIngredients(queryParams);
 
-  const [recipes, setRecipes] = useState<SimpleRecipe[]>([]);
-  const [recipesCount, setRecipesCount] = useState<number | null>(null);
+  const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
+  const [fetchedRecipes, setFetchedRecipes] = useState<SimpleRecipesResponse | null>(
+    null,
+  );
+  const [page, setPage] = useState<number>(1);
 
   const { sendRequest: fetchRecipes } = useHttp();
 
   useEffect(
     () => {
       const searchParams = new URLSearchParams(decodeURI(search));
+      const currentPage = Number(searchParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
 
-      searchParams.set('rows', PAGINATION_RESULTS_COUNT.toString());
+      const offset = (currentPage - 1) * PAGINATION_RESULTS_COUNT;
+
+      document.title = `Recipe Search${ingredients.length > 0
+        ? ` |${ingredients.map((ingr) => ` ${ingr.label}`)}`
+        : ''}`;
 
       const requestConfig = {
         url: `http://localhost:5000/api/recipes${search}`,
       };
 
-      const fetchedRecipesHandler = (recipesResponse: SimpleRecipeResponse) => {
-        // console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
-        setRecipesCount(recipesResponse.docs.length);
-        setRecipes(prepareRecipes(recipesResponse));
+      const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
+        setFetchedRecipes(recipesResponse);
+        setPaginatedRecipes(prepareRecipes(recipesResponse, offset));
       };
 
-      setRecipesCount(null);
+      setFetchedRecipes(null);
+      setPage(currentPage);
       fetchRecipes(requestConfig, fetchedRecipesHandler);
     },
     [fetchRecipes, search],
@@ -50,7 +60,11 @@ export default function Recipes() {
   const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
     const mergedIngredients = mergeSearchIngredients(ingredients, searchIngredientLabels);
 
-    navigate(buildCurrentUrl(pathname, queryParams, mergedIngredients));
+    navigate(
+      buildUrl(pathname, queryParams, {
+        ingredients: mergedIngredients,
+      }),
+    );
   };
 
   const searchIngredientRemoveHandler = (removedIngredient: SearchedIngredient) => {
@@ -58,12 +72,23 @@ export default function Recipes() {
       (ingredient) => ingredient.label !== removedIngredient.label,
     );
 
-    navigate(buildCurrentUrl(pathname, queryParams, filteredIngredients));
+    navigate(
+      buildUrl(pathname, queryParams, {
+        ingredients: filteredIngredients,
+      }),
+    );
   };
 
   const searchIngredientsRemoveAllHandler = () => {
-    navigate(buildCurrentUrl(pathname, queryParams, []));
+    navigate(
+      buildUrl(pathname, queryParams, {
+        ingredients: [],
+        page: 1,
+      }),
+    );
   };
+
+  const recipesCount: number | null = fetchedRecipes ? fetchedRecipes.docs.length : null;
 
   return (
     <Fragment>
@@ -76,16 +101,10 @@ export default function Recipes() {
       >
         <Container>
           <SearchIngredientBar onSearch={searchByIngredientsHandler} />
-          <Typography
-            component='h1'
-            variant='h2'
-            align='center'
-            color='text.primary'
-            marginTop='5%'
-            gutterBottom
-          >
-            {buildSearchHeader(recipesCount, ingredients.length)}
-          </Typography>
+          <SearchHeader
+            recipesCount={recipesCount}
+            ingredientsCount={ingredients.length}
+          />
           <SearchIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
@@ -93,64 +112,17 @@ export default function Recipes() {
           />
         </Container>
       </Box>
-      <RecipesGrid recipes={recipes} />
+      <RecipesGrid recipes={paginatedRecipes} />
+      {recipesCount && (
+        <RecipesPagination
+          page={page}
+          maxPages={Math.ceil((recipesCount || 0) / PAGINATION_RESULTS_COUNT)}
+          queryParams={queryParams}
+        />
+      )}
     </Fragment>
   );
 }
-
-const buildSearchHeader = (
-  recipesCount: number | null,
-  ingredientsCount: number,
-): string => {
-  let searchHeader = `Found ${recipesCount} recipe${recipesCount === 1 ? '' : 's'}`;
-
-  if (ingredientsCount > 0 && recipesCount === null) {
-    searchHeader = 'Searching recipes...';
-  } else if (ingredientsCount === 0) {
-    searchHeader = 'Add some ingredients';
-  }
-
-  return searchHeader;
-};
-
-const getIngredients = (queryParams: URLSearchParams): SearchedIngredient[] => {
-  const joinedIngredients = queryParams.get('ingredients');
-  const ingredients = joinedIngredients ? joinedIngredients.split(';') : [];
-
-  const uniqueIngredients = ingredients.map((ingredient, index) => {
-    return {
-      key: index,
-      label: ingredient,
-    };
-  });
-
-  console.log(
-    `Ingredients extracted from query params: ${JSON.stringify(uniqueIngredients)}`,
-  );
-
-  return uniqueIngredients as SearchedIngredient[];
-};
-
-const buildCurrentUrl = (
-  pathname: string,
-  queryParams: URLSearchParams,
-  ingredients: SearchedIngredient[],
-): string => {
-  const updatedQueryParams = queryParams;
-
-  const encodedIngredients = encodeIngredientsToQueryParam(ingredients);
-  updatedQueryParams.set('ingredients', encodedIngredients);
-
-  return `${pathname}?${updatedQueryParams.toString()}`;
-};
-
-const encodeIngredientsToQueryParam = (ingredients: SearchedIngredient[]): string => {
-  const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
-  const joinedIngredients = ingredientLabels.join(';');
-  const encodedIngredients = encodeURI(joinedIngredients);
-
-  return encodedIngredients;
-};
 
 const mergeSearchIngredients = (
   originalIngredients: SearchedIngredient[],
@@ -175,13 +147,13 @@ const mergeSearchIngredients = (
 };
 
 const prepareRecipes = (
-  recipeResponse: SimpleRecipeResponse,
+  recipeResponse: SimpleRecipesResponse,
   offset: number = 0,
 ): SimpleRecipe[] => {
   const { docs, highlighting = {} } = recipeResponse;
 
   const searchedRecipes = docs
-    .slice(offset, PAGINATION_RESULTS_COUNT)
+    .slice(offset, offset + PAGINATION_RESULTS_COUNT)
     .map((recipeDoc) => {
       const date = new Intl.DateTimeFormat('en-US', {
         month: 'long',

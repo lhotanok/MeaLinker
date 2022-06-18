@@ -23,6 +23,7 @@ export default function RecipeDetail() {
 
       const fetchedRecipeHandler = (recipe: FullRecipe) => {
         console.log(JSON.stringify(recipe, null, 2));
+        document.title = recipe.jsonld.name;
         setRecipe(recipe);
       };
 

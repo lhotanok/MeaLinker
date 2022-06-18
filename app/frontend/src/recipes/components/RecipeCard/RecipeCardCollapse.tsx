@@ -32,7 +32,11 @@ export default function RecipeCardCollapse({
         }}
       >
         <CardContent>
-          <Typography variant='subtitle1'>{`${ingredients.length} ingredients`}</Typography>
+          <Typography variant='subtitle1'>
+            {ingredients.length.toString() +
+              ' ingredient' +
+              (ingredients.length !== 1 ? 's' : '')}
+          </Typography>
           <List dense>{ingredientElements}</List>
         </CardContent>
       </Card>
