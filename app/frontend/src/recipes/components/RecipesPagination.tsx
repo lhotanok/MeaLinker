@@ -1,4 +1,5 @@
-import { Box, Container, Pagination, PaginationItem } from '@mui/material';
+import { Box, Container, PaginationItem } from '@mui/material';
+import Pagination, { paginationClasses } from '@mui/material/Pagination';
 import { Link } from 'react-router-dom';
 import { MAX_PAGINATION_PAGES, QUERY_PARAM_NAMES } from '../constants';
 
@@ -21,6 +22,7 @@ export default function RecipesPagination({
           count={maxPages}
           color='secondary'
           size='large'
+          sx={{ [`& .${paginationClasses.ul}`]: { justifyContent: 'center' } }}
           renderItem={(item) => {
             const updatedQueryParams = queryParams;
             const itemPage = item.page || 1;
