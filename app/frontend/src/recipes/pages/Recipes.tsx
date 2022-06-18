@@ -61,6 +61,10 @@ export default function Recipes() {
     navigate(buildCurrentUrl(pathname, queryParams, filteredIngredients));
   };
 
+  const searchIngredientsRemoveAllHandler = () => {
+    navigate(buildCurrentUrl(pathname, queryParams, []));
+  };
+
   return (
     <Fragment>
       <Box
@@ -85,6 +89,7 @@ export default function Recipes() {
           <SearchIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
+            onRemoveAll={searchIngredientsRemoveAllHandler}
           />
         </Container>
       </Box>

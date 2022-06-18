@@ -6,14 +6,15 @@ import Header from './shared/components/Header';
 import Footer from './shared/components/Footer';
 import IngredientDetail from './ingredients/pages/IngredientDetail';
 import RecipeDetail from './recipes/pages/RecipeDetail';
+import { PRIMARY_COLOR, SECONDARY_COLOR } from './shared/constants';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#dc1a22',
+      main: PRIMARY_COLOR,
     },
     secondary: {
-      main: '#548664',
+      main: SECONDARY_COLOR,
     },
   },
 });
@@ -27,10 +28,7 @@ export default function App() {
         <Routes>
           <Route path='/recipes' element={<Recipes />} />
           <Route path='/recipes/:recipeId' element={<RecipeDetail />} />
-          <Route
-            path='/ingredients/:ingredientId'
-            element={<IngredientDetail />}
-          />
+          <Route path='/ingredients/:ingredientId' element={<IngredientDetail />} />
           <Route path='/' element={<Navigate to='/recipes' />} />
         </Routes>
       </main>

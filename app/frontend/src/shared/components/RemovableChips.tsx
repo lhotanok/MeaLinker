@@ -1,16 +1,20 @@
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Container from '@mui/material/Container';
 import { ListBaseItem } from '../types/ListBaseItem';
+import { Avatar, IconButton } from '@mui/material';
+import { PRIMARY_COLOR } from '../constants';
+import { Box } from '@mui/system';
 
 type RemovableChipsProps = {
   chips: ListBaseItem[];
   onRemove: (event: any) => void;
+  onRemoveAll: () => void;
 };
 
 export default function RemovableChips(props: RemovableChipsProps) {
-  const { chips, onRemove } = props;
-  // console.log(`Chips: ${JSON.stringify(chips)}`);
+  const { chips, onRemove, onRemoveAll } = props;
 
   const handleRemove = (chipToRemove: ListBaseItem) => () => {
     onRemove(chipToRemove);
@@ -18,15 +22,33 @@ export default function RemovableChips(props: RemovableChipsProps) {
 
   const listItems = chips.map((data) => {
     return (
-      <Grid item key={data.key}>
-        <Chip color='secondary' label={data.label} onDelete={handleRemove(data)} />
+      <Grid item key={data.key} justifyContent='center' margin={1}>
+        <Box
+          display='flex'
+          justifyContent='center'
+          alignItems='center'
+          position='relative'
+          height='100%'
+        >
+          <Chip color='secondary' label={data.label} onDelete={handleRemove(data)} />
+        </Box>
       </Grid>
     );
   });
 
+  if (listItems.length > 0) {
+    listItems.push(
+      <IconButton size='large' onClick={onRemoveAll}>
+        <Avatar sx={{ bgcolor: PRIMARY_COLOR }}>
+          <DeleteIcon />
+        </Avatar>
+      </IconButton>,
+    );
+  }
+
   return (
     <Container maxWidth='md'>
-      <Grid container spacing={1.5} justifyContent='center'>
+      <Grid container justifyContent='center'>
         {listItems}
       </Grid>
     </Container>
