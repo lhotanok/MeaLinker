@@ -32,14 +32,19 @@ export default function Recipes() {
 
   useEffect(
     () => {
+      document.title = `Recipe Search${ingredients.length > 0
+        ? ` |${ingredients.map((ingr) => ` ${ingr.label}`)}`
+        : ''}`;
+    },
+    [ingredients],
+  );
+
+  useEffect(
+    () => {
       const searchParams = new URLSearchParams(decodeURI(search));
       const currentPage = Number(searchParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
 
       const offset = (currentPage - 1) * PAGINATION_RESULTS_COUNT;
-
-      document.title = `Recipe Search${ingredients.length > 0
-        ? ` |${ingredients.map((ingr) => ` ${ingr.label}`)}`
-        : ''}`;
 
       const requestConfig = {
         url: `http://localhost:5000/api/recipes${search}`,
