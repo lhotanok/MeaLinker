@@ -11,12 +11,17 @@ router.get('/', async (req, res) => {
   const { ingredients: encodedIngredients = '', rows: requestedRows = '' } = req.query;
 
   const ingredientsText = decodeURI(encodedIngredients.toString());
-  const ingredients = ingredientsText.split(';');
-  console.log(`Extracted ingredients from ${req.url} request: ${ingredients}`);
+  const ingredients = ingredientsText.split(';').filter((ingredient) => ingredient);
+  console.log(
+    `Extracted ingredients from ${req.url} request: ${JSON.stringify(ingredients)}`,
+  );
 
   //const rows = Number(requestedRows.toString()) || DEFAULT_PAGINATION_RESULTS_COUNT;
 
-  const recipes = await recipesModel.getRecipesByIngredients(ingredients);
+  const recipes =
+    ingredients.length === 0
+      ? []
+      : await recipesModel.getRecipesByIngredients(ingredients);
 
   // const recipes = await recipesModel.getAllRecipes();
   res.status(200).json(recipes);

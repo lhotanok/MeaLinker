@@ -1,1 +1,1 @@
-node database-manager.js
+node database-manager.mjs

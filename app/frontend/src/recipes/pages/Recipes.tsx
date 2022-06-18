@@ -22,7 +22,7 @@ export default function Recipes() {
   const ingredients = getIngredients(queryParams);
 
   const [recipes, setRecipes] = useState<SearchedRecipe[]>([]);
-  const [recipesCount, setRecipesCount] = useState<number>(0);
+  const [recipesCount, setRecipesCount] = useState<number | null>(null);
 
   const { sendRequest: fetchRecipes } = useHttp();
 
@@ -30,23 +30,21 @@ export default function Recipes() {
     () => {
       const searchParams = new URLSearchParams(decodeURI(search));
 
-      if (searchParams.get('ingredients')) {
-        searchParams.set('rows', PAGINATION_RESULTS_COUNT.toString());
+      searchParams.set('rows', PAGINATION_RESULTS_COUNT.toString());
 
-        const requestConfig = {
-          url: `http://localhost:5000/api/recipes${search}`,
-        };
+      const requestConfig = {
+        url: `http://localhost:5000/api/recipes${search}`,
+      };
 
-        const searchedIngredients = getIngredients(searchParams);
+      const searchedIngredients = getIngredients(searchParams);
 
-        const fetchedRecipesHandler = (recipes: SimpleRecipe[]) => {
-          // console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
-          setRecipesCount(recipes.length);
-          setRecipes(prepareRecipes(recipes, searchedIngredients));
-        };
+      const fetchedRecipesHandler = (recipes: SimpleRecipe[]) => {
+        // console.log(`First recipe: ${JSON.stringify(recipes[0], null, 2)}`);
+        setRecipesCount(recipes.length);
+        setRecipes(prepareRecipes(recipes, searchedIngredients));
+      };
 
-        fetchRecipes(requestConfig, fetchedRecipesHandler);
-      }
+      fetchRecipes(requestConfig, fetchedRecipesHandler);
     },
     [fetchRecipes, search],
   );
@@ -64,13 +62,6 @@ export default function Recipes() {
 
     navigate(buildCurrentUrl(pathname, queryParams, filteredIngredients));
   };
-
-  let searchingHeader = `Found ${recipesCount} recipe${recipes.length === 1 ? '' : 's'}`;
-  if (ingredients.length > 0 && recipesCount === 0) {
-    searchingHeader = 'Searching recipes...';
-  } else if (ingredients.length === 0) {
-    searchingHeader = 'Add some ingredients';
-  }
 
   return (
     <Fragment>
@@ -91,7 +82,7 @@ export default function Recipes() {
             marginTop='5%'
             gutterBottom
           >
-            {searchingHeader}
+            {buildSearchHeader(recipesCount, ingredients.length)}
           </Typography>
           <SearchIngredients
             ingredients={ingredients}
@@ -103,6 +94,21 @@ export default function Recipes() {
     </Fragment>
   );
 }
+
+const buildSearchHeader = (
+  recipesCount: number | null,
+  ingredientsCount: number,
+): string => {
+  let searchHeader = `Found ${recipesCount} recipe${recipesCount === 1 ? '' : 's'}`;
+
+  if (ingredientsCount > 0 && recipesCount === null) {
+    searchHeader = 'Searching recipes...';
+  } else if (ingredientsCount === 0) {
+    searchHeader = 'Add some ingredients';
+  }
+
+  return searchHeader;
+};
 
 const getIngredients = (queryParams: URLSearchParams): SearchedIngredient[] => {
   const joinedIngredients = queryParams.get('ingredients');

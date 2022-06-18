@@ -10,7 +10,7 @@ type RemovableChipsProps = {
 
 export default function RemovableChips(props: RemovableChipsProps) {
   const { chips, onRemove } = props;
-  console.log(`Chips: ${JSON.stringify(chips)}`);
+  // console.log(`Chips: ${JSON.stringify(chips)}`);
 
   const handleRemove = (chipToRemove: ListBaseItem) => () => {
     onRemove(chipToRemove);
@@ -19,11 +19,7 @@ export default function RemovableChips(props: RemovableChipsProps) {
   const listItems = chips.map((data) => {
     return (
       <Grid item key={data.key}>
-        <Chip
-          color='secondary'
-          label={data.label}
-          onDelete={handleRemove(data)}
-        />
+        <Chip color='secondary' label={data.label} onDelete={handleRemove(data)} />
       </Grid>
     );
   });

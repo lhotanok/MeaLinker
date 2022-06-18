@@ -1,25 +1,74 @@
-const fs = require('fs');
-const log4js = require('log4js');
-const log = log4js.getLogger('CouchDB manager');
+import { unescape } from 'html-escaper';
+import { decode } from 'html-entities';
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import * as fs from 'fs';
+import pkg from 'log4js';
+import { PASSWORD, PORT, USERNAME } from './config.mjs';
+
+const { getLogger } = pkg;
+const log = getLogger('CouchDB manager');
 log.level = 'debug';
 
-const { PORT, USERNAME, PASSWORD } = require('./config');
-const {
+import {
   FILE_ENCODING,
   FOOD_COM_RECIPES_PATH,
   FOOD_COM_INGREDIENTS_PATH,
   RECIPES_DATABASE_NAME,
   INGREDIENTS_DATABASE_NAME,
-} = require('./constants');
+} from './constants.mjs';
 
-const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
+import nanoRoot from 'nano';
+
+const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
 function readFileFromCurrentDir(filePath) {
   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
+function decodeJsonStrings(json) {
+  if (typeof obj === 'string') {
+    return decode(json);
+  } else if (Array.isArray(json)) {
+    return json.map((item) => decodeJsonStrings(item));
+  } else if (!json || typeof obj !== 'object') {
+    return json;
+  }
+
+  const decodedObj = {};
+
+  Object.entries(json).forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      decodedObj[key] = decode(value);
+    } else if (typeof value === 'object') {
+      decodedObj[key] = decodeJsonStrings(value);
+    } else {
+      decodedObj[key] = value;
+    }
+  });
+
+  return decodedObj;
+}
+
 function loadJsonFromFile(filePath) {
-  return JSON.parse(readFileFromCurrentDir(filePath));
+  const fileContent = readFileFromCurrentDir(filePath);
+
+  // double decoding is used to ensure the best results
+
+  // might be redundant, not powerfull enough by itself
+  const escapedContent = unescape(fileContent);
+
+  const json = JSON.parse(escapedContent);
+
+  // decodes all strings from json object recursively
+  const decodedJson = decodeJsonStrings(json);
+
+  return decodedJson;
 }
 
 async function createDatabase(dbName) {
@@ -87,9 +136,9 @@ async function main() {
    * the old DB would be preferred for large datasets.
    */
   await destroyDatabase(RECIPES_DATABASE_NAME);
-  await createDatabase(RECIPES_DATABASE_NAME);
-
   await destroyDatabase(INGREDIENTS_DATABASE_NAME);
+
+  await createDatabase(RECIPES_DATABASE_NAME);
   await createDatabase(INGREDIENTS_DATABASE_NAME);
 
   insertRecipes(recipeDb);
