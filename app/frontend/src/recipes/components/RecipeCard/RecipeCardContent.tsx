@@ -9,9 +9,42 @@ import humanizeDuration from 'humanize-duration';
 type RecipeCardProps = {
   name: string;
   rating: number;
+  reviewsCount: number;
   description: string;
   mins: number;
 };
+
+export default function RecipeCardContent({
+  name,
+  rating,
+  reviewsCount,
+  description,
+  mins,
+}: RecipeCardProps) {
+  return (
+    <CardContent>
+      <Stack direction='row'>
+        <HeartRating value={rating} />
+        <Typography marginLeft='2%'>{`(${reviewsCount || 0})`}</Typography>
+        {mins && (
+          <Typography
+            textAlign='right'
+            marginLeft='auto'
+            color='#00cb0f'
+          >{`${buildHumanReadablePrepTime(mins)}`}</Typography>
+        )}
+      </Stack>
+      <Typography variant='h5' component='div'>
+        {name}
+      </Typography>
+      <Box marginTop={1.2}>
+        <Typography variant='body2' color='text.secondary'>
+          {buildDescriptionPreview(description, name)}
+        </Typography>
+      </Box>
+    </CardContent>
+  );
+}
 
 const buildDescriptionPreview = (description: string, name: string): string => {
   const sentencesMatches = Array.from(description.matchAll(ALL_SENTENCES_REGEX));
@@ -57,33 +90,3 @@ const buildHumanReadablePrepTime = (minutes: number): string => {
 
   return shortEnglishHumanizer(milliseconds);
 };
-
-export default function RecipeCardContent({
-  name,
-  rating,
-  description,
-  mins,
-}: RecipeCardProps) {
-  return (
-    <CardContent>
-      <Stack direction='row'>
-        <HeartRating value={rating} />
-        {mins && (
-          <Typography
-            textAlign='right'
-            marginLeft='auto'
-            color='#00cb0f'
-          >{`${buildHumanReadablePrepTime(mins)}`}</Typography>
-        )}
-      </Stack>
-      <Typography variant='h5' component='div'>
-        {name}
-      </Typography>
-      <Box marginTop={1.2}>
-        <Typography variant='body2' color='text.secondary'>
-          {buildDescriptionPreview(description, name)}
-        </Typography>
-      </Box>
-    </CardContent>
-  );
-}

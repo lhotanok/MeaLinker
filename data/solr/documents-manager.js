@@ -88,6 +88,7 @@ function filterRecipeIndexedFields(recipe) {
     recipeCategory,
     stepsCount,
     rating: rating.value,
+    reviewsCount: rating.reviews,
     tags,
     ingredients: getFilteredIngredients(ingredients),
     cookMinutes: getDurationInMinutes(time.cooking),

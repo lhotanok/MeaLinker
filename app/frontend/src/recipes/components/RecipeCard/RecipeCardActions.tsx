@@ -3,27 +3,33 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
-import { SvgIcon, SvgIconProps } from '@mui/material';
+import { SvgIcon, SvgIconProps, Typography } from '@mui/material';
 
 type RecipeCardActionsProps = {
   expanded: boolean;
+  stepsCount: number;
   onExpandClick: React.MouseEventHandler<HTMLButtonElement>;
   onViewClick: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 export default function RecipeCardActions({
   expanded,
+  stepsCount,
   onExpandClick,
   onViewClick,
 }: RecipeCardActionsProps) {
   return (
     <CardActions sx={{ marginTop: 'auto' }} disableSpacing>
-      <Button size='small' onClick={onViewClick}>
+      <Button size='large' onClick={onViewClick}>
         View
       </Button>
+      <Typography
+        marginLeft='1.5%'
+        color='text.secondary'
+      >{`(${stepsCount} steps)`}</Typography>
       <Stack direction='row' marginLeft='auto'>
         <IngredientsButton
-          size='small'
+          size='medium'
           color='secondary'
           onClick={onExpandClick}
           endIcon={

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import LoadingProgress from '../../shared/components/LinearLoadingProgress';
+import LoadingProgress from '../../shared/components/LoadingProgress';
 import useHttp from '../../shared/hooks/use-http';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';

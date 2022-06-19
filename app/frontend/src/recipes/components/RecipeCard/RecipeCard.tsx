@@ -6,6 +6,7 @@ import RecipeCardActions from './RecipeCardActions';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { SimpleRecipe } from '../../types/SimpleRecipesResponse';
+import { CardActionArea } from '@mui/material';
 
 interface RecipeReviewCardProps extends SimpleRecipe {}
 
@@ -21,6 +22,8 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
     name,
     description = '',
     rating,
+    reviewsCount = 0,
+    stepsCount,
     totalMinutes,
     image,
     ingredients = [],
@@ -60,15 +63,20 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
         justifyContent: 'space-between',
       }}
     >
-      <CardMedia component='img' height='250' image={image} alt={name} />
+      <CardActionArea onClick={handleViewClick}>
+        <CardMedia component='img' height='250' image={image} alt={name} />
+      </CardActionArea>
+
       <RecipeCardContent
         name={name}
         rating={rating}
+        reviewsCount={reviewsCount}
         description={description}
         mins={totalMinutes}
       />
       <RecipeCardActions
         expanded={expanded}
+        stepsCount={stepsCount}
         onExpandClick={handleExpandClick}
         onViewClick={handleViewClick}
       />

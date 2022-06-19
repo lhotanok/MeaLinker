@@ -6,6 +6,7 @@ export type Recipe = {
   recipeCategory: string;
   stepsCount: number;
   rating: number;
+  reviewsCount: number;
   tags: string[];
   ingredients: string[];
   cookMinutes: number;

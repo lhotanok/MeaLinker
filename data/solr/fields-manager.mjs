@@ -60,6 +60,7 @@ async function postRecipesAddFields() {
     ingredients: { multiValued: true },
     tags: { multiValued: true },
     rating: { type: FLOAT },
+    reviewsCount: { type: INT },
     stepsCount: { type: INT },
     cookMinutes: { type: INT },
     prepMinutes: { type: INT },
