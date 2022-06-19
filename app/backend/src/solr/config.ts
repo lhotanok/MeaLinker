@@ -5,5 +5,3 @@ export const CORES = {
   INGREDIENTS: 'ingredients',
 };
 export const SECURE = false;
-
-export const DEFAULT_MAX_RESULTS_COUNT = 8000;

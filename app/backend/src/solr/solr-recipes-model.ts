@@ -1,6 +1,7 @@
 import log4js from 'log4js';
+import { DEFAULT_PAGINATION_RESULTS_COUNT } from '../constants';
 
-import { CORES, DEFAULT_MAX_RESULTS_COUNT } from './config';
+import { CORES } from './config';
 import SolrModel from './solr-model';
 import { Recipe } from './types/recipe';
 import { SolrResponse } from './types/search-response';
@@ -25,7 +26,8 @@ class SolrRecipesModel extends SolrModel {
 
   public async getRecipesByIngredients(
     ingredients: string[],
-    rows = DEFAULT_MAX_RESULTS_COUNT,
+    rows: number,
+    offset: number,
   ): Promise<SolrResponse<Recipe>> {
     const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
 
@@ -38,17 +40,19 @@ class SolrRecipesModel extends SolrModel {
         fl: 'ingredients',
         preserveMulti: true,
       })
+      .start(offset)
       .rows(rows);
 
     const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
     const solrResponse: SolrResponse<Recipe> = {
       docs: searchResponse.response.docs,
+      totalCount: searchResponse.response.numFound,
       highlighting: searchResponse.highlighting,
     };
 
     log.info(
-      `Fetched ${searchResponse.response.docs
-        .length} recipes for ingredients: ${ingredients}`,
+      `Found ${solrResponse.totalCount} recipes for ingredients: ${ingredients}. Fetched recipes ${offset}-${offset +
+        rows}.`,
     );
     return solrResponse;
   }

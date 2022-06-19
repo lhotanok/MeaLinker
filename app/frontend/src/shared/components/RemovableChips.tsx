@@ -5,7 +5,7 @@ import Container from '@mui/material/Container';
 import { ListBaseItem } from '../types/ListBaseItem';
 import { Avatar, IconButton } from '@mui/material';
 import { PRIMARY_COLOR } from '../constants';
-import { Box } from '@mui/system';
+import CenteredBox from './CenteredBox';
 
 type RemovableChipsProps = {
   chips: ListBaseItem[];
@@ -23,22 +23,18 @@ export default function RemovableChips(props: RemovableChipsProps) {
   const listItems = chips.map((data) => {
     return (
       <Grid item key={data.key} justifyContent='center' margin={1}>
-        <Box
-          display='flex'
-          justifyContent='center'
-          alignItems='center'
-          position='relative'
-          height='100%'
-        >
-          <Chip color='secondary' label={data.label} onDelete={handleRemove(data)} />
-        </Box>
+        <CenteredBox
+          children={
+            <Chip color='secondary' label={data.label} onDelete={handleRemove(data)} />
+          }
+        />
       </Grid>
     );
   });
 
   if (listItems.length > 0) {
     listItems.push(
-      <IconButton size='large' onClick={onRemoveAll}>
+      <IconButton key='remove-all-chips' size='large' onClick={onRemoveAll}>
         <Avatar sx={{ bgcolor: PRIMARY_COLOR }}>
           <DeleteIcon />
         </Avatar>

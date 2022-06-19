@@ -9,7 +9,11 @@ import useHttp from '../../shared/hooks/use-http';
 import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
 import { SearchedIngredient } from '../types/SearchedIngredient';
 import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../constants';
-import { buildUrl, parseIngredients } from '../../shared/tools/request-parser';
+import {
+  buildRecipeSearchUrl,
+  buildUrl,
+  parseIngredients,
+} from '../../shared/tools/request-parser';
 import SearchHeader from '../components/SearchHeader';
 import RecipesPagination from '../components/RecipesPagination';
 
@@ -21,12 +25,10 @@ export default function Recipes() {
 
   const queryParams = new URLSearchParams(decodeURI(search));
   const ingredients = parseIngredients(queryParams);
+  const page = Number(queryParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
 
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
-  const [fetchedRecipes, setFetchedRecipes] = useState<SimpleRecipesResponse | null>(
-    null,
-  );
-  const [page, setPage] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const { sendRequest: fetchRecipes } = useHttp();
 
@@ -41,38 +43,39 @@ export default function Recipes() {
 
   useEffect(
     () => {
-      const searchParams = new URLSearchParams(decodeURI(search));
-      const currentPage = Number(searchParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
-
-      const offset = (currentPage - 1) * PAGINATION_RESULTS_COUNT;
+      const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
+        setTotalCount(recipesResponse.totalCount);
+        setPaginatedRecipes(prepareRecipes(recipesResponse));
+      };
 
       const requestConfig = {
-        url: `http://localhost:5000/api/recipes${search}`,
+        url: buildRecipeSearchUrl(search),
       };
 
-      const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
-        setFetchedRecipes(recipesResponse);
-        setPaginatedRecipes(prepareRecipes(recipesResponse, offset));
-      };
-
-      setFetchedRecipes(null);
-      setPage(currentPage);
       fetchRecipes(requestConfig, fetchedRecipesHandler);
     },
     [fetchRecipes, search],
   );
 
   const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
-    const mergedIngredients = mergeSearchIngredients(ingredients, searchIngredientLabels);
+    if (searchIngredientLabels.length > 0) {
+      setTotalCount(null);
+      const mergedIngredients = mergeSearchIngredients(
+        ingredients,
+        searchIngredientLabels,
+      );
 
-    navigate(
-      buildUrl(pathname, queryParams, {
-        ingredients: mergedIngredients,
-      }),
-    );
+      navigate(
+        buildUrl(pathname, queryParams, {
+          ingredients: mergedIngredients,
+        }),
+      );
+    }
   };
 
   const searchIngredientRemoveHandler = (removedIngredient: SearchedIngredient) => {
+    setTotalCount(null);
+
     const filteredIngredients = ingredients.filter(
       (ingredient) => ingredient.label !== removedIngredient.label,
     );
@@ -85,6 +88,8 @@ export default function Recipes() {
   };
 
   const searchIngredientsRemoveAllHandler = () => {
+    setTotalCount(null);
+
     navigate(
       buildUrl(pathname, queryParams, {
         ingredients: [],
@@ -92,8 +97,6 @@ export default function Recipes() {
       }),
     );
   };
-
-  const recipesCount: number | null = fetchedRecipes ? fetchedRecipes.docs.length : null;
 
   return (
     <Fragment>
@@ -106,10 +109,7 @@ export default function Recipes() {
       >
         <Container>
           <SearchIngredientBar onSearch={searchByIngredientsHandler} />
-          <SearchHeader
-            recipesCount={recipesCount}
-            ingredientsCount={ingredients.length}
-          />
+          <SearchHeader recipesCount={totalCount} ingredientsCount={ingredients.length} />
           <SearchIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
@@ -118,12 +118,14 @@ export default function Recipes() {
         </Container>
       </Box>
       <RecipesGrid recipes={paginatedRecipes} />
-      {recipesCount && (
+      {totalCount ? (
         <RecipesPagination
           page={page}
-          maxPages={Math.ceil((recipesCount || 0) / PAGINATION_RESULTS_COUNT)}
+          maxPages={Math.ceil((totalCount || 0) / PAGINATION_RESULTS_COUNT)}
           queryParams={queryParams}
         />
+      ) : (
+        ''
       )}
     </Fragment>
   );

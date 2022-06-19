@@ -1,4 +1,4 @@
-import { QUERY_PARAM_NAMES } from '../../recipes/constants';
+import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../../recipes/constants';
 import { SearchedIngredient } from '../../recipes/types/SearchedIngredient';
 
 export const parseIngredients = (queryParams: URLSearchParams): SearchedIngredient[] => {
@@ -55,4 +55,19 @@ export const encodeIngredientsToQueryParam = (
   const encodedIngredients = encodeURI(joinedIngredients);
 
   return encodedIngredients;
+};
+
+export const buildRecipeSearchUrl = (locationSearch: string): string => {
+  const searchParams = new URLSearchParams(decodeURI(locationSearch));
+  const page = Number(searchParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
+
+  const offset = (page - 1) * PAGINATION_RESULTS_COUNT;
+
+  const apiSearchParams = new URLSearchParams({
+    ingredients: searchParams.get(QUERY_PARAM_NAMES.INGREDIENTS) || '',
+    rows: PAGINATION_RESULTS_COUNT.toString(),
+    offset: offset.toString(),
+  });
+
+  return `http://localhost:5000/api/recipes?${apiSearchParams.toString()}`;
 };

@@ -46,7 +46,7 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
     };
 
     window.addEventListener('resize', handleResize);
-  }, []);
+  });
 
   return (
     <Card

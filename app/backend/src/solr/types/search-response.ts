@@ -11,5 +11,6 @@ export type Highlighting = {
 
 export type SolrResponse<SolrDocument> = {
   docs: SolrDocument[];
+  totalCount: number;
   highlighting?: Highlighting;
 };

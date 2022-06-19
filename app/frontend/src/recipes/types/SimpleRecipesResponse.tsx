@@ -30,5 +30,6 @@ export type HighlightedFields = {
 
 export type SimpleRecipesResponse = {
   docs: SimpleRecipe[];
+  totalCount: number;
   highlighting?: Record<string, HighlightedFields>;
 };

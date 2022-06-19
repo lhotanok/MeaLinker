@@ -2,8 +2,8 @@ import { Client, Query } from 'solr-client';
 import log4js from 'log4js';
 
 import SolrClientFactory from './solr-client-factory';
-import { DEFAULT_MAX_RESULTS_COUNT } from './config';
 import { ExtendedSearchResponse } from './types/search-response';
+import { DEFAULT_MAX_RESULTS_COUNT } from '../constants';
 
 const log = log4js.getLogger('SolrModel');
 log.level = 'debug';

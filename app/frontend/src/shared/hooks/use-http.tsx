@@ -22,7 +22,7 @@ export default function useHttp() {
         : null;
 
       try {
-        console.log('Fetching response...');
+        console.log('Fetching response...', { url });
         const response = await fetch(url, {
           method,
           headers,

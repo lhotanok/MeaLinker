@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
-import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
 import { Avatar } from '@mui/material';
 import { IconButton } from '@mui/material';
@@ -39,7 +39,7 @@ export default function AutocompleteSearchBar({
         <Stack direction='row' spacing={1.5}>
           <IconButton size='large' onClick={searchHandler}>
             <Avatar sx={{ bgcolor: SECONDARY_COLOR }}>
-              <SearchIcon />
+              <AddIcon />
             </Avatar>
           </IconButton>
           <TextField {...params} label={label} />

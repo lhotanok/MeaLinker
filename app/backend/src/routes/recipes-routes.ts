@@ -1,5 +1,5 @@
 import express from 'express';
-import { DEFAULT_PAGINATION_RESULTS_COUNT } from '../constants';
+import { DEFAULT_PAGINATION_RESULTS_COUNT, MAX_RESULTS_COUNT } from '../constants';
 import CouchDbRecipesModel from '../couchdb/couchdb-recipes-model';
 import SolrRecipesModel from '../solr/solr-recipes-model';
 import { Recipe } from '../solr/types/recipe';
@@ -10,21 +10,23 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   const recipesModel = new SolrRecipesModel();
 
-  const { ingredients: encodedIngredients = '', rows: requestedRows = '' } = req.query;
+  const {
+    ingredients: encodedIngredients = '',
+    rows: requestedRows = `${DEFAULT_PAGINATION_RESULTS_COUNT}`,
+    offset = '0',
+  } = req.query;
 
   const ingredientsText = decodeURI(encodedIngredients.toString());
   const ingredients = ingredientsText.split(';').filter((ingredient) => ingredient);
-  console.log(
-    `Extracted ingredients from ${req.url} request: ${JSON.stringify(ingredients)}`,
-  );
 
-  //const rows = Number(requestedRows.toString()) || DEFAULT_PAGINATION_RESULTS_COUNT;
+  const rows = Math.min(Number(requestedRows), MAX_RESULTS_COUNT);
 
   const recipes: SolrResponse<Recipe> = await recipesModel.getRecipesByIngredients(
     ingredients,
+    rows,
+    Number(offset),
   );
 
-  // const recipes = await recipesModel.getAllRecipes();
   res.status(200).json(recipes);
 });
 
