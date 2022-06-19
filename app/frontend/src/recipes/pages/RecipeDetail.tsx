@@ -6,9 +6,14 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
+import { Grid } from '@mui/material';
+import ZoomableImage from '../../shared/components/ZoomableImage';
 
 export default function RecipeDetail() {
-  const [recipe, setRecipe] = useState<FullRecipe>({} as FullRecipe);
+  const [recipe, setRecipe] = useState<FullRecipe>({
+    jsonld: {},
+    structured: {},
+  } as FullRecipe);
 
   const params = useParams();
   const { recipeId } = params;
@@ -37,24 +42,20 @@ export default function RecipeDetail() {
   if (isLoading) headlineText = ''; // 'Loading recipe...';
 
   return (
-    <Box
-      sx={{
-        bgcolor: 'background.paper',
-        pt: 2,
-      }}
-    >
-      <Container>
-        <Typography
-          component='h1'
-          variant='h4'
-          align='center'
-          color='text.primary'
-          gutterBottom
-        >
-          {headlineText}
-        </Typography>
-      </Container>
-      {isLoading && <LoadingProgress />}
-    </Box>
+    <Container>
+      <Box pt={3} pl={2}>
+        <Grid container>
+          <Grid item key='headline' xs={12}>
+            <Typography component='h1' variant='h4' color='text.primary' gutterBottom>
+              {headlineText}
+            </Typography>
+          </Grid>
+          {isLoading && <LoadingProgress />}
+          <Grid item key={'banner'} xs={8}>
+            <ZoomableImage src={recipe.jsonld.image} alt={recipe.jsonld.name} />
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
   );
 }

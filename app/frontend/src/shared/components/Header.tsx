@@ -37,9 +37,9 @@ export default function Header() {
   ));
 
   return (
-    <AppBar position='relative'>
+    <AppBar position='sticky'>
       <Container>
-        <Toolbar>
+        <Toolbar disableGutters={true} sx={{ width: '100%' }}>
           <Icon />
           <Typography variant='h5' color='inherit' paddingRight='14%'>
             MeaLinker

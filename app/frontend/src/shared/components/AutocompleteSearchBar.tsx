@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import { Avatar } from '@mui/material';
 import { IconButton } from '@mui/material';
 import { SECONDARY_COLOR } from '../constants';
+import CenteredBox from './CenteredBox';
 
 type AutocompleteSearchBarProps = {
   hints: string[];
@@ -42,7 +43,7 @@ export default function AutocompleteSearchBar({
               <AddIcon />
             </Avatar>
           </IconButton>
-          <TextField {...params} label={label} />
+          <CenteredBox children={<TextField {...params} label={label} />} />
         </Stack>
       )}
       onChange={onChangeHandler}
