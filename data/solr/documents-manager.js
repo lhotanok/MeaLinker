@@ -5,7 +5,11 @@ const {
   COUCHDB: { RECIPES_DB_NAME, INGREDIENTS_DB_NAME, USERNAME, PASSWORD, PORT },
   SOLR,
 } = require('./config');
-const { RECIPES_PATH, INGREDIENTS_PATH } = require('./constants');
+const {
+  RECIPES_PATH,
+  INGREDIENTS_PATH,
+  FOOD_COM_DEFAULT_IMAGE_SRC,
+} = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
 const log = log4js.getLogger('Solr documents manager');
@@ -19,7 +23,10 @@ async function fillWithDatabaseDocuments(recipes, ingredients) {
   const recipesDatabase = nano.use(RECIPES_DB_NAME);
   const ingredientsDatabase = nano.use(INGREDIENTS_DB_NAME);
 
+  log.info(`Fetching CouchDB collection: ${RECIPES_DB_NAME} ...`);
   const recipeDocuments = await recipesDatabase.list({ include_docs: true });
+
+  log.info(`Fetching CouchDB collection: ${INGREDIENTS_DB_NAME} ...`);
   const ingredientDocuments = await ingredientsDatabase.list({ include_docs: true });
 
   recipeDocuments.rows.forEach(({ doc }) => recipes.push(filterRecipeIndexedFields(doc)));
@@ -122,6 +129,27 @@ function filterIngredientIndexedFields(ingredient) {
   return filteredIngredient;
 }
 
+function removeRecipesWithoutImage(recipes) {
+  log.info('Shifting non-image recipes to the back...');
+
+  const imageRecipes = [];
+  const nonImageRecipes = [];
+
+  recipes.forEach((recipe) => {
+    if (recipe.image && recipe.image !== FOOD_COM_DEFAULT_IMAGE_SRC) {
+      imageRecipes.push(recipe);
+    } else {
+      nonImageRecipes.push(recipe);
+    }
+  });
+
+  log.info(
+    `Found ${imageRecipes.length} recipes with images and ${nonImageRecipes.length} recipes without any image.`,
+  );
+
+  return imageRecipes; // .concat(nonImageRecipes);
+}
+
 async function pushDocumentsToSolr(documents, core) {
   const { HOST, PORT, SECURE } = SOLR;
 
@@ -131,6 +159,10 @@ async function pushDocumentsToSolr(documents, core) {
     core,
     secure: SECURE,
   });
+
+  log.info(`Deleting all documents...`);
+  await client.deleteAll();
+  log.info(`All documents deleted.`);
 
   const addResponse = await client.add(documents);
   log.info(`Add documents response: ${JSON.stringify(addResponse, null, 2)}`);
@@ -156,7 +188,9 @@ async function main() {
 
   const { CORES: { RECIPES, INGREDIENTS } } = SOLR;
 
-  await pushDocumentsToSolr(recipes, RECIPES);
+  const filteredRecipes = removeRecipesWithoutImage(recipes);
+
+  await pushDocumentsToSolr(filteredRecipes, RECIPES);
   await pushDocumentsToSolr(ingredients, INGREDIENTS);
 }
 

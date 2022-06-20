@@ -1,6 +1,10 @@
 import { CircularProgress } from '@mui/material';
-import CenteredBox from './CenteredBox';
+import FlexBox from './FlexBox';
 
 export default function CircularLoadingProgress() {
-  return <CenteredBox children={<CircularProgress color='secondary' />} />;
+  return (
+    <FlexBox>
+      <CircularProgress color='secondary' />
+    </FlexBox>
+  );
 }

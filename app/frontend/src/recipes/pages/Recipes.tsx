@@ -107,7 +107,7 @@ export default function Recipes() {
           pb: 6,
         }}
       >
-        <Container>
+        <Container maxWidth='md'>
           <SearchIngredientBar onSearch={searchByIngredientsHandler} />
           <SearchHeader recipesCount={totalCount} ingredientsCount={ingredients.length} />
           <SearchIngredients

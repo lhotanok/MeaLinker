@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
 import { Button, Grid } from '@mui/material';
 import ZoomableImage from '../../shared/components/ZoomableImage';
-import { convertToReadableDate } from '../../shared/tools/value-format-parser';
+import { convertToReadableDate } from '../../shared/tools/value-prettifier';
 import RecipeHeader from '../components/Detail/RecipeHeader';
 import IngredientsCard from '../components/Detail/IngredientsCard';
 
@@ -29,7 +29,7 @@ export default function RecipeDetail() {
 
       const fetchedRecipeHandler = (recipe: FullRecipe) => {
         console.log(JSON.stringify(recipe, null, 2));
-        document.title = recipe.jsonld.name;
+        document.title = `Recipe | ${recipe.jsonld.name}`;
         setRecipe(recipe);
       };
 
@@ -49,10 +49,10 @@ export default function RecipeDetail() {
   );
 
   return (
-    <Container>
-      <Grid container padding={3} spacing={3}>
+    <Container maxWidth='xl'>
+      <Grid container padding={3} spacing={8}>
         {isLoading && <LoadingProgress />}
-        <Grid item key='left-column' xs={8}>
+        <Grid item key='left-column' xs={7}>
           <Grid container>
             <RecipeHeader
               headline={headlineText}
@@ -71,7 +71,7 @@ export default function RecipeDetail() {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item key='right-column' xs={4}>
+        <Grid item key='right-column' xs={5}>
           <IngredientsCard
             ingredients={recipe.structured.ingredients}
             servings={recipe.structured.servings}

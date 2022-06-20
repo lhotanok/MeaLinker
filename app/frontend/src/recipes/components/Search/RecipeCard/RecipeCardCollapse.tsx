@@ -8,7 +8,8 @@ import {
   CONTINUOUS_HIGHLIGHTINGS_REGEX,
   HIGHLIGHTED_ITEM_REGEX,
 } from '../../../constants';
-import IngredientIcon from './IngredientIcon';
+import ImageIcon from '../../../../shared/components/ImageIcon';
+import vegetableIcon from '../../../../assets/vegetable-icon.png';
 
 type RecipeCardCollapseProps = {
   expanded: boolean;
@@ -47,8 +48,8 @@ export default function RecipeCardCollapse({
   );
 }
 
-const getIngredientElements = (ingredients: string[]) => {
-  return ingredients.map((ingredient) => {
+const getIngredientElements = (ingredients: string[]): JSX.Element[] => {
+  return ingredients.map((ingredient, index) => {
     const mergedHighlightsIngredient = ingredient.replace(
       CONTINUOUS_HIGHLIGHTINGS_REGEX,
       ' ',
@@ -61,10 +62,10 @@ const getIngredientElements = (ingredients: string[]) => {
     );
 
     return (
-      <Fragment key={Math.random()}>
+      <Fragment key={index}>
         <ListItem>
           <ListItemIcon>
-            <IngredientIcon />
+            <ImageIcon src={vegetableIcon} alt={ingredient} size={25} />
           </ListItemIcon>
           <ListItemText secondary={ingredientItem} />
         </ListItem>

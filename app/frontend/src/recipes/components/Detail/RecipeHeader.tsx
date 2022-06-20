@@ -22,7 +22,9 @@ export default function RecipeHeader({
       </Typography>
       <Stack direction='row' spacing={1.5}>
         <HeartRating value={rating.value} />
-        <Typography color='text.secondary'>({rating.reviews} reviews)</Typography>
+        <Typography color='text.secondary'>
+          ({rating.reviews} review{rating.reviews !== 1 && 's'})
+        </Typography>
       </Stack>
       <Typography color='text.primary'>{description}</Typography>
     </Grid>

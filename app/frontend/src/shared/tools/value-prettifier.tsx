@@ -1,5 +1,6 @@
 import humanizeDuration from 'humanize-duration';
 import { ALL_SENTENCES_REGEX, MAX_DESCRIPTION_CHARS } from '../../recipes/constants';
+import { RecipeIngredient } from '../../recipes/types/FullRecipe';
 
 export const addThousandsSeparator = (
   number: number,
@@ -82,4 +83,21 @@ export const buildDescriptionPreview = (description: string, name: string): stri
   }
 
   return sentences.join('');
+};
+
+export const shiftNonAmountIngredientsToBack = (
+  ingredients: RecipeIngredient[],
+): RecipeIngredient[] => {
+  const amountIngredients: RecipeIngredient[] = [];
+  const nonAmountIngredients: RecipeIngredient[] = [];
+
+  ingredients.forEach((ingredient) => {
+    if (ingredient.amount) {
+      amountIngredients.push(ingredient);
+    } else {
+      nonAmountIngredients.push(ingredient);
+    }
+  });
+
+  return amountIngredients.concat(nonAmountIngredients);
 };

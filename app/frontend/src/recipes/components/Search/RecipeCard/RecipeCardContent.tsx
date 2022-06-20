@@ -5,7 +5,7 @@ import { Box } from '@mui/material';
 import {
   buildDescriptionPreview,
   convertToReadableTime,
-} from '../../../../shared/tools/value-format-parser';
+} from '../../../../shared/tools/value-prettifier';
 import HeartRating from '../../../../shared/components/HeartRating';
 
 type RecipeCardProps = {

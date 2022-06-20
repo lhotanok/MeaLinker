@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { addThousandsSeparator } from '../../../shared/tools/value-format-parser';
+import { addThousandsSeparator } from '../../../shared/tools/value-prettifier';
 
 type SearchHeaderProps = {
   recipesCount: number | null;

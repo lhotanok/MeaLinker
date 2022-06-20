@@ -1,11 +1,12 @@
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import Icon from './MealinkerIcon';
 import { useNavigate } from 'react-router-dom';
+import mealinkerIcon from '../../assets/icon.png';
+import ImageIcon from './ImageIcon';
+import { Stack } from '@mui/material';
 
 const pages = [
   {
@@ -38,13 +39,13 @@ export default function Header() {
 
   return (
     <AppBar position='sticky'>
-      <Container>
-        <Toolbar disableGutters={true} sx={{ width: '100%' }}>
-          <Icon />
+      <Container maxWidth='xl'>
+        <Toolbar disableGutters={true} sx={{ width: '100%', maxHeight: '50vh' }}>
+          <ImageIcon src={mealinkerIcon} alt='MeaLinker' size={60} />
           <Typography variant='h5' color='inherit' paddingRight='14%'>
             MeaLinker
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { md: 'flex' } }}>{menuItems}</Box>
+          <Stack direction='row'>{menuItems}</Stack>
         </Toolbar>
       </Container>
     </AppBar>

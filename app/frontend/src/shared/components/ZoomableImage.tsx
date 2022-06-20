@@ -1,23 +1,16 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Card,
-  CardMedia,
-  Stack,
-  Typography,
-} from '@mui/material';
+import { Button, ButtonGroup, Card, CardMedia, Stack, Typography } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import { ReactNode } from 'react';
+import React from 'react';
+import FlexBox from './FlexBox';
 
 type ZoomableImageProps = {
   src: string;
   alt: string;
   description?: string;
-  actionButton?: ReactNode;
+  actionButton?: JSX.Element;
 };
 
 export default function ZoomableImage({
@@ -50,16 +43,9 @@ export default function ZoomableImage({
                 <ZoomOutMapIcon />
               </Button>
             </ButtonGroup>
-            <Box
-              width='100%'
-              height='100%'
-              marginLeft='auto'
-              display='flex'
-              justifyContent='right'
-              alignItems='right'
-            >
-              {actionButton}
-            </Box>
+            <FlexBox alignment='right'>
+              {actionButton ? actionButton : <React.Fragment />}
+            </FlexBox>
           </Stack>
           <TransformComponent>
             <CardMedia component='img' image={src} alt={alt} />

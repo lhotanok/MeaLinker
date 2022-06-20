@@ -2,7 +2,7 @@ import { Box, CircularProgress, Container, PaginationItem, Stack } from '@mui/ma
 import Pagination, { paginationClasses } from '@mui/material/Pagination';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import CenteredBox from '../../../shared/components/CenteredBox';
+import FlexBox from '../../../shared/components/FlexBox';
 import {
   MAX_PAGINATION_PAGES,
   QUERY_PARAM_NAMES,
@@ -58,7 +58,7 @@ export default function RecipesPagination({
               );
             }}
           />
-          <CenteredBox
+          <FlexBox
             children={
               paginationLoading ? (
                 <CircularProgress color='secondary' />
