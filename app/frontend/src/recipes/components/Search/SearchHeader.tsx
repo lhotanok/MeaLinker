@@ -1,5 +1,8 @@
 import { Stack, Typography } from '@mui/material';
-import { addThousandsSeparator } from '../../../shared/tools/value-prettifier';
+import {
+  addThousandsSeparator,
+  buildPlural,
+} from '../../../shared/tools/value-prettifier';
 
 type SearchHeaderProps = {
   recipesCount: number | null;
@@ -41,7 +44,7 @@ const buildSearchHeader = (
   ingredientsCount: number,
 ): string => {
   const parsedRecipesCount = addThousandsSeparator(recipesCount || 0, ',');
-  let searchHeader = `${parsedRecipesCount} recipe${recipesCount === 1 ? '' : 's'} found`;
+  let searchHeader = `${buildPlural('recipe', parsedRecipesCount)} found`;
 
   if (ingredientsCount > 0 && recipesCount === null) {
     searchHeader = 'Searching recipes...';

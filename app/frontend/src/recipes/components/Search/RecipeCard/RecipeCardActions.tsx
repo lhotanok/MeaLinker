@@ -23,7 +23,10 @@ export default function RecipeCardActions({
       <Button size='large' onClick={onViewClick}>
         View
       </Button>
-      <Typography color='text.secondary'>{`(${stepsCount} steps)`}</Typography>
+      <Typography
+        marginLeft={0.5}
+        color='text.secondary'
+      >{`(${stepsCount} steps)`}</Typography>
       <Stack direction='row' marginLeft='auto'>
         <IngredientsButton
           size='medium'

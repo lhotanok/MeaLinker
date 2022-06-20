@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Card, CardMedia, Stack, Typography } from '@mui/material';
+import { Button, ButtonGroup, Card, CardMedia, Stack } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
@@ -9,20 +9,14 @@ import FlexBox from './FlexBox';
 type ZoomableImageProps = {
   src: string;
   alt: string;
-  description?: string;
   actionButton?: JSX.Element;
 };
 
-export default function ZoomableImage({
-  src,
-  alt,
-  description,
-  actionButton,
-}: ZoomableImageProps) {
+export default function ZoomableImage({ src, alt, actionButton }: ZoomableImageProps) {
   return (
     <TransformWrapper wheel={{ wheelDisabled: true }}>
       {({ zoomIn, zoomOut, resetTransform }) => (
-        <Card elevation={0}>
+        <Card elevation={0} sx={{ maxHeight: 600 }}>
           <Stack direction='row' pb={1}>
             <ButtonGroup
               disableElevation={true}
@@ -50,9 +44,6 @@ export default function ZoomableImage({
           <TransformComponent>
             <CardMedia component='img' image={src} alt={alt} />
           </TransformComponent>
-          <Typography pt={1} color='text.secondary'>
-            {description}
-          </Typography>
         </Card>
       )}
     </TransformWrapper>

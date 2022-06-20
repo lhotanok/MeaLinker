@@ -1,16 +1,16 @@
 import {
   ListItem,
-  ListItemIcon,
   Avatar,
   ListItemText,
   Divider,
   List,
+  ListItemAvatar,
 } from '@mui/material';
 import { Fragment } from 'react';
-import FlexBox from '../../../shared/components/FlexBox';
-import { PRIMARY_COLOR } from '../../../shared/constants';
-import { shiftNonAmountIngredientsToBack } from '../../../shared/tools/value-prettifier';
-import { RecipeIngredient } from '../../types/FullRecipe';
+import FlexBox from '../../../../shared/components/FlexBox';
+import { PRIMARY_COLOR } from '../../../../shared/constants';
+import { shiftNonAmountIngredientsToBack } from '../../../../shared/tools/value-prettifier';
+import { RecipeIngredient } from '../../../types/FullRecipe';
 
 type IngredientsListProps = {
   ingredients: RecipeIngredient[];
@@ -24,7 +24,7 @@ export default function IngredientsList({ ingredients }: IngredientsListProps) {
     return (
       <Fragment key={index}>
         <ListItem>
-          <ListItemIcon>
+          <ListItemAvatar>
             {amount && (
               <FlexBox>
                 <Avatar
@@ -38,10 +38,10 @@ export default function IngredientsList({ ingredients }: IngredientsListProps) {
                 </Avatar>
               </FlexBox>
             )}
-          </ListItemIcon>
+          </ListItemAvatar>
           <ListItemText primary={text} sx={{ paddingLeft: 1 }} />
         </ListItem>
-        {index !== ingredients.length - 1 && <Divider component='li' variant='middle' />}
+        {index !== ingredients.length - 1 && <Divider component='li' variant='inset' />}
       </Fragment>
     );
   });

@@ -101,3 +101,9 @@ export const shiftNonAmountIngredientsToBack = (
 
   return amountIngredients.concat(nonAmountIngredients);
 };
+
+export const buildPlural = (textRoot: string, countable: number | string | any[]) => {
+  const count = Array.isArray(countable) ? countable.length : countable;
+
+  return count.toString() !== '1' ? `${count} ${textRoot}s` : `${count} ${textRoot}`;
+};
