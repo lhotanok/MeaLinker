@@ -2,9 +2,8 @@ import { Fragment, useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import SearchIngredients from '../../ingredients/components/SearchIngredients';
-import SearchIngredientBar from '../../ingredients/components/SearchIngredientBar';
-import RecipesGrid from '../components/RecipesGrid';
+import SearchIngredientBar from '../components/Search/SearchIngredientBar';
+import RecipesGrid from '../components/Search/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
 import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
 import { SearchedIngredient } from '../types/SearchedIngredient';
@@ -14,8 +13,9 @@ import {
   buildUrl,
   parseIngredients,
 } from '../../shared/tools/request-parser';
-import SearchHeader from '../components/SearchHeader';
-import RecipesPagination from '../components/RecipesPagination';
+import SearchHeader from '../components/Search/SearchHeader';
+import SearchIngredients from '../components/Search/SearchedIngredients';
+import RecipesPagination from '../components/Search/RecipesPagination';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -162,12 +162,6 @@ const prepareRecipes = (
   const searchedRecipes = docs
     .slice(offset, offset + PAGINATION_RESULTS_COUNT)
     .map((recipeDoc) => {
-      const date = new Intl.DateTimeFormat('en-US', {
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      }).format(new Date(recipeDoc.date)); // example date format: June 5, 2022
-
       const { id } = recipeDoc;
       const recipeHighlighting = highlighting[id];
       const ingredients =
@@ -178,7 +172,6 @@ const prepareRecipes = (
       const searchedRecipe: SimpleRecipe = {
         ...recipeDoc,
         ingredients,
-        date,
       };
 
       return searchedRecipe;

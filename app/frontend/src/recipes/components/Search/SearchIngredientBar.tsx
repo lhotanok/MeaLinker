@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import AutocompleteSearchBar from '../../shared/components/AutocompleteSearchBar';
-import useHttp from '../../shared/hooks/use-http';
-import { SimpleIngredient } from '../types/SimpleIngredient';
+import AutocompleteSearchBar from '../../../shared/components/AutocompleteSearchBar';
+import useHttp from '../../../shared/hooks/use-http';
+import { SimpleIngredient } from '../../types/SimpleIngredient';
 
 type SearchIngredientBarProps = {
   onSearch: (searchedItems: string[]) => void;

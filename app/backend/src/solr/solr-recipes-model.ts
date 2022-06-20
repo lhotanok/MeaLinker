@@ -1,5 +1,4 @@
 import log4js from 'log4js';
-import { DEFAULT_PAGINATION_RESULTS_COUNT } from '../constants';
 
 import { CORES } from './config';
 import SolrModel from './solr-model';

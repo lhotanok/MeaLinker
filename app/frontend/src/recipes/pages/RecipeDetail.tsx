@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import LoadingProgress from '../../shared/components/LoadingProgress';
 import useHttp from '../../shared/hooks/use-http';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
-import { Grid } from '@mui/material';
+import { Button, Grid } from '@mui/material';
 import ZoomableImage from '../../shared/components/ZoomableImage';
+import { convertToReadableDate } from '../../shared/tools/value-format-parser';
+import RecipeHeader from '../components/Detail/RecipeHeader';
+import IngredientsCard from '../components/Detail/IngredientsCard';
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<FullRecipe>({
@@ -37,25 +38,46 @@ export default function RecipeDetail() {
     [recipeId, fetchRecipe],
   );
 
-  let headlineText = recipe.jsonld ? recipe.jsonld.name : '';
+  let headlineText = recipe.jsonld.name ? recipe.jsonld.name : '';
   if (error) headlineText = 'Recipe could not be loaded';
   if (isLoading) headlineText = ''; // 'Loading recipe...';
 
+  const viewSourceButton = (
+    <Button size='large' href={recipe.jsonld.url}>
+      View Source
+    </Button>
+  );
+
   return (
     <Container>
-      <Box pt={3} pl={2}>
-        <Grid container>
-          <Grid item key='headline' xs={12}>
-            <Typography component='h1' variant='h4' color='text.primary' gutterBottom>
-              {headlineText}
-            </Typography>
-          </Grid>
-          {isLoading && <LoadingProgress />}
-          <Grid item key={'banner'} xs={8}>
-            <ZoomableImage src={recipe.jsonld.image} alt={recipe.jsonld.name} />
+      <Grid container padding={3} spacing={3}>
+        {isLoading && <LoadingProgress />}
+        <Grid item key='left-column' xs={8}>
+          <Grid container>
+            <RecipeHeader
+              headline={headlineText}
+              description={recipe.jsonld.description}
+              rating={recipe.structured.rating}
+            />
+            <Grid pt={3} xs={12} item key={'banner'}>
+              <ZoomableImage
+                src={recipe.jsonld.image}
+                alt={recipe.jsonld.name}
+                description={`Published: ${convertToReadableDate(
+                  recipe.jsonld.datePublished,
+                )}`}
+                actionButton={viewSourceButton}
+              />
+            </Grid>
           </Grid>
         </Grid>
-      </Box>
+        <Grid item key='right-column' xs={4}>
+          <IngredientsCard
+            ingredients={recipe.structured.ingredients}
+            servings={recipe.structured.servings}
+          />
+        </Grid>
+      </Grid>
     </Container>
   );
 }

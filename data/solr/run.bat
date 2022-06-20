@@ -1,1 +1,1 @@
-docker start solr-mealinker
+node documents-manager.js

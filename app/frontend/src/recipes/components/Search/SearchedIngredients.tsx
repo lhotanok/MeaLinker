@@ -1,18 +1,18 @@
-import RemovableChips from '../../shared/components/RemovableChips';
 import Stack from '@mui/material/Stack';
-import { SearchedIngredient } from '../../recipes/types/SearchedIngredient';
+import RemovableChips from '../../../shared/components/RemovableChips';
+import { SearchedIngredient } from '../../types/SearchedIngredient';
 
-type SearchIngredientsProps = {
+type SearchedIngredientsProps = {
   ingredients: SearchedIngredient[];
   onRemove: (event: any) => void;
   onRemoveAll: () => void;
 };
 
-export default function SearchIngredients({
+export default function SearchedIngredients({
   ingredients,
   onRemove,
   onRemoveAll,
-}: SearchIngredientsProps) {
+}: SearchedIngredientsProps) {
   return (
     <Stack sx={{ pt: 4 }} direction='row' spacing={2} justifyContent='center'>
       <RemovableChips

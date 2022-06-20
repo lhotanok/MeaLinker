@@ -4,7 +4,10 @@ import CardContent from '@mui/material/CardContent';
 import { Card, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { Fragment } from 'react';
 import reactStringReplace from 'react-string-replace';
-import { CONTINUOUS_HIGHLIGHTINGS_REGEX, HIGHLIGHTED_ITEM_REGEX } from '../../constants';
+import {
+  CONTINUOUS_HIGHLIGHTINGS_REGEX,
+  HIGHLIGHTED_ITEM_REGEX,
+} from '../../../constants';
 import IngredientIcon from './IngredientIcon';
 
 type RecipeCardCollapseProps = {
