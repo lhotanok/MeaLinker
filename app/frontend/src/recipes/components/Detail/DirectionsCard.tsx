@@ -1,7 +1,7 @@
 import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
 import directionsIcon from '../../../assets/directions-icon.png';
 import InfoCard from '../../../shared/components/InfoCard';
-import { SECONDARY_COLOR } from '../../../shared/constants';
+import { LIGHTER_SECONDARY_COLOR, SECONDARY_COLOR } from '../../../shared/constants';
 
 type DirectionsCardProps = {
   directions: string[];
@@ -14,7 +14,7 @@ export default function DirectionsCard({ directions }: DirectionsCardProps) {
         <ListItemAvatar>
           <Avatar
             sx={{
-              bgcolor: SECONDARY_COLOR,
+              bgcolor: LIGHTER_SECONDARY_COLOR,
               width: 30,
               height: 30,
             }}

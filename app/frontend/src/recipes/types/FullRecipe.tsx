@@ -6,11 +6,7 @@ export type FullRecipe = {
   jsonld: RecipeJsonld;
   structured: {
     foodComId: string;
-    time: {
-      cooking: PrepTime;
-      preparation: PrepTime;
-      total: PrepTime;
-    };
+    time: RecipeTime;
     servings: string;
     tags: string[];
     rating: {
@@ -21,6 +17,12 @@ export type FullRecipe = {
     ingredients: RecipeIngredient[];
     stepsCount: number;
   };
+};
+
+export type RecipeTime = {
+  cooking: PrepTime;
+  preparation: PrepTime;
+  total: PrepTime;
 };
 
 export type PrepTime = {

@@ -5,6 +5,7 @@ import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import React from 'react';
 import FlexBox from './FlexBox';
+import { LIGHTER_PRIMARY_COLOR, LIGHTER_SECONDARY_COLOR } from '../constants';
 
 type ZoomableImageProps = {
   src: string;
@@ -25,25 +26,28 @@ export default function ZoomableImage({ src, alt, actionButton }: ZoomableImageP
                 color='inherit'
                 aria-label='button group'
               >
-                <Button sx={{ backgroundColor: '#82b692' }} onClick={() => zoomIn()}>
+                <Button
+                  sx={{ backgroundColor: LIGHTER_SECONDARY_COLOR }}
+                  onClick={() => zoomIn()}
+                >
                   <ZoomInIcon />
                 </Button>
                 <Button sx={{ backgroundColor: '#A2DFF9' }} onClick={() => zoomOut()}>
                   <ZoomOutIcon />
                 </Button>
                 <Button
-                  sx={{ backgroundColor: '#ff6d75' }}
+                  sx={{ backgroundColor: LIGHTER_PRIMARY_COLOR }}
                   onClick={() => resetTransform()}
                 >
                   <ZoomOutMapIcon />
                 </Button>
               </ButtonGroup>
             </Grid>
-            <Grid item xs alignContent='right'>
-              <FlexBox alignment='right'>
-                {actionButton ? actionButton : <React.Fragment />}
-              </FlexBox>
-            </Grid>
+            {actionButton && (
+              <Grid item xs alignContent='right'>
+                <FlexBox alignment='right'>{actionButton}</FlexBox>
+              </Grid>
+            )}
           </Grid>
           <TransformComponent>
             <CardMedia component='img' image={src} alt={alt} />

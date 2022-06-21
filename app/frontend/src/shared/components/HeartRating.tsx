@@ -3,10 +3,11 @@ import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { LIGHTER_PRIMARY_COLOR } from '../constants';
 
 const StyledRating = styled(Rating)({
   '& .MuiRating-iconFilled': {
-    color: '#ff6d75',
+    color: LIGHTER_PRIMARY_COLOR,
   },
 });
 
@@ -23,9 +24,7 @@ export default function HeartRating({ value }: HeartRatingProps) {
         precision={0.5}
         readOnly
         icon={<FavoriteIcon fontSize='inherit' />}
-        emptyIcon={
-          <FavoriteBorderIcon style={{ opacity: 0.55 }} fontSize='inherit' />
-        }
+        emptyIcon={<FavoriteBorderIcon style={{ opacity: 0.55 }} fontSize='inherit' />}
       />
     </Box>
   );

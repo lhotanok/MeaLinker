@@ -17,7 +17,7 @@ export default function RecipeHeader({
   rating = { value: 0, reviews: 0 },
 }: RecipeHeaderProps) {
   return (
-    <Grid item pb={3}>
+    <Grid item>
       <Typography component='h1' variant='h4' color='text.primary' gutterBottom>
         {headline}
       </Typography>

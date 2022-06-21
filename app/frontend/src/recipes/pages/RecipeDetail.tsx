@@ -5,13 +5,15 @@ import LoadingProgress from '../../shared/components/LoadingProgress';
 import useHttp from '../../shared/hooks/use-http';
 import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
-import { Box, Button, Card, CardContent, Divider, Grid, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Grid, Typography } from '@mui/material';
 import ZoomableImage from '../../shared/components/ZoomableImage';
 import { convertToReadableDate } from '../../shared/tools/value-prettifier';
 import RecipeHeader from '../components/Detail/RecipeHeader';
 import IngredientsCard from '../components/Detail/IngredientsCard/IngredientsCard';
 import NutritionCard from '../components/Detail/NutritionCard/NutritionCard';
 import DirectionsCard from '../components/Detail/DirectionsCard';
+import PrepTimeBox from '../components/Detail/PrepTimeSection/PrepTimeBox';
+import PrepTimeDivider from '../components/Detail/PrepTimeSection/PrepTimeDivider';
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<FullRecipe>({
@@ -32,7 +34,7 @@ export default function RecipeDetail() {
       };
 
       const fetchedRecipeHandler = (recipe: FullRecipe) => {
-        console.log(JSON.stringify(recipe, null, 2));
+        // console.log(JSON.stringify(recipe, null, 2));
         document.title = `Recipe | ${recipe.jsonld.name}`;
         setRecipe(recipe);
       };
@@ -65,7 +67,7 @@ export default function RecipeDetail() {
       <Container maxWidth='xl'>
         <Grid container padding={3} pt={6} spacing={6}>
           {isLoading && <LoadingProgress />}
-          <Grid item key='left-column' xs>
+          <Grid item key='left-column' lg={7} md={7} sm={12}>
             <Card raised>
               <CardContent>
                 <RecipeHeader
@@ -73,8 +75,9 @@ export default function RecipeDetail() {
                   description={recipe.jsonld.description}
                   rating={recipe.structured.rating}
                 />
-                <Divider variant='middle' />
-                <Box pt={3}>
+                <PrepTimeDivider totalTime={(recipe.structured.time || {}).total} />
+                <PrepTimeBox time={recipe.structured.time || {}} />
+                <Box pt={5}>
                   <ZoomableImage
                     src={recipe.jsonld.image}
                     alt={recipe.jsonld.name}
@@ -86,14 +89,14 @@ export default function RecipeDetail() {
                 </Typography>
               </CardContent>
             </Card>
+            <DirectionsCard directions={directions} />
+          </Grid>
+          <Grid item key='right-column' xs>
+            <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
             <IngredientsCard
               ingredients={recipe.structured.ingredients}
               servings={recipe.structured.servings}
             />
-          </Grid>
-          <Grid item key='right-column' xs>
-            <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
-            <DirectionsCard directions={directions} />
           </Grid>
         </Grid>
       </Container>

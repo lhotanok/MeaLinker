@@ -42,9 +42,9 @@ export default function NutritionCard({ nutrition }: NutritionCardProps) {
   ];
 
   const nutritionGrid = (
-    <Grid container spacing={1.5}>
+    <Grid component='ul' container spacing={1.5} sx={{ padding: 0 }}>
       {nutritionItems.map(({ name, icon, value }) => (
-        <Grid item key={name} xs>
+        <Grid component='li' item key={name} xs sx={{ listStyle: 'none' }}>
           <NutritionListItem name={name} icon={icon} nutritionValue={value} />
         </Grid>
       ))}

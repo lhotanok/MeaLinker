@@ -1,6 +1,7 @@
 import humanizeDuration from 'humanize-duration';
 import { ALL_SENTENCES_REGEX, MAX_DESCRIPTION_CHARS } from '../../recipes/constants';
-import { RecipeIngredient } from '../../recipes/types/FullRecipe';
+import { PrepTime, RecipeIngredient } from '../../recipes/types/FullRecipe';
+import { MAX_MINUTES_FOR_RAW_MINUTES_FORMAT } from '../constants';
 
 export const addThousandsSeparator = (
   number: number,
@@ -57,6 +58,39 @@ export const convertToReadableTime = (minutes: number): string => {
   });
 
   return shortEnglishHumanizer(milliseconds);
+};
+
+export const joinTimeEntries = (
+  time: PrepTime,
+  preferMinutes: boolean = false,
+): string => {
+  const { weeks = 0, days = 0, hours = 0, minutes = 0 } = time;
+  let joinedTime = '';
+
+  if (preferMinutes) {
+    const totalMinutes = minutes + hours * 60 + days * 24 * 60 + weeks * 7 * 24 * 60;
+    if (totalMinutes < MAX_MINUTES_FOR_RAW_MINUTES_FORMAT) {
+      return `${totalMinutes} min`;
+    }
+  }
+
+  if (time.weeks) {
+    joinedTime += ` ${weeks} w`;
+  }
+
+  if (time.days) {
+    joinedTime += ` ${days} d`;
+  }
+
+  if (time.hours) {
+    joinedTime += ` ${hours} h`;
+  }
+
+  if (time.minutes) {
+    joinedTime += ` ${minutes} min`;
+  }
+
+  return joinedTime.trim();
 };
 
 export const buildDescriptionPreview = (description: string, name: string): string => {

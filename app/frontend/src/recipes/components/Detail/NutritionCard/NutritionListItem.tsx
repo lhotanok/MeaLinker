@@ -15,7 +15,7 @@ export default function NutritionListItem({
   const { value, unit } = nutritionValue;
 
   return (
-    <ListItem>
+    <ListItem component='div'>
       <ListItemAvatar>
         <Avatar variant='rounded' src={icon} sx={{ width: 36, height: 36 }} />
       </ListItemAvatar>
