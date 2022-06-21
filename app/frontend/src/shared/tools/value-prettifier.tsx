@@ -107,3 +107,11 @@ export const buildPlural = (textRoot: string, countable: number | string | any[]
 
   return count.toString() !== '1' ? `${count} ${textRoot}s` : `${count} ${textRoot}`;
 };
+
+/* Shuffles array elements in-place with Durstenfeld shuffle algorithm */
+export const shuffleElements = (array: any[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+};
