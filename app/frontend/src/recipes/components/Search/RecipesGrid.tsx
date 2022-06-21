@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import { SimpleRecipe } from '../../types/SimpleRecipesResponse';
@@ -10,16 +9,14 @@ type RecipesGridProps = {
 
 export default function RecipesGrid({ recipes }: RecipesGridProps) {
   return (
-    <React.Fragment>
-      <Container>
-        <Grid container spacing={4}>
-          {recipes.map((recipe) => (
-            <Grid item key={recipe.id} xs={12} md={4}>
-              <RecipeCard {...recipe} />
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </React.Fragment>
+    <Container>
+      <Grid container spacing={4}>
+        {recipes.map((recipe) => (
+          <Grid item key={recipe.id} xs>
+            <RecipeCard {...recipe} />
+          </Grid>
+        ))}
+      </Grid>
+    </Container>
   );
 }

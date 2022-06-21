@@ -10,7 +10,7 @@ import sodiumIcon from '../../../../assets/sodium-icon.png';
 import cholesterolIcon from '../../../../assets/cholesterol-icon.png';
 import InfoCard from '../../../../shared/components/InfoCard';
 import { Grid } from '@mui/material';
-import NutritionList, { NutritionItem } from './NutritionList';
+import NutritionListItem from './NutritionListItem';
 
 type NutritionCardProps = {
   nutrition: RecipeNutrition;
@@ -29,29 +29,25 @@ export default function NutritionCard({ nutrition }: NutritionCardProps) {
     sodium,
   } = nutrition;
 
-  const nutritionItems: NutritionItem[] = [
+  const nutritionItems = [
     { name: 'Calories', icon: caloriesIcon, value: calories },
-    { name: 'Carbs', icon: carbohydratesIcon, value: carbohydrate },
-    { name: 'Protein', icon: proteinIcon, value: protein },
     { name: 'Fiber', icon: fiberIcon, value: fiber },
-    { name: 'Sugar', icon: sugarIcon, value: sugar },
-    { name: 'Fat', icon: fatIcon, value: fat },
     { name: 'Cholesterol', icon: cholesterolIcon, value: cholesterol },
+    { name: 'Carbs', icon: carbohydratesIcon, value: carbohydrate },
+    { name: 'Sugar', icon: sugarIcon, value: sugar },
     { name: 'Sodium', icon: sodiumIcon, value: sodium },
+    { name: 'Protein', icon: proteinIcon, value: protein },
+    { name: 'Fat', icon: fatIcon, value: fat },
     { name: 'Saturated fat', icon: fatIcon, value: saturatedFat },
   ];
 
   const nutritionGrid = (
-    <Grid container>
-      <Grid item xs={3.7}>
-        <NutritionList nutritionItems={nutritionItems.slice(0, 3)} />
-      </Grid>
-      <Grid item xs={3.7}>
-        <NutritionList nutritionItems={nutritionItems.slice(3, 6)} />
-      </Grid>
-      <Grid item xs={4.3}>
-        <NutritionList nutritionItems={nutritionItems.slice(6, 9)} />
-      </Grid>
+    <Grid container spacing={1.5}>
+      {nutritionItems.map(({ name, icon, value }) => (
+        <Grid item key={name} xs>
+          <NutritionListItem name={name} icon={icon} nutritionValue={value} />
+        </Grid>
+      ))}
     </Grid>
   );
 

@@ -15,16 +15,6 @@ export default function SearchHeader({
 }: SearchHeaderProps) {
   return (
     <Stack direction='row' justifyContent='center'>
-      {/* <Typography
-        component='h1'
-        variant='h2'
-        align='center'
-        marginTop='5%'
-        gutterBottom
-        color='secondary'
-      >
-        678
-      </Typography> */}
       <Typography
         component='h1'
         variant='h2'

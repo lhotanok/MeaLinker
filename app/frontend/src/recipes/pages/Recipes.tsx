@@ -1,4 +1,4 @@
-import { Fragment, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -14,7 +14,7 @@ import {
   parseIngredients,
 } from '../../shared/tools/request-parser';
 import SearchHeader from '../components/Search/SearchHeader';
-import SearchIngredients from '../components/Search/SearchedIngredients';
+import SearchedIngredients from '../components/Search/SearchedIngredients';
 import RecipesPagination from '../components/Search/RecipesPagination';
 
 export default function Recipes() {
@@ -99,7 +99,7 @@ export default function Recipes() {
   };
 
   return (
-    <Fragment>
+    <Container>
       <Box
         sx={{
           bgcolor: 'background.paper',
@@ -110,7 +110,7 @@ export default function Recipes() {
         <Container maxWidth='md'>
           <SearchIngredientBar onSearch={searchByIngredientsHandler} />
           <SearchHeader recipesCount={totalCount} ingredientsCount={ingredients.length} />
-          <SearchIngredients
+          <SearchedIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
             onRemoveAll={searchIngredientsRemoveAllHandler}
@@ -127,7 +127,7 @@ export default function Recipes() {
       ) : (
         ''
       )}
-    </Fragment>
+    </Container>
   );
 }
 

@@ -65,7 +65,7 @@ export default function RecipeDetail() {
       <Container maxWidth='xl'>
         <Grid container padding={3} pt={6} spacing={6}>
           {isLoading && <LoadingProgress />}
-          <Grid item key='left-column' xs={7}>
+          <Grid item key='left-column' xs>
             <Card raised>
               <CardContent>
                 <RecipeHeader
@@ -86,14 +86,14 @@ export default function RecipeDetail() {
                 </Typography>
               </CardContent>
             </Card>
-            <DirectionsCard directions={directions} />
-          </Grid>
-          <Grid item key='right-column' xs={5}>
-            <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
             <IngredientsCard
               ingredients={recipe.structured.ingredients}
               servings={recipe.structured.servings}
             />
+          </Grid>
+          <Grid item key='right-column' xs>
+            <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
+            <DirectionsCard directions={directions} />
           </Grid>
         </Grid>
       </Container>

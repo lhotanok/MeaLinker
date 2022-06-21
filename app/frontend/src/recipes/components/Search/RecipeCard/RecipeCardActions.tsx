@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { styled } from '@mui/material/styles';
 import { SvgIcon, SvgIconProps, Typography } from '@mui/material';
+import { buildPlural } from '../../../../shared/tools/value-prettifier';
 
 type RecipeCardActionsProps = {
   expanded: boolean;
@@ -23,10 +24,9 @@ export default function RecipeCardActions({
       <Button size='large' onClick={onViewClick}>
         View
       </Button>
-      <Typography
-        marginLeft={0.5}
-        color='text.secondary'
-      >{`(${stepsCount} steps)`}</Typography>
+      <Typography marginLeft={0.5} align='center' color='text.secondary'>
+        {buildPlural('step', stepsCount)}
+      </Typography>
       <Stack direction='row' marginLeft='auto'>
         <IngredientsButton
           size='medium'
