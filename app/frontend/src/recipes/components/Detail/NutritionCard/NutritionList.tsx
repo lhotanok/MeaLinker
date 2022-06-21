@@ -14,7 +14,9 @@ export type NutritionItem = {
 
 export default function NutritionList({ nutritionItems }: NutritionListProps) {
   const nutritionListItems = nutritionItems.map(({ name, icon, value }) => {
-    return <NutritionListItem name={name} icon={icon} nutritionValue={value} />;
+    return (
+      <NutritionListItem name={name} key={name} icon={icon} nutritionValue={value} />
+    );
   });
 
   return <List>{nutritionListItems}</List>;

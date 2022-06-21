@@ -1,4 +1,5 @@
 import { Route, Navigate, Routes } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import Recipes from './recipes/pages/Recipes';
 import { createTheme, ThemeProvider } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -21,18 +22,20 @@ const theme = createTheme({
 
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Header />
-      <main>
-        <Routes>
-          <Route path='/recipes' element={<Recipes />} />
-          <Route path='/recipes/:recipeId' element={<RecipeDetail />} />
-          <Route path='/ingredients/:ingredientId' element={<IngredientDetail />} />
-          <Route path='/' element={<Navigate to='/recipes' />} />
-        </Routes>
-      </main>
-      <Footer />
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Header />
+        <main>
+          <Routes>
+            <Route path='/recipes' element={<Recipes />} />
+            <Route path='/recipes/:recipeId' element={<RecipeDetail />} />
+            <Route path='/ingredients/:ingredientId' element={<IngredientDetail />} />
+            <Route path='/' element={<Navigate to='/recipes' />} />
+          </Routes>
+        </main>
+        <Footer />
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }

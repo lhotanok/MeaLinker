@@ -10,7 +10,7 @@ type DirectionsCardProps = {
 export default function DirectionsCard({ directions }: DirectionsCardProps) {
   const directionListItems = directions.map((direction, index) => {
     return (
-      <ListItem>
+      <ListItem key={index}>
         <ListItemAvatar>
           <Avatar
             sx={{

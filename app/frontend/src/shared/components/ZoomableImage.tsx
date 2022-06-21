@@ -24,14 +24,14 @@ export default function ZoomableImage({ src, alt, actionButton }: ZoomableImageP
               color='inherit'
               aria-label='button group'
             >
-              <Button sx={{ backgroundColor: '#80cbc4' }} onClick={() => zoomIn()}>
+              <Button sx={{ backgroundColor: '#82b692' }} onClick={() => zoomIn()}>
                 <ZoomInIcon />
               </Button>
-              <Button sx={{ backgroundColor: '#90caf9' }} onClick={() => zoomOut()}>
+              <Button sx={{ backgroundColor: '#A2DFF9' }} onClick={() => zoomOut()}>
                 <ZoomOutIcon />
               </Button>
               <Button
-                sx={{ backgroundColor: '#b39ddb' }}
+                sx={{ backgroundColor: '#ff6d75' }}
                 onClick={() => resetTransform()}
               >
                 <ZoomOutMapIcon />

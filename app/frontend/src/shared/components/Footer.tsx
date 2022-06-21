@@ -32,13 +32,17 @@ export default function Footer() {
           recipe details.
         </Typography>
         <Typography align='center'>
-          <FlaticonLink iconCategory='Vegetable' author='justicon' />
+          <FlaticonLink iconCategory='Vegetable' author='justicon and Icongeek26' />
           <FlaticonLink iconCategory='Food' author='Freepik' />
           <FlaticonLink iconCategory='Nutrition' author='Freepik' />
           <FlaticonLink iconCategory='Cook' author='Freepik' />
           <FlaticonLink iconCategory='Wheat' author='DinosoftLabs' />
           <FlaticonLink iconCategory='Calories' author='Vitaly Gorbachev' />
           <FlaticonLink iconCategory='Trans fat free' author='Vitaly Gorbachev' />
+          <FlaticonLink iconCategory='Protein' author='iconixar' />
+          <FlaticonLink iconCategory='Sugar' author='Freepik' />
+          <FlaticonLink iconCategory='Cholesterol' author='photo3idea_studio' />
+          <FlaticonLink iconCategory='Sodium' author='Smashicons' />
         </Typography>
         <Copyright />
       </Stack>

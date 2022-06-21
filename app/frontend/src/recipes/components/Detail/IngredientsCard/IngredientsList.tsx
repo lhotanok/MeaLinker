@@ -5,9 +5,9 @@ import {
   Divider,
   List,
   ListItemAvatar,
+  Box,
 } from '@mui/material';
 import { Fragment } from 'react';
-import FlexBox from '../../../../shared/components/FlexBox';
 import { PRIMARY_COLOR } from '../../../../shared/constants';
 import { shiftNonAmountIngredientsToBack } from '../../../../shared/tools/value-prettifier';
 import { RecipeIngredient } from '../../../types/FullRecipe';
@@ -26,7 +26,7 @@ export default function IngredientsList({ ingredients }: IngredientsListProps) {
         <ListItem>
           <ListItemAvatar>
             {amount && (
-              <FlexBox>
+              <Box display='flex' justifyContent='center' alignItems='center' height={6}>
                 <Avatar
                   sx={{
                     color: PRIMARY_COLOR,
@@ -36,7 +36,7 @@ export default function IngredientsList({ ingredients }: IngredientsListProps) {
                 >
                   {amount}
                 </Avatar>
-              </FlexBox>
+              </Box>
             )}
           </ListItemAvatar>
           <ListItemText primary={text} sx={{ paddingLeft: 1 }} />

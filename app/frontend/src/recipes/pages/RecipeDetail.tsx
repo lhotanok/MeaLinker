@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
 import LoadingProgress from '../../shared/components/LoadingProgress';
 import useHttp from '../../shared/hooks/use-http';
@@ -55,40 +56,47 @@ export default function RecipeDetail() {
     .map((instruction) => instruction.text);
 
   return (
-    <Container maxWidth='xl'>
-      <Grid container padding={3} pt={6} spacing={6}>
-        {isLoading && <LoadingProgress />}
-        <Grid item key='left-column' xs={7}>
-          <Card raised>
-            <CardContent>
-              <RecipeHeader
-                headline={headlineText}
-                description={recipe.jsonld.description}
-                rating={recipe.structured.rating}
-              />
-              <Divider variant='middle' />
-              <Box pt={3}>
-                <ZoomableImage
-                  src={recipe.jsonld.image}
-                  alt={recipe.jsonld.name}
-                  actionButton={viewSourceButton}
+    <Fragment>
+      <Helmet>
+        <script className='recipe-jsonld' type='application/ld+json'>
+          {JSON.stringify(recipe.jsonld)}
+        </script>
+      </Helmet>
+      <Container maxWidth='xl'>
+        <Grid container padding={3} pt={6} spacing={6}>
+          {isLoading && <LoadingProgress />}
+          <Grid item key='left-column' xs={7}>
+            <Card raised>
+              <CardContent>
+                <RecipeHeader
+                  headline={headlineText}
+                  description={recipe.jsonld.description}
+                  rating={recipe.structured.rating}
                 />
-              </Box>
-              <Typography pt={1} color='text.secondary'>
-                {`Published: ${convertToReadableDate(recipe.jsonld.datePublished)}`}
-              </Typography>
-            </CardContent>
-          </Card>
-          <DirectionsCard directions={directions} />
+                <Divider variant='middle' />
+                <Box pt={3}>
+                  <ZoomableImage
+                    src={recipe.jsonld.image}
+                    alt={recipe.jsonld.name}
+                    actionButton={viewSourceButton}
+                  />
+                </Box>
+                <Typography pt={1} color='text.secondary'>
+                  {`Published: ${convertToReadableDate(recipe.jsonld.datePublished)}`}
+                </Typography>
+              </CardContent>
+            </Card>
+            <DirectionsCard directions={directions} />
+          </Grid>
+          <Grid item key='right-column' xs={5}>
+            <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
+            <IngredientsCard
+              ingredients={recipe.structured.ingredients}
+              servings={recipe.structured.servings}
+            />
+          </Grid>
         </Grid>
-        <Grid item key='right-column' xs={5}>
-          <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
-          <IngredientsCard
-            ingredients={recipe.structured.ingredients}
-            servings={recipe.structured.servings}
-          />
-        </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </Fragment>
   );
 }

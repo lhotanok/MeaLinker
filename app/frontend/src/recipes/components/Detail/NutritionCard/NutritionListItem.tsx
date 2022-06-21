@@ -17,7 +17,7 @@ export default function NutritionListItem({
   return (
     <ListItem>
       <ListItemAvatar>
-        <Avatar variant='square' src={icon} sx={{ width: 35, height: 35 }} />
+        <Avatar variant='rounded' src={icon} sx={{ width: 36, height: 36 }} />
       </ListItemAvatar>
       <ListItemText
         primary={name}
