@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -31,8 +31,14 @@ export default function Recipes() {
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [addSnackbarOpen, setAddSnackbarOpen] = useState(false);
-  const [addSnackbarText, setAddSnackbarText] = useState('');
-  const [newSnackbarText, setNewSnackbarText] = useState('');
+  const [addSnackbarText, setAddSnackbarText] = useState<{
+    text: string;
+    severity: 'success' | 'info';
+  } | null>(null);
+  const [newSnackbarText, setNewSnackbarText] = useState<{
+    text: string;
+    severity: 'success' | 'info';
+  } | null>(null);
 
   const { sendRequest: fetchRecipes } = useHttp();
 
@@ -65,9 +71,9 @@ export default function Recipes() {
     () => {
       if (newSnackbarText && !addSnackbarOpen) {
         // Set a new snack when we don't have an active one
-        setAddSnackbarText(newSnackbarText);
+        setAddSnackbarText({ ...newSnackbarText });
         setAddSnackbarOpen(true);
-        setNewSnackbarText('');
+        setNewSnackbarText(null);
       } else if (addSnackbarOpen && newSnackbarText) {
         // Close an active snack when a new one is added
         setAddSnackbarOpen(false);
@@ -95,7 +101,7 @@ export default function Recipes() {
             ? `${addedIngredients[0].label} added`
             : `${addedIngredients.length} ingredients added`;
 
-        setNewSnackbarText(snackbarText);
+        setNewSnackbarText({ text: snackbarText, severity: 'success' });
 
         navigate(
           buildUrl(pathname, queryParams, {
@@ -108,6 +114,10 @@ export default function Recipes() {
 
   const searchIngredientRemoveHandler = (removedIngredient: SearchedIngredient) => {
     setTotalCount(null);
+
+    setNewSnackbarText(
+      { text: `${removedIngredient.label} removed`, severity: 'info' },
+    );
 
     const filteredIngredients = ingredients.filter(
       (ingredient) => ingredient.label !== removedIngredient.label,
@@ -122,6 +132,15 @@ export default function Recipes() {
 
   const searchIngredientsRemoveAllHandler = () => {
     setTotalCount(null);
+
+    const snackbarText =
+      ingredients.length === 1
+        ? `${ingredients[0].label} removed`
+        : `${ingredients.length === 2
+            ? 'Both'
+            : `All ${ingredients.length}`} ingredients removed`;
+
+    setNewSnackbarText({ text: snackbarText, severity: 'info' });
 
     navigate(
       buildUrl(pathname, queryParams, {
@@ -140,7 +159,7 @@ export default function Recipes() {
     }
 
     setAddSnackbarOpen(false);
-    setAddSnackbarText('');
+    setAddSnackbarText(null);
   };
 
   return (
@@ -161,13 +180,13 @@ export default function Recipes() {
             onRemoveAll={searchIngredientsRemoveAllHandler}
           />
           <Snackbar
-            key={addSnackbarText}
+            key={addSnackbarText?.text}
             open={addSnackbarOpen}
             onClose={handleAddSnackbarClose}
             autoHideDuration={4000}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           >
-            <Alert severity='success'>{addSnackbarText}</Alert>
+            <Alert severity={addSnackbarText?.severity}>{addSnackbarText?.text}</Alert>
           </Snackbar>
         </Container>
       </Box>
