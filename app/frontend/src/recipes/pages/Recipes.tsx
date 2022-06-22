@@ -59,17 +59,20 @@ export default function Recipes() {
 
   const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
     if (searchIngredientLabels.length > 0) {
-      setTotalCount(null);
       const mergedIngredients = mergeSearchIngredients(
         ingredients,
         searchIngredientLabels,
       );
 
-      navigate(
-        buildUrl(pathname, queryParams, {
-          ingredients: mergedIngredients,
-        }),
-      );
+      if (mergedIngredients.length > ingredients.length) {
+        setTotalCount(null);
+
+        navigate(
+          buildUrl(pathname, queryParams, {
+            ingredients: mergedIngredients,
+          }),
+        );
+      }
     }
   };
 

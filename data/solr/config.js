@@ -3,7 +3,7 @@ const COUCHDB = {
   USERNAME: 'admin',
   PASSWORD: process.env.COUCHDB_PASSWORD,
   RECIPES_DB_NAME: 'recipes',
-  INGREDIENTS_DB_NAME: 'ingredients',
+  INGREDIENTS_DB_NAME: 'search-ingredients',
 };
 
 const SOLR = {

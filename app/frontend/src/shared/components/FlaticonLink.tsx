@@ -1,4 +1,5 @@
 import Link from '@mui/material/Link';
+import { LIGHTER_PRIMARY_COLOR } from '../constants';
 
 type FlaticonLinkProps = {
   iconCategory: string;
@@ -11,7 +12,7 @@ export default function FlaticonLink({ iconCategory, author }: FlaticonLinkProps
 
   return (
     <Link
-      style={{ color: 'primary' }}
+      style={{ color: LIGHTER_PRIMARY_COLOR }}
       href={`https://www.flaticon.com/free-icons/${urlCategory}`}
       title={`${lowercaseCategory} icons`}
     >

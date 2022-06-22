@@ -21,6 +21,8 @@ import {
   FOOD_COM_INGREDIENTS_PATH,
   RECIPES_DATABASE_NAME,
   INGREDIENTS_DATABASE_NAME,
+  SEARCH_INGREDIENTS_DATABASE_NAME,
+  FOOD_COM_SEARCH_INGREDIENTS_PATH,
 } from './constants.mjs';
 
 import nanoRoot from 'nano';
@@ -115,10 +117,11 @@ async function insertRecipes(mealinkerDb) {
   }
 }
 
-async function insertIngredients(mealinkerDb) {
-  const ingredients = loadJsonFromFile(FOOD_COM_INGREDIENTS_PATH);
-
-  log.info(`Inserting ${ingredients.length} ingredients into ingredients database...`);
+async function insertIngredients(mealinkerDb, ingredients) {
+  log.info(
+    `Inserting ${ingredients.length} ingredients into ${mealinkerDb.config
+      .db} database...`,
+  );
 
   for (const ingredient of ingredients) {
     const { identifier } = ingredient;
@@ -129,6 +132,7 @@ async function insertIngredients(mealinkerDb) {
 async function main() {
   const recipeDb = nano.use(RECIPES_DATABASE_NAME);
   const ingredientsDb = nano.use(INGREDIENTS_DATABASE_NAME);
+  const searchIngredientsDb = nano.use(SEARCH_INGREDIENTS_DATABASE_NAME);
 
   /**
    * Destroying the old DB and creating a new one is easier than updating the old DB.
@@ -137,12 +141,18 @@ async function main() {
    */
   await destroyDatabase(RECIPES_DATABASE_NAME);
   await destroyDatabase(INGREDIENTS_DATABASE_NAME);
+  await destroyDatabase(SEARCH_INGREDIENTS_DATABASE_NAME);
 
   await createDatabase(RECIPES_DATABASE_NAME);
   await createDatabase(INGREDIENTS_DATABASE_NAME);
+  await createDatabase(SEARCH_INGREDIENTS_DATABASE_NAME);
+
+  const ingredients = loadJsonFromFile(FOOD_COM_INGREDIENTS_PATH);
+  const searchIngredients = loadJsonFromFile(FOOD_COM_SEARCH_INGREDIENTS_PATH);
 
   insertRecipes(recipeDb);
-  insertIngredients(ingredientsDb);
+  insertIngredients(ingredientsDb, ingredients);
+  insertIngredients(searchIngredientsDb, searchIngredients);
 }
 
 (async () => {

@@ -18,8 +18,15 @@ class SolrModel {
     this.client = SolrClientFactory.getClient(core);
   }
 
-  protected async fetchAllDocuments<SolrDocument>(): Promise<SolrDocument[]> {
-    const query = this.client.query().q('*').rows(DEFAULT_MAX_RESULTS_COUNT);
+  protected async fetchAllDocuments<SolrDocument>(
+    sortOptions?: Record<string, any>,
+  ): Promise<SolrDocument[]> {
+    let query = this.client.query().q('*').rows(DEFAULT_MAX_RESULTS_COUNT);
+
+    if (sortOptions) {
+      query = query.sort(sortOptions);
+    }
+
     return this.fetchDocumentsByQuery<SolrDocument>(query);
   }
 

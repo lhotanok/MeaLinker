@@ -4,15 +4,18 @@ import ingredientsIcon from '../../../../assets/diet-icon.png';
 import IngredientsList from './IngredientsList';
 import InfoCard from '../../../../shared/components/InfoCard';
 import { buildPlural } from '../../../../shared/tools/value-prettifier';
+import { SimpleIngredient } from '../../../types/SimpleIngredient';
 
 type IngredientsCardProps = {
   ingredients?: RecipeIngredient[];
   servings?: string;
+  detailIngredients: SimpleIngredient[];
 };
 
 export default function IngredientsCard({
   ingredients = [],
   servings,
+  detailIngredients,
 }: IngredientsCardProps) {
   const subheader = servings ? `Yield: ${buildPlural('serving', servings)}` : '';
   return (
@@ -21,7 +24,12 @@ export default function IngredientsCard({
         title='Ingredients'
         subheader={subheader}
         iconSrc={ingredientsIcon}
-        content={<IngredientsList ingredients={ingredients} />}
+        content={
+          <IngredientsList
+            ingredients={ingredients}
+            detailIngredients={detailIngredients}
+          />
+        }
       />
     </Box>
   );

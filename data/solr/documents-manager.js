@@ -117,8 +117,7 @@ function filterRecipeIndexedFields(recipe) {
 }
 
 function filterIngredientIndexedFields(ingredient) {
-  const { _id, jsonld } = ingredient;
-  const { label, thumbnail } = jsonld;
+  const { _id, label, thumbnail } = ingredient;
 
   const filteredIngredient = {
     id: _id,
@@ -130,7 +129,7 @@ function filterIngredientIndexedFields(ingredient) {
 }
 
 function removeRecipesWithoutImage(recipes) {
-  log.info('Shifting non-image recipes to the back...');
+  log.info('Removing recipes without image...');
 
   const imageRecipes = [];
   const nonImageRecipes = [];
@@ -171,6 +170,74 @@ async function pushDocumentsToSolr(documents, core) {
   log.info(`Commit response: ${JSON.stringify(commitResponse, null, 2)}`);
 }
 
+async function buildScoredIngredientsBasedOnUsage(ingredients) {
+  const scoredIngredients = [];
+
+  const { HOST, PORT, SECURE } = SOLR;
+
+  const client = solr.createClient({
+    host: HOST,
+    port: PORT,
+    core: SOLR.CORES.RECIPES,
+    secure: SECURE,
+  });
+
+  log.info(
+    `Adding ingredient scores based on their usage. Processing ${ingredients.length} recipe search queries...`,
+  );
+
+  for (const ingredient of ingredients) {
+    const query = client.query().q(`ingredients: "${ingredient.label}"`).qop('AND');
+    const searchResponse = await client.search(query);
+    const recipesFound = searchResponse.response.numFound;
+
+    scoredIngredients.push({
+      ...ingredient,
+      recipesCount: recipesFound,
+    });
+  }
+
+  return scoredIngredients;
+}
+
+function filterIngredients(scoredIngredients) {
+  log.info(
+    `Performing the following filter operations:
+     - removing ingredients that are not used in any recipe from the current collection
+     - removing duplicate ingredients`,
+  );
+
+  const scoreMapping = {};
+  scoredIngredients.forEach((ingredient) => {
+    scoreMapping[ingredient.recipesCount] = scoreMapping[ingredient.recipesCount]
+      ? [...scoreMapping[ingredient.recipesCount], ingredient]
+      : [ingredient];
+  });
+
+  const filteredIngredients = scoredIngredients
+    .filter((ingredient) => ingredient.recipesCount !== 0)
+    .filter((ingredient) => {
+      const sameScoreIngredients = scoreMapping[ingredient.recipesCount];
+
+      for (const ingr of sameScoreIngredients) {
+        const currentLabelRoot = ingredient.label.slice(0, ingredient.label.length - 1);
+        const storedLabelRoot = ingr.label.slice(0, ingr.label.length - 1);
+        if (
+          currentLabelRoot.replace(/-/g, ' ').startsWith(storedLabelRoot) &&
+          ingredient.label !== ingr.label
+        ) {
+          // There's another ingredient with the same score and shorter name, we'll include only that ingredient
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+  log.info(`Filtered: ${filteredIngredients.length} ingredients`);
+  return filteredIngredients;
+}
+
 async function main() {
   const recipes = [];
   const ingredients = [];
@@ -189,9 +256,11 @@ async function main() {
   const { CORES: { RECIPES, INGREDIENTS } } = SOLR;
 
   const filteredRecipes = removeRecipesWithoutImage(recipes);
-
   await pushDocumentsToSolr(filteredRecipes, RECIPES);
-  await pushDocumentsToSolr(ingredients, INGREDIENTS);
+
+  const scoredIngredients = await buildScoredIngredientsBasedOnUsage(ingredients);
+  const filteredIngredients = await filterIngredients(scoredIngredients);
+  await pushDocumentsToSolr(filteredIngredients, INGREDIENTS);
 }
 
 (async () => {

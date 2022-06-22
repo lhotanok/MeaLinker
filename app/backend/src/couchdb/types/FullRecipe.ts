@@ -1,3 +1,4 @@
+import { LocalizedValue } from './FullIngredient';
 import { RecipeJsonld } from './RecipeJsonld';
 
 export type FullRecipe = {
@@ -54,4 +55,5 @@ export type RecipeIngredient = {
   amount: string;
   text: string;
   thumbnail?: string;
+  label?: LocalizedValue;
 };

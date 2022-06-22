@@ -16,13 +16,16 @@ class SolrIngredientsModel extends SolrModel {
     super(INGREDIENTS);
   }
 
-  public async getAllIngredients() : Promise<Ingredient[]> {
-    const ingredients = await this.fetchAllDocuments<Ingredient>();
+  public async getAllIngredients(): Promise<Ingredient[]> {
+    const sortOptions = { recipesCount: 'desc' };
+    const ingredients = await this.fetchAllDocuments<Ingredient>(sortOptions);
+
     log.info(`Fetched ${ingredients.length} ingredients`);
+
     return ingredients;
   }
 
-  public async getIngredientById(ingredientId: string) : Promise<Ingredient> {
+  public async getIngredientById(ingredientId: string): Promise<Ingredient> {
     const ingredient = await this.fetchDocumentById<Ingredient>(ingredientId);
     return ingredient;
   }

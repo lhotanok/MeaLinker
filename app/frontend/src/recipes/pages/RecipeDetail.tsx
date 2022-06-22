@@ -14,23 +14,29 @@ import NutritionCard from '../components/Detail/NutritionCard/NutritionCard';
 import DirectionsCard from '../components/Detail/DirectionsCard';
 import PrepTimeBox from '../components/Detail/PrepTimeSection/PrepTimeBox';
 import PrepTimeDivider from '../components/Detail/PrepTimeSection/PrepTimeDivider';
+import { SimpleIngredient } from '../types/SimpleIngredient';
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<FullRecipe>({
     jsonld: {},
     structured: {},
   } as FullRecipe);
+  const [ingredients, setIngredients] = useState<SimpleIngredient[]>([]);
 
   const params = useParams();
   const { recipeId } = params;
 
-  const { isLoading, error, sendRequest: fetchRecipe } = useHttp();
+  const { isLoading, error, sendRequest } = useHttp();
 
   useEffect(
     () => {
       window.scrollTo(0, 0);
-      const requestConfig = {
+      const recipeRequestConfig = {
         url: `http://localhost:5000/api/recipes/${recipeId}`,
+      };
+
+      const ingredientsRequestConfig = {
+        url: `http://localhost:5000/api/ingredients`,
       };
 
       const fetchedRecipeHandler = (recipe: FullRecipe) => {
@@ -39,9 +45,14 @@ export default function RecipeDetail() {
         setRecipe(recipe);
       };
 
-      fetchRecipe(requestConfig, fetchedRecipeHandler);
+      const fetchedIngredientsHandler = (ingredients: SimpleIngredient[]) => {
+        setIngredients(ingredients);
+      };
+
+      sendRequest(recipeRequestConfig, fetchedRecipeHandler);
+      sendRequest(ingredientsRequestConfig, fetchedIngredientsHandler);
     },
-    [recipeId, fetchRecipe],
+    [recipeId, sendRequest],
   );
 
   let headlineText = recipe.jsonld.name ? recipe.jsonld.name : '';
@@ -96,6 +107,7 @@ export default function RecipeDetail() {
             <IngredientsCard
               ingredients={recipe.structured.ingredients}
               servings={recipe.structured.servings}
+              detailIngredients={ingredients}
             />
           </Grid>
         </Grid>

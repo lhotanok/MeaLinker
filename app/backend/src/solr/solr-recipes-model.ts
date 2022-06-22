@@ -27,10 +27,14 @@ class SolrRecipesModel extends SolrModel {
     ingredients: string[],
     rows: number,
     offset: number,
+    sortOptions: Record<string, any> | undefined = {
+      rating: 'desc',
+      reviewsCount: 'desc',
+    },
   ): Promise<SolrResponse<Recipe>> {
     const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
 
-    const query = this.client
+    let query = this.client
       .query()
       .q(ingredientsQuery)
       .qop('AND')
@@ -40,7 +44,8 @@ class SolrRecipesModel extends SolrModel {
         preserveMulti: true,
       })
       .start(offset)
-      .rows(rows);
+      .rows(rows)
+      .sort(sortOptions);
 
     const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
     const solrResponse: SolrResponse<Recipe> = {

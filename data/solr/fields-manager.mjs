@@ -54,9 +54,9 @@ async function postRecipesAddFields() {
   const { INT, FLOAT, STRING } = FIELD_TYPES;
 
   const addFields = {
-    name: {},
-    description: {},
-    recipeCategory: {},
+    name: { type: STRING },
+    description: { type: STRING },
+    recipeCategory: { type: STRING },
     ingredients: { multiValued: true },
     tags: { multiValued: true },
     rating: { type: FLOAT },
@@ -82,11 +82,12 @@ async function postRecipesAddFields() {
 }
 
 async function postIngredientsAddFields() {
-  const { STRING } = FIELD_TYPES;
+  const { STRING, INT } = FIELD_TYPES;
 
   const addFields = {
-    label: {},
+    label: { type: STRING },
     thumbnail: { type: STRING, indexed: false },
+    recipesCount: { type: INT },
   };
 
   await postAddFields(addFields, SOLR_INGREDIENTS_SCHEMA);

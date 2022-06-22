@@ -49,6 +49,11 @@ export type Measurable = {
   unit: string;
 };
 
+export type LocalizedValue = {
+  '@value': string;
+  '@language': string;
+};
+
 export type RecipeIngredient = {
   identifier: string;
   foodComId: number;
@@ -56,4 +61,5 @@ export type RecipeIngredient = {
   amount: string;
   text: string;
   thumbnail?: string;
+  label?: LocalizedValue;
 };

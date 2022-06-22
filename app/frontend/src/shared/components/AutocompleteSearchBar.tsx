@@ -5,7 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
 import { Avatar } from '@mui/material';
 import { IconButton } from '@mui/material';
-import { SECONDARY_COLOR } from '../constants';
+import { MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING, SECONDARY_COLOR } from '../constants';
 import FlexBox from './FlexBox';
 
 type AutocompleteSearchBarProps = {
@@ -36,6 +36,21 @@ export default function AutocompleteSearchBar({
       selectOnFocus
       clearOnBlur
       options={hints}
+      filterOptions={(options, state) => {
+        const filteredOptions = options
+          .filter((option) => {
+            if (!state.inputValue) {
+              return option;
+            }
+
+            return option.toLowerCase().includes(state.inputValue.toLowerCase());
+          })
+          .slice(0, MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING);
+
+        console.log(`Filtered options: ${filteredOptions.length}`);
+
+        return filteredOptions;
+      }}
       renderInput={(params) => (
         <Stack direction='row' spacing={1.5}>
           <IconButton size='large' onClick={searchHandler}>

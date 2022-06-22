@@ -31,7 +31,7 @@ export default function HighlightedIngredientsList({
       <Fragment key={index}>
         <ListItem>
           <ListItemIcon>
-            <ImageIcon src={vegetableIcon} alt={ingredient} size={25} />
+            <ImageIcon src={vegetableIcon} alt={ingredient} size={20} />
           </ListItemIcon>
           <ListItemText secondary={ingredientItem} />
         </ListItem>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import AutocompleteSearchBar from '../../../shared/components/AutocompleteSearchBar';
 import useHttp from '../../../shared/hooks/use-http';
-import { shuffleElements } from '../../../shared/tools/value-prettifier';
 import { SimpleIngredient } from '../../types/SimpleIngredient';
 
 type SearchIngredientBarProps = {
@@ -20,7 +19,6 @@ export default function SearchIngredientBar({ onSearch }: SearchIngredientBarPro
       };
 
       const fetchedIngredientsHandler = (ingredients: SimpleIngredient[]) => {
-        shuffleElements(ingredients);
         setIngredients(ingredients);
       };
 
