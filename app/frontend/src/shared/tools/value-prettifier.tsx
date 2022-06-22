@@ -1,7 +1,13 @@
+import { Link, Tooltip } from '@mui/material';
 import humanizeDuration from 'humanize-duration';
+import reactStringReplace from 'react-string-replace';
 import { ALL_SENTENCES_REGEX, MAX_DESCRIPTION_CHARS } from '../../recipes/constants';
 import { PrepTime, RecipeIngredient } from '../../recipes/types/FullRecipe';
-import { MAX_MINUTES_FOR_RAW_MINUTES_FORMAT } from '../constants';
+import {
+  A_HREF_CONTENT_REGEX,
+  A_HREF_GROUPS_REGEX,
+  MAX_MINUTES_FOR_RAW_MINUTES_FORMAT,
+} from '../constants';
 
 export const addThousandsSeparator = (
   number: number,
@@ -42,6 +48,7 @@ export const convertToReadableTime = (minutes: number): string => {
 
   // Snippet from: https://www.npmjs.com/package/humanize-duration
   const shortEnglishHumanizer = humanizeDuration.humanizer({
+    delimiter: ' ',
     language: 'shortEn',
     languages: {
       shortEn: {
@@ -148,4 +155,35 @@ export const shuffleElements = (array: any[]) => {
     const j = Math.floor(Math.random() * (i + 1));
     [array[i], array[j]] = [array[j], array[i]];
   }
+};
+
+export const escapeAHrefContent = (text: string) => {
+  const hrefMatches = new RegExp(A_HREF_GROUPS_REGEX).exec(text) || [];
+
+  const previewWithoutHrefContent = text.replace(A_HREF_CONTENT_REGEX, '>');
+
+  const escapedText = reactStringReplace(
+    previewWithoutHrefContent,
+    A_HREF_GROUPS_REGEX,
+    (match, i) => {
+      const hrefUrl = hrefMatches[1];
+      const hrefText = hrefMatches[2];
+
+      console.log(`match: ${match}, i: ${i}, hrefMatches: ${hrefMatches}`);
+
+      if (match === hrefUrl) {
+        return (
+          <Tooltip key={i} title={`Go to: ${hrefUrl}`}>
+            <Link href={hrefUrl}>{hrefText || hrefUrl}</Link>
+          </Tooltip>
+        );
+      } else if (match !== hrefText) {
+        return match;
+      }
+
+      return '';
+    },
+  );
+
+  return escapedText;
 };

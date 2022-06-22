@@ -167,10 +167,19 @@ const prepareRecipes = (
     .map((recipeDoc) => {
       const { id } = recipeDoc;
       const recipeHighlighting = highlighting[id];
-      const ingredients =
-        recipeHighlighting && recipeHighlighting.ingredients
-          ? recipeHighlighting.ingredients
-          : recipeDoc.ingredients;
+      const ingredients: string[] = [];
+
+      recipeDoc.ingredients.forEach((ingredient, index) => {
+        if (
+          recipeHighlighting &&
+          recipeHighlighting.ingredients &&
+          !ingredient.includes('href') // Solr highlighting truncates <a href> content
+        ) {
+          ingredients.push(recipeHighlighting.ingredients[index]);
+        } else {
+          ingredients.push(ingredient);
+        }
+      });
 
       const searchedRecipe: SimpleRecipe = {
         ...recipeDoc,

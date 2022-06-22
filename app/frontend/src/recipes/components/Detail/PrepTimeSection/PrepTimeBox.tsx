@@ -12,7 +12,7 @@ export default function PrepTimeBox({
 }: PrepTimeBoxProps) {
   return (
     <Container>
-      <Grid container columnSpacing={3} rowSpacing={1.5} maxWidth='75%'>
+      <Grid container columnSpacing={3} rowSpacing={1.5}>
         {time.preparation && <PrepTimeItem time={time.preparation} header='Prep time' />}
         <Divider orientation='vertical' variant='middle' flexItem />
         {time.cooking && <PrepTimeItem time={time.cooking} header='Cook time' />}

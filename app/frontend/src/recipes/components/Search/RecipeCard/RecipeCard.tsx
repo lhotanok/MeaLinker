@@ -7,10 +7,13 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { SimpleRecipe } from '../../../types/SimpleRecipesResponse';
 import { CardActionArea } from '@mui/material';
+import { PAGINATION_RESULTS_COUNT } from '../../../constants';
 
-interface RecipeReviewCardProps extends SimpleRecipe {}
+interface RecipeCardProps extends SimpleRecipe {
+  position: number;
+}
 
-export default function RecipeReviewCard(props: RecipeReviewCardProps) {
+export default function RecipeCard(props: RecipeCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState<number>(0);
   const [expanded, setExpanded] = useState(false);
@@ -27,6 +30,7 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
     totalMinutes,
     image,
     ingredients = [],
+    position,
   } = props;
 
   const handleExpandClick = () => {
@@ -50,6 +54,8 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
 
     window.addEventListener('resize', handleResize);
   });
+
+  const expandedCardZIndex = PAGINATION_RESULTS_COUNT - position + 10; // 10 ensures non-negative
 
   return (
     <Card
@@ -84,6 +90,7 @@ export default function RecipeReviewCard(props: RecipeReviewCardProps) {
         expanded={expanded}
         ingredients={ingredients}
         cardWidth={width}
+        zIndex={expandedCardZIndex}
       />
     </Card>
   );

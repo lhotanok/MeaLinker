@@ -5,6 +5,7 @@ import { Box } from '@mui/material';
 import {
   buildDescriptionPreview,
   convertToReadableTime,
+  escapeAHrefContent,
 } from '../../../../shared/tools/value-prettifier';
 import HeartRating from '../../../../shared/components/HeartRating';
 
@@ -23,6 +24,9 @@ export default function RecipeCardContent({
   description,
   mins,
 }: RecipeCardProps) {
+  const descriptionPreview = buildDescriptionPreview(description, name);
+  const escapedDescription = escapeAHrefContent(descriptionPreview);
+
   return (
     <CardContent>
       <Stack direction='row'>
@@ -39,7 +43,7 @@ export default function RecipeCardContent({
       </Typography>
       <Box marginTop={1.2}>
         <Typography variant='body2' color='text.secondary'>
-          {buildDescriptionPreview(description, name)}
+          {escapedDescription}
         </Typography>
       </Box>
     </CardContent>

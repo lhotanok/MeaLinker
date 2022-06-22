@@ -8,18 +8,20 @@ type RecipeCardCollapseProps = {
   expanded: boolean;
   ingredients: string[];
   cardWidth: number;
+  zIndex: number;
 };
 
 export default function RecipeCardCollapse({
   expanded,
   ingredients,
   cardWidth,
+  zIndex,
 }: RecipeCardCollapseProps) {
   return (
     <Collapse in={expanded} timeout='auto' unmountOnExit>
       <Card
         sx={{
-          zIndex: 1,
+          zIndex,
           maxWidth: 400,
           width: cardWidth + 1,
           marginTop: -0.5,

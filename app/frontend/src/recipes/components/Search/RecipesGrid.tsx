@@ -11,11 +11,15 @@ export default function RecipesGrid({ recipes }: RecipesGridProps) {
   return (
     <Container>
       <Grid container spacing={4}>
-        {recipes.map((recipe) => (
-          <Grid item key={recipe.id} xs>
-            <RecipeCard {...recipe} />
-          </Grid>
-        ))}
+        {recipes.map((recipe, index) => {
+          const props = { ...recipe, position: index };
+
+          return (
+            <Grid item key={recipe.id} xs>
+              <RecipeCard {...props} />
+            </Grid>
+          );
+        })}
       </Grid>
     </Container>
   );

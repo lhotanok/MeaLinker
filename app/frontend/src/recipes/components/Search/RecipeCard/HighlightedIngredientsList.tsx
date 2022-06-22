@@ -7,6 +7,7 @@ import {
   HIGHLIGHTED_ITEM_REGEX,
 } from '../../../constants';
 import vegetableIcon from '../../../../assets/vegetable-icon.png';
+import { escapeAHrefContent } from '../../../../shared/tools/value-prettifier';
 
 type IngredientsListProps = {
   ingredients: string[];
@@ -21,11 +22,13 @@ export default function HighlightedIngredientsList({
       ' ',
     );
 
-    const ingredientItem = reactStringReplace(
-      mergedHighlightsIngredient,
-      HIGHLIGHTED_ITEM_REGEX,
-      (match, i) => <strong key={i}>{match}</strong>,
-    );
+    const ingredientItem = ingredient.includes('href')
+      ? escapeAHrefContent(ingredient.replace(/<\/?em>/gi, ''))
+      : reactStringReplace(
+          mergedHighlightsIngredient,
+          HIGHLIGHTED_ITEM_REGEX,
+          (match, i) => <strong key={i}>{match}</strong>,
+        );
 
     return (
       <Fragment key={index}>
