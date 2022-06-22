@@ -12,10 +12,6 @@ export const parseIngredients = (queryParams: URLSearchParams): SearchedIngredie
     };
   });
 
-  console.log(
-    `Ingredients extracted from query params: ${JSON.stringify(uniqueIngredients)}`,
-  );
-
   return uniqueIngredients as SearchedIngredient[];
 };
 

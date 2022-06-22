@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -16,6 +16,7 @@ import {
 import SearchHeader from '../components/Search/SearchHeader';
 import SearchedIngredients from '../components/Search/SearchedIngredients';
 import RecipesPagination from '../components/Search/RecipesPagination';
+import { Snackbar, Alert } from '@mui/material';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -29,6 +30,9 @@ export default function Recipes() {
 
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [addSnackbarOpen, setAddSnackbarOpen] = useState(false);
+  const [addSnackbarText, setAddSnackbarText] = useState('');
+  const [newSnackbarText, setNewSnackbarText] = useState('');
 
   const { sendRequest: fetchRecipes } = useHttp();
 
@@ -57,6 +61,21 @@ export default function Recipes() {
     [fetchRecipes, search],
   );
 
+  useEffect(
+    () => {
+      if (newSnackbarText && !addSnackbarOpen) {
+        // Set a new snack when we don't have an active one
+        setAddSnackbarText(newSnackbarText);
+        setAddSnackbarOpen(true);
+        setNewSnackbarText('');
+      } else if (addSnackbarOpen && newSnackbarText) {
+        // Close an active snack when a new one is added
+        setAddSnackbarOpen(false);
+      }
+    },
+    [addSnackbarOpen, addSnackbarText, newSnackbarText],
+  );
+
   const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
     if (searchIngredientLabels.length > 0) {
       const mergedIngredients = mergeSearchIngredients(
@@ -64,8 +83,19 @@ export default function Recipes() {
         searchIngredientLabels,
       );
 
-      if (mergedIngredients.length > ingredients.length) {
+      const addedIngredients = mergedIngredients.filter(
+        (ingr) => !ingredients.map(({ label }) => label).includes(ingr.label),
+      );
+
+      if (addedIngredients.length > 0) {
         setTotalCount(null);
+
+        const snackbarText =
+          addedIngredients.length === 1
+            ? `${addedIngredients[0].label} added`
+            : `${addedIngredients.length} ingredients added`;
+
+        setNewSnackbarText(snackbarText);
 
         navigate(
           buildUrl(pathname, queryParams, {
@@ -101,6 +131,18 @@ export default function Recipes() {
     );
   };
 
+  const handleAddSnackbarClose = (
+    _event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAddSnackbarOpen(false);
+    setAddSnackbarText('');
+  };
+
   return (
     <Container>
       <Box
@@ -118,6 +160,15 @@ export default function Recipes() {
             onRemove={searchIngredientRemoveHandler}
             onRemoveAll={searchIngredientsRemoveAllHandler}
           />
+          <Snackbar
+            key={addSnackbarText}
+            open={addSnackbarOpen}
+            onClose={handleAddSnackbarClose}
+            autoHideDuration={4000}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          >
+            <Alert severity='success'>{addSnackbarText}</Alert>
+          </Snackbar>
         </Container>
       </Box>
       <RecipesGrid recipes={paginatedRecipes} />

@@ -22,7 +22,7 @@ export default function useHttp() {
         : null;
 
       try {
-        console.log('Fetching response...', { url });
+        console.debug('Fetching response...', { url });
         const response = await fetch(url, {
           method,
           headers,
@@ -36,7 +36,7 @@ export default function useHttp() {
         const data = await response.json();
         processDataFn(data);
       } catch (err) {
-        console.log(`Error catched: ${JSON.stringify(err)}`);
+        console.debug(`Error catched: ${JSON.stringify(err)}`);
         if (err instanceof Error) {
           setError(err.message || 'Something went wrong!');
         }

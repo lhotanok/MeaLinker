@@ -21,10 +21,15 @@ export default function AutocompleteSearchBar({
 }: AutocompleteSearchBarProps) {
   const [searchedItems, setSearchedItems] = useState<string[]>([]);
 
-  const onChangeHandler = (_ev: React.SyntheticEvent<Element, Event>, value: string[]) =>
+  const onChangeHandler = (
+    _ev: React.SyntheticEvent<Element, Event>,
+    value: string[],
+  ) => {
     setSearchedItems(value);
+    onSearch(value);
+  };
 
-  const searchHandler = () => {
+  const addIngredientsHandler = () => {
     onSearch(searchedItems);
     setSearchedItems([]);
   };
@@ -47,13 +52,11 @@ export default function AutocompleteSearchBar({
           })
           .slice(0, MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING);
 
-        console.log(`Filtered options: ${filteredOptions.length}`);
-
         return filteredOptions;
       }}
       renderInput={(params) => (
         <Stack direction='row' spacing={1.5}>
-          <IconButton size='large' onClick={searchHandler}>
+          <IconButton size='large' onClick={addIngredientsHandler}>
             <Avatar sx={{ bgcolor: SECONDARY_COLOR }}>
               <AddIcon />
             </Avatar>

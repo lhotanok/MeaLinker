@@ -33,6 +33,7 @@ export default function HighlightedIngredient({
           if (index === 1) {
             return (
               <Tooltip
+                key={index}
                 title={
                   <Stack>
                     See more
