@@ -17,10 +17,28 @@ class SolrRecipesModel extends SolrModel {
     super(RECIPES);
   }
 
-  public async getAllRecipes(): Promise<Recipe[]> {
-    const recipes = await this.fetchAllDocuments<Recipe>();
-    log.info(`Fetched ${recipes.length} recipes`);
-    return recipes;
+  public async getAllRecipes(
+    rows: number,
+    offset: number,
+    sortOptions: Record<string, any> | undefined = {
+      rating: 'desc',
+      reviewsCount: 'desc',
+    },
+  ): Promise<SolrResponse<Recipe>> {
+    const query = this.client.query().q('*:*').start(offset).rows(rows).sort(sortOptions);
+
+    const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
+    const solrResponse: SolrResponse<Recipe> = {
+      docs: searchResponse.response.docs,
+      totalCount: searchResponse.response.numFound,
+    };
+
+    log.info(
+      `Found ${solrResponse.totalCount} recipes. Fetched recipes ${offset}-${offset +
+        rows}.`,
+    );
+
+    return solrResponse;
   }
 
   public async getRecipesByIngredients(
@@ -34,7 +52,7 @@ class SolrRecipesModel extends SolrModel {
   ): Promise<SolrResponse<Recipe>> {
     const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
 
-    let query = this.client
+    const query = this.client
       .query()
       .q(ingredientsQuery)
       .qop('AND')

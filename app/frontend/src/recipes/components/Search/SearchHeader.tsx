@@ -6,13 +6,9 @@ import {
 
 type SearchHeaderProps = {
   recipesCount: number | null;
-  ingredientsCount: number;
 };
 
-export default function SearchHeader({
-  recipesCount,
-  ingredientsCount,
-}: SearchHeaderProps) {
+export default function SearchHeader({ recipesCount }: SearchHeaderProps) {
   return (
     <Stack direction='row' justifyContent='center'>
       <Typography
@@ -23,23 +19,18 @@ export default function SearchHeader({
         marginTop='5%'
         gutterBottom
       >
-        {buildSearchHeader(recipesCount, ingredientsCount)}
+        {buildSearchHeader(recipesCount)}
       </Typography>
     </Stack>
   );
 }
 
-const buildSearchHeader = (
-  recipesCount: number | null,
-  ingredientsCount: number,
-): string => {
+const buildSearchHeader = (recipesCount: number | null): string => {
   const parsedRecipesCount = addThousandsSeparator(recipesCount || 0, ',');
   let searchHeader = `${buildPlural('recipe', parsedRecipesCount)} found`;
 
-  if (ingredientsCount > 0 && recipesCount === null) {
+  if (recipesCount === null) {
     searchHeader = 'Searching recipes...';
-  } else if (ingredientsCount === 0) {
-    searchHeader = 'Add some ingredients';
   }
 
   return searchHeader;

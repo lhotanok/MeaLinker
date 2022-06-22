@@ -112,7 +112,7 @@ export default function Recipes() {
       >
         <Container maxWidth='md'>
           <SearchIngredientBar onSearch={searchByIngredientsHandler} />
-          <SearchHeader recipesCount={totalCount} ingredientsCount={ingredients.length} />
+          <SearchHeader recipesCount={totalCount} />
           <SearchedIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
