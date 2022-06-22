@@ -6,6 +6,7 @@ import { PrepTime, RecipeIngredient } from '../../recipes/types/FullRecipe';
 import {
   A_HREF_CONTENT_REGEX,
   A_HREF_GROUPS_REGEX,
+  HREF_URL_REGEX,
   MAX_MINUTES_FOR_RAW_MINUTES_FORMAT,
 } from '../constants';
 
@@ -158,32 +159,26 @@ export const shuffleElements = (array: any[]) => {
 };
 
 export const escapeAHrefContent = (text: string) => {
-  const hrefMatches = new RegExp(A_HREF_GROUPS_REGEX).exec(text) || [];
+  if (!text.match(/a href=/gi)) {
+    return text;
+  }
 
-  const previewWithoutHrefContent = text.replace(A_HREF_CONTENT_REGEX, '>');
+  const escapedText = reactStringReplace(text, A_HREF_GROUPS_REGEX, (match, i) => {
+    const hrefUrlMatches = new RegExp(HREF_URL_REGEX).exec(match) || [];
+    const hrefContentMatches = new RegExp(A_HREF_CONTENT_REGEX).exec(match) || [];
 
-  const escapedText = reactStringReplace(
-    previewWithoutHrefContent,
-    A_HREF_GROUPS_REGEX,
-    (match, i) => {
-      const hrefUrl = hrefMatches[1];
-      const hrefText = hrefMatches[2];
+    const url = new URL(hrefUrlMatches[1]);
+    const urlWithoutProtocol = url.host + url.pathname;
 
-      console.log(`match: ${match}, i: ${i}, hrefMatches: ${hrefMatches}`);
-
-      if (match === hrefUrl) {
-        return (
-          <Tooltip key={i} title={`Go to: ${hrefUrl}`}>
-            <Link href={hrefUrl}>{hrefText || hrefUrl}</Link>
-          </Tooltip>
-        );
-      } else if (match !== hrefText) {
-        return match;
-      }
-
-      return '';
-    },
-  );
+    return (
+      <Tooltip
+        key={i}
+        title={`Visit ${urlWithoutProtocol.replace(/www./gi, '').replace(/\/$/gi, '')}`}
+      >
+        <Link href={hrefUrlMatches[1]}>{hrefContentMatches[1] || hrefUrlMatches[1]}</Link>
+      </Tooltip>
+    );
+  });
 
   return escapedText;
 };

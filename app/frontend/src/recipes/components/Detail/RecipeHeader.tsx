@@ -1,6 +1,6 @@
 import { Grid, Stack, Typography } from '@mui/material';
 import HeartRating from '../../../shared/components/HeartRating';
-import { buildPlural } from '../../../shared/tools/value-prettifier';
+import { buildPlural, escapeAHrefContent } from '../../../shared/tools/value-prettifier';
 
 type RecipeHeaderProps = {
   headline: string;
@@ -27,7 +27,7 @@ export default function RecipeHeader({
           ({buildPlural('review', rating.reviews)})
         </Typography>
       </Stack>
-      <Typography color='text.primary'>{description}</Typography>
+      <Typography color='text.primary'>{escapeAHrefContent(description)}</Typography>
     </Grid>
   );
 }
