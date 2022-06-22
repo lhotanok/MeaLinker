@@ -34,20 +34,18 @@ function readFileFromCurrentDir(filePath) {
 }
 
 function decodeJsonStrings(json) {
-  if (typeof obj === 'string') {
+  if (typeof json === 'string') {
     return decode(json);
   } else if (Array.isArray(json)) {
     return json.map((item) => decodeJsonStrings(item));
-  } else if (!json || typeof obj !== 'object') {
+  } else if (!json || typeof json !== 'object') {
     return json;
   }
 
   const decodedObj = {};
 
   Object.entries(json).forEach(([key, value]) => {
-    if (typeof value === 'string') {
-      decodedObj[key] = decode(value);
-    } else if (typeof value === 'object') {
+    if (typeof value === 'object' || typeof value === 'string') {
       decodedObj[key] = decodeJsonStrings(value);
     } else {
       decodedObj[key] = value;
@@ -106,9 +104,7 @@ async function tryInsertItem(mealinkerDb, identifier, item) {
   }
 }
 
-async function insertRecipes(mealinkerDb) {
-  const recipes = loadJsonFromFile(FOOD_COM_RECIPES_PATH);
-
+async function insertRecipes(mealinkerDb, recipes) {
   log.info(`Inserting ${recipes.length} recipes into recipes database...`);
 
   for (const recipe of recipes) {
@@ -147,10 +143,11 @@ async function main() {
   await createDatabase(INGREDIENTS_DATABASE_NAME);
   await createDatabase(SEARCH_INGREDIENTS_DATABASE_NAME);
 
+  const recipes = loadJsonFromFile(FOOD_COM_RECIPES_PATH);
   const ingredients = loadJsonFromFile(FOOD_COM_INGREDIENTS_PATH);
   const searchIngredients = loadJsonFromFile(FOOD_COM_SEARCH_INGREDIENTS_PATH);
 
-  insertRecipes(recipeDb);
+  insertRecipes(recipeDb, recipes);
   insertIngredients(ingredientsDb, ingredients);
   insertIngredients(searchIngredientsDb, searchIngredients);
 }

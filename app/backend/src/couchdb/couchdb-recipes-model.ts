@@ -8,7 +8,7 @@ const log = log4js.getLogger('CouchDbModel');
 log.level = 'debug';
 
 /**
- * Provides static methods for fetching recipes and ingredients
+ * Provides methods for fetching recipes and ingredients
  * json documents from CouchDB.
  */
 class CouchDbRecipesModel {
