@@ -23,8 +23,8 @@ function createAddField({
   };
 }
 
-async function postAddFields(addFields, schemaUrl) {
-  log.info(`Posting new Add Fields to if any...`, { schemaUrl });
+async function postAddFields(addFields, schemaUrl, fieldCategory = 'add-field') {
+  log.info(`Posting new Add Fields if any...`, { schemaUrl });
 
   const fieldNames = Object.keys(addFields);
 
@@ -33,7 +33,7 @@ async function postAddFields(addFields, schemaUrl) {
       const result = await got
         .post(schemaUrl, {
           json: {
-            'add-field': createAddField({
+            [fieldCategory]: createAddField({
               name,
               ...addFields[name],
             }),
@@ -43,11 +43,36 @@ async function postAddFields(addFields, schemaUrl) {
 
       log.info(`${name} Add Field response: ${JSON.stringify(result, null, 2)}`);
     } catch (e) {
-      // field has already been added
+      log.info(`Add Field '${name}' was already added`);
     }
   }
 
   log.info(`Add Fields posted`, { schemaUrl });
+}
+
+async function postCopyFields(copyFields, schemaUrl) {
+  log.info(`Posting new Copy Fields if any...`, { schemaUrl });
+
+  const fieldSources = Object.keys(copyFields);
+
+  for (const source of fieldSources) {
+    try {
+      const result = await got
+        .post(schemaUrl, {
+          json: {
+            source,
+            dest: fieldSources[source],
+          },
+        })
+        .json();
+
+      log.info(`${source} Copy Field response: ${JSON.stringify(result, null, 2)}`);
+    } catch (e) {
+      log.info(`Copy fields for '${source}' were already added`);
+    }
+  }
+
+  log.info(`Copy fields posted`, { schemaUrl });
 }
 
 async function postRecipesAddFields() {
@@ -78,7 +103,17 @@ async function postRecipesAddFields() {
     protein: { type: FLOAT },
   };
 
-  await postAddFields(addFields, SOLR_RECIPES_SCHEMA);
+  const dynamicFields = {
+    '*_recipeCategoryFacet': { type: STRING },
+  };
+
+  const copyFields = {
+    'recipeCategory': ['_recipeCategoryFacet'],
+  };
+
+  await postAddFields(addFields, SOLR_RECIPES_SCHEMA, 'add-field');
+  await postAddFields(dynamicFields, SOLR_RECIPES_SCHEMA, 'add-dynamic-field');
+  await postCopyFields(copyFields, SOLR_RECIPES_SCHEMA);
 }
 
 async function postIngredientsAddFields() {
