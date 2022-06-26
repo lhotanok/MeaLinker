@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
-import LoadingProgress from '../../shared/components/LoadingProgress';
+import LinearLoadingProgress from '../../shared/components/LinearLoadingProgress';
 import useHttp from '../../shared/hooks/use-http';
 import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
@@ -65,7 +65,7 @@ export default function RecipeDetail() {
       </Helmet>
       <Container maxWidth='xl'>
         <Grid container padding={3} pt={6} spacing={6}>
-          {isLoading && <LoadingProgress />}
+          {isLoading && <LinearLoadingProgress />}
           <Grid item key='left-column' lg={7} md={7} sm={12}>
             <Card raised>
               <CardContent>

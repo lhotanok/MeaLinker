@@ -10,7 +10,7 @@ import sodiumIcon from '../../../../assets/sodium-icon.png';
 import cholesterolIcon from '../../../../assets/cholesterol-icon.png';
 import InfoCard from '../../../../shared/components/InfoCard';
 import { Grid } from '@mui/material';
-import NutritionListItem from './NutritionListItem';
+import NutritionItem from './NutritionItem';
 
 type NutritionCardProps = {
   nutrition: RecipeNutrition;
@@ -45,7 +45,7 @@ export default function NutritionCard({ nutrition }: NutritionCardProps) {
     <Grid component='ul' container spacing={1.5} sx={{ padding: 0 }}>
       {nutritionItems.map(({ name, icon, value }) => (
         <Grid component='li' item key={name} xs sx={{ listStyle: 'none' }}>
-          <NutritionListItem name={name} icon={icon} nutritionValue={value} />
+          <NutritionItem name={name} icon={icon} nutritionValue={value} />
         </Grid>
       ))}
     </Grid>

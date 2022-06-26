@@ -1,17 +1,17 @@
 import { ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
 import { Measurable } from '../../../types/FullRecipe';
 
-type NutritionListItemProps = {
+type NutritionItemProps = {
   name: string;
   icon: string;
   nutritionValue?: Measurable;
 };
 
-export default function NutritionListItem({
+export default function NutritionItem({
   name,
   icon,
   nutritionValue = { value: 0, unit: '' },
-}: NutritionListItemProps) {
+}: NutritionItemProps) {
   const { value, unit } = nutritionValue;
 
   return (
