@@ -1,6 +1,6 @@
 <Silk>
         <Prefixes>
-      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="dbo" namespace="http://dbpedia.org/ontology/"/><Prefix id="dbp" namespace="http://dbpedia.org/property/"/><Prefix id="wikibase" namespace="http://wikiba.se/ontology#"/><Prefix id="wd" namespace="http://www.wikidata.org/entity/"/>
+      <Prefix id="rdf" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/><Prefix id="dbo" namespace="http://dbpedia.org/ontology/"/><Prefix id="dbp" namespace="http://dbpedia.org/property/"/><Prefix id="owl" namespace="http://www.w3.org/2002/07/owl#"/><Prefix id="rdfs" namespace="http://www.w3.org/2000/01/rdf-schema#"/><Prefix id="wd" namespace="http://www.wikidata.org/entity/"/><Prefix id="wikibase" namespace="http://wikiba.se/ontology#"/>
     </Prefixes>
         <DataSources>
           <Dataset id="food-ingredients" type="file" uriProperty=""><MetaData>
@@ -21,7 +21,7 @@
           <Interlink id="food-dbpedia-ingr-linker"><MetaData>
         <Label></Label>
         <Description></Description>
-        <Modified>2022-02-01T19:47:32.118Z</Modified>
+        <Modified>2022-06-25T19:01:11.367Z</Modified>
       </MetaData>
         <SourceDataset dataSource="food-ingredients" var="a" typeUri="">
         <RestrictTo>
@@ -30,7 +30,7 @@
       </SourceDataset>
         <TargetDataset dataSource="dbpedia" var="b" typeUri="">
         <RestrictTo>
-          ?recipe &lt;http://dbpedia.org/ontology/ingredient&gt; ?a .
+          {  { ?recipe &lt;http://dbpedia.org/ontology/ingredient&gt; ?a } UNION { ?a &lt;http://dbpedia.org/ontology/ingredient&gt; ?anotherIngredient }  } .
         </RestrictTo>
       </TargetDataset>
         <LinkageRule linkType="&lt;http://www.w3.org/2002/07/owl#sameAs&gt;">

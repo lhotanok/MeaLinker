@@ -1,6 +1,5 @@
 import express from 'express';
 import CouchDbIngredientsModel from '../couchdb/couchdb-ingredients-model';
-import CouchDbModel from '../couchdb/couchdb-recipes-model';
 import SolrIngredientsModel from '../solr/solr-ingredients-model';
 
 const router = express.Router();

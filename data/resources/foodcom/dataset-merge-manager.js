@@ -95,7 +95,7 @@ async function main() {
     const recipeIdsWithIngrIds = filterRecipeIdsWithIngredientIds(tokenizedRecipes);
 
     fs.writeFileSync(UNIQUE_INGR_WITH_IDS_PATH, JSON.stringify(uniqueIngredients));
-    
+
     generatedRecipes.forEach((recipe) => {
         const { structured } = recipe;
         const { foodComId, ingredients } = structured;

@@ -13,11 +13,12 @@ function createAddField({
   type = FIELD_TYPES.TEXT,
   indexed = true,
   multiValued = false,
+  stored = true,
 }) {
   return {
     name,
     type,
-    stored: true,
+    stored,
     indexed,
     multiValued,
   };
@@ -28,6 +29,8 @@ async function postAddFields(addFields, schemaUrl, fieldCategory = 'add-field') 
 
   const fieldNames = Object.keys(addFields);
 
+  const stored = fieldCategory === 'add-field';
+
   for (const name of fieldNames) {
     try {
       const result = await got
@@ -36,6 +39,7 @@ async function postAddFields(addFields, schemaUrl, fieldCategory = 'add-field') 
             [fieldCategory]: createAddField({
               name,
               ...addFields[name],
+              stored,
             }),
           },
         })
@@ -60,8 +64,10 @@ async function postCopyFields(copyFields, schemaUrl) {
       const result = await got
         .post(schemaUrl, {
           json: {
-            source,
-            dest: fieldSources[source],
+            'add-copy-field': {
+              source,
+              dest: copyFields[source],
+            }
           },
         })
         .json();

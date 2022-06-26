@@ -12,6 +12,7 @@ const {
     UNIQUE_INGR_WITH_IDS_PATH,
     INGR_MAP_PATH,
     FILE_ENCODING,
+    JSON_RECIPES_PATH,
 } = require('./constants');
 
 const { NAMESPACE_UUID } = require('./constants');
@@ -97,16 +98,18 @@ function getUniqueIngredients(mappedIngredients) {
 }
 
 async function main() {
-    const extendedRecipes = [];
-
     const generatedRecipes = loadJsonFromFile(GENERATED_DATASET_PATH);
+    const rawRecipes = loadJsonFromFile(JSON_RECIPES_PATH);
     const tokenizedRecipes = await loadJsonFromCsv(TOKENIZED_RECIPES_PATH);
     const mappedIngredients = await loadJsonFromCsv(INGR_MAP_PATH);
 
     const uniqueIngredients = getUniqueIngredients(mappedIngredients);
     const recipeIdsWithIngrIds = filterRecipeIdsWithIngredientIds(tokenizedRecipes);
-    
-    generatedRecipes.forEach((recipe) => {
+
+    const rawRecipesIdMap = {};
+    rawRecipes.forEach((recipe) => rawRecipesIdMap[recipe.id] = recipe);
+
+    const extendedRecipes = generatedRecipes.map((recipe) => {
         const { structured, jsonld } = recipe;
         const { foodComId, ingredients } = structured;
 
@@ -115,12 +118,19 @@ async function main() {
         const mergedIngredients = mergeIngredientIdsWithNames(ingredientIds, uniqueIngredients);
         const extendedIngredients = mergeRawIngrWithNormalizedIngr(ingredients, mergedIngredients);
 
+        const author = {
+            id: rawRecipesIdMap[foodComId].contributor_id,
+            name: jsonld.author,
+            url: `https://www.food.com/user/${rawRecipesIdMap[foodComId].contributor_id}`,
+        };
+
         const extendedRecipe = recipe;
 
         extendedRecipe.structured.ingredients = extendedIngredients;
         extendedRecipe.structured.stepsCount = jsonld.recipeInstructions.length;
+        extendedRecipe.structured.author = author;
 
-        extendedRecipes.push(extendedRecipe);
+        return extendedRecipe;
     });
 
     console.log(`${extendedRecipes.length} recipes merged with extended ingredients info`);
