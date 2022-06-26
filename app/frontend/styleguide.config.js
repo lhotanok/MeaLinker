@@ -18,6 +18,7 @@ module.exports = {
     url: 'https://github.com/lhotanok/MeaLinker',
     text: 'Fork me on GitHub',
   },
+  styleguideDir: '../../docs',
   pagePerSection: true,
   sections: [
     {
