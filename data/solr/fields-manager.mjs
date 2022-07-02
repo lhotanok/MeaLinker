@@ -29,8 +29,6 @@ async function postAddFields(addFields, schemaUrl, fieldCategory = 'add-field') 
 
   const fieldNames = Object.keys(addFields);
 
-  const stored = fieldCategory === 'add-field';
-
   for (const name of fieldNames) {
     try {
       const result = await got
@@ -39,7 +37,6 @@ async function postAddFields(addFields, schemaUrl, fieldCategory = 'add-field') 
             [fieldCategory]: createAddField({
               name,
               ...addFields[name],
-              stored,
             }),
           },
         })
@@ -67,7 +64,7 @@ async function postCopyFields(copyFields, schemaUrl) {
             'add-copy-field': {
               source,
               dest: copyFields[source],
-            }
+            },
           },
         })
         .json();
@@ -82,12 +79,12 @@ async function postCopyFields(copyFields, schemaUrl) {
 }
 
 async function postRecipesAddFields() {
-  const { INT, FLOAT, STRING } = FIELD_TYPES;
+  const { INT, FLOAT, TEXT, STRING } = FIELD_TYPES;
 
   const addFields = {
-    name: { type: STRING },
-    description: { type: STRING },
-    recipeCategory: { type: STRING },
+    name: { type: TEXT },
+    description: { type: TEXT },
+    recipeCategory: { type: TEXT },
     ingredients: { multiValued: true },
     tags: { multiValued: true },
     rating: { type: FLOAT },
@@ -109,16 +106,17 @@ async function postRecipesAddFields() {
     protein: { type: FLOAT },
   };
 
-  const dynamicFields = {
-    '*_recipeCategoryFacet': { type: STRING },
+  const facetFields = {
+    _recipeCategoryFacet: { type: STRING, stored: false },
+    _ingredientsFacet: { type: STRING, multiValued: true, stored: false },
   };
 
   const copyFields = {
-    'recipeCategory': ['_recipeCategoryFacet'],
+    recipeCategory: ['_recipeCategoryFacet'],
   };
 
-  await postAddFields(addFields, SOLR_RECIPES_SCHEMA, 'add-field');
-  await postAddFields(dynamicFields, SOLR_RECIPES_SCHEMA, 'add-dynamic-field');
+  await postAddFields(addFields, SOLR_RECIPES_SCHEMA);
+  await postAddFields(facetFields, SOLR_RECIPES_SCHEMA);
   await postCopyFields(copyFields, SOLR_RECIPES_SCHEMA);
 }
 
