@@ -200,6 +200,44 @@ async function buildScoredIngredientsBasedOnUsage(ingredients) {
   return scoredIngredients;
 }
 
+async function injectSearchIngredientsToRecipes(ingredients, recipes) {
+  const recipesMap = {};
+  recipes.forEach((recipe) => (recipesMap[recipe.id] = recipe));
+
+  const { HOST, PORT, SECURE } = SOLR;
+
+  const client = solr.createClient({
+    host: HOST,
+    port: PORT,
+    core: SOLR.CORES.RECIPES,
+    secure: SECURE,
+  });
+
+  log.info(
+    `Fetching all recipes to match them with search ingredients. Processing ${ingredients.length} recipe search queries...`,
+  );
+
+  for (const ingredient of ingredients) {
+    const query = client
+      .query()
+      .q(`ingredients: "${ingredient.label}"`)
+      .qop('AND')
+      .rows(500000);
+    const searchResponse = await client.search(query);
+    const { docs } = searchResponse.response;
+
+    docs.forEach((doc) => {
+      if (!recipesMap[doc.id]._ingredientsFacet) {
+        recipesMap[doc.id]._ingredientsFacet = [];
+      }
+
+      recipesMap[doc.id]._ingredientsFacet.push(ingredient.label);
+    });
+  }
+
+  return Object.values(recipesMap);
+}
+
 function filterIngredients(scoredIngredients) {
   log.info(
     `Performing the following filter operations:
@@ -259,6 +297,12 @@ async function main() {
   await pushDocumentsToSolr(filteredRecipes, RECIPES);
 
   const scoredIngredients = await buildScoredIngredientsBasedOnUsage(ingredients);
+  const extendedRecipes = await injectSearchIngredientsToRecipes(
+    ingredients,
+    filteredRecipes,
+  );
+  await pushDocumentsToSolr(extendedRecipes, RECIPES);
+
   const filteredIngredients = await filterIngredients(scoredIngredients);
   await pushDocumentsToSolr(filteredIngredients, INGREDIENTS);
 }
