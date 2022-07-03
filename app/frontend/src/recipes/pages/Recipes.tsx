@@ -6,7 +6,6 @@ import SearchIngredientBar from '../components/Search/SearchIngredientBar';
 import RecipesGrid from '../components/Search/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
 import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
-import { SearchedIngredient } from '../types/SearchedIngredient';
 import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../constants';
 import {
   buildRecipeSearchUrl,
@@ -17,6 +16,7 @@ import SearchHeader from '../components/Search/SearchHeader';
 import SearchedIngredients from '../components/Search/SearchedIngredients';
 import RecipesPagination from '../components/Search/RecipesPagination';
 import { Snackbar, Alert } from '@mui/material';
+import { Facets } from '../types/Facets';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -30,6 +30,8 @@ export default function Recipes() {
 
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [facets, setFacets] = useState<Facets>({ ingredientFacets: [] });
+
   const [addSnackbarOpen, setAddSnackbarOpen] = useState(false);
   const [addSnackbarText, setAddSnackbarText] = useState<{
     text: string;
@@ -45,7 +47,7 @@ export default function Recipes() {
   useEffect(
     () => {
       document.title = `Recipe Search${ingredients.length > 0
-        ? ` |${ingredients.map((ingr) => ` ${ingr.label}`)}`
+        ? ` |${ingredients.join(' ')}`
         : ''}`;
     },
     [ingredients],
@@ -55,6 +57,7 @@ export default function Recipes() {
     () => {
       const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
         setTotalCount(recipesResponse.totalCount);
+        setFacets(recipesResponse.facets);
         setPaginatedRecipes(prepareRecipes(recipesResponse));
       };
 
@@ -90,7 +93,7 @@ export default function Recipes() {
       );
 
       const addedIngredients = mergedIngredients.filter(
-        (ingr) => !ingredients.map(({ label }) => label).includes(ingr.label),
+        (ingr) => !ingredients.includes(ingr),
       );
 
       if (addedIngredients.length > 0) {
@@ -98,7 +101,7 @@ export default function Recipes() {
 
         const snackbarText =
           addedIngredients.length === 1
-            ? `${addedIngredients[0].label} added`
+            ? `${addedIngredients[0]} added`
             : `${addedIngredients.length} ingredients added`;
 
         setNewSnackbarText({ text: snackbarText, severity: 'success' });
@@ -112,39 +115,38 @@ export default function Recipes() {
     }
   };
 
-  const searchIngredientRemoveHandler = (removedIngredient: SearchedIngredient) => {
+  const searchIngredientRemoveHandler = (removedIngredients: string[]) => {
+    const filteredIngredients = ingredients.filter(
+      (ingredient) => !removedIngredients.includes(ingredient),
+    );
+
+    if (filteredIngredients.length === ingredients.length) {
+      return;
+    }
+
     setTotalCount(null);
 
-    setNewSnackbarText(
-      { text: `${removedIngredient.label} removed`, severity: 'info' },
-    );
+    let snackbarText = `${removedIngredients.length === 1
+      ? removedIngredients[0]
+      : `${removedIngredients.length} ingredients`} removed`;
 
-    const filteredIngredients = ingredients.filter(
-      (ingredient) => ingredient.label !== removedIngredient.label,
-    );
+    if (filteredIngredients.length === 0) {
+      snackbarText =
+        ingredients.length === 1
+          ? `${ingredients[0]} removed`
+          : `${ingredients.length === 2
+              ? 'Both'
+              : `All ${ingredients.length}`} ingredients removed`;
+    }
+
+    setNewSnackbarText({
+      text: snackbarText,
+      severity: 'info',
+    });
 
     navigate(
       buildUrl(pathname, queryParams, {
         ingredients: filteredIngredients,
-      }),
-    );
-  };
-
-  const searchIngredientsRemoveAllHandler = () => {
-    setTotalCount(null);
-
-    const snackbarText =
-      ingredients.length === 1
-        ? `${ingredients[0].label} removed`
-        : `${ingredients.length === 2
-            ? 'Both'
-            : `All ${ingredients.length}`} ingredients removed`;
-
-    setNewSnackbarText({ text: snackbarText, severity: 'info' });
-
-    navigate(
-      buildUrl(pathname, queryParams, {
-        ingredients: [],
         page: 1,
       }),
     );
@@ -172,21 +174,28 @@ export default function Recipes() {
         }}
       >
         <Container maxWidth='md'>
-          <SearchIngredientBar onSearch={searchByIngredientsHandler} />
+          <SearchIngredientBar
+            ingredientFacets={facets.ingredientFacets.filter(
+              (facet) => facet.count !== totalCount,
+            )}
+            onSearch={searchByIngredientsHandler}
+            onRemove={searchIngredientRemoveHandler}
+          />
           <SearchHeader recipesCount={totalCount} />
           <SearchedIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
-            onRemoveAll={searchIngredientsRemoveAllHandler}
           />
           <Snackbar
-            key={addSnackbarText?.text}
+            key={addSnackbarText ? addSnackbarText.text : ''}
             open={addSnackbarOpen}
             onClose={handleAddSnackbarClose}
             autoHideDuration={4000}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           >
-            <Alert severity={addSnackbarText?.severity}>{addSnackbarText?.text}</Alert>
+            <Alert severity={addSnackbarText ? addSnackbarText.severity : 'info'}>
+              {addSnackbarText ? addSnackbarText.text : ''}
+            </Alert>
           </Snackbar>
         </Container>
       </Box>
@@ -205,25 +214,18 @@ export default function Recipes() {
 }
 
 const mergeSearchIngredients = (
-  originalIngredients: SearchedIngredient[],
-  newIngredientLabels: string[],
-): SearchedIngredient[] => {
-  const ingredientLabels = originalIngredients.map((original) => original.label);
+  originalIngredients: string[],
+  newIngredients: string[],
+): string[] => {
+  const mergedIngredients: string[] = [...originalIngredients];
 
-  newIngredientLabels.forEach((ingredientLabel) => {
-    if (!ingredientLabels.includes(ingredientLabel)) {
-      ingredientLabels.push(ingredientLabel);
+  newIngredients.forEach((ingredientLabel) => {
+    if (!mergedIngredients.includes(ingredientLabel)) {
+      mergedIngredients.push(ingredientLabel);
     }
   });
 
-  const mergedIngredients = ingredientLabels.map((label, index) => {
-    return {
-      key: index,
-      label,
-    };
-  });
-
-  return mergedIngredients as SearchedIngredient[];
+  return mergedIngredients;
 };
 
 const prepareRecipes = (

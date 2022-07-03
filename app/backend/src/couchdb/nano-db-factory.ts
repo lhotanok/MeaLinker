@@ -1,7 +1,7 @@
 import { PORT, USERNAME, PASSWORD } from './config';
 import nanoRoot from 'nano';
-import { FullRecipe } from './types/FullRecipe';
-import { FullIngredient } from './types/FullIngredient';
+import { FullRecipe } from './types/full-recipe';
+import { FullIngredient } from './types/full-ingredient';
 
 const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 

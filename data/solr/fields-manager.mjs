@@ -1,6 +1,6 @@
 import got from 'got';
 import pkg from 'log4js';
-import { SOLR_RECIPES_SCHEMA, SOLR_INGREDIENTS_SCHEMA } from './config.js';
+import { SOLR_RECIPES_SCHEMA } from './config.js';
 
 import { FIELD_TYPES } from './constants.js';
 
@@ -120,21 +120,8 @@ async function postRecipesAddFields() {
   await postCopyFields(copyFields, SOLR_RECIPES_SCHEMA);
 }
 
-async function postIngredientsAddFields() {
-  const { STRING, INT } = FIELD_TYPES;
-
-  const addFields = {
-    label: { type: STRING },
-    thumbnail: { type: STRING, indexed: false },
-    recipesCount: { type: INT },
-  };
-
-  await postAddFields(addFields, SOLR_INGREDIENTS_SCHEMA);
-}
-
 async function main() {
   await postRecipesAddFields();
-  await postIngredientsAddFields();
 }
 
 (async () => {

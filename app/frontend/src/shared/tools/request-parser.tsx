@@ -1,18 +1,10 @@
 import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../../recipes/constants';
-import { SearchedIngredient } from '../../recipes/types/SearchedIngredient';
 
-export const parseIngredients = (queryParams: URLSearchParams): SearchedIngredient[] => {
+export const parseIngredients = (queryParams: URLSearchParams): string[] => {
   const joinedIngredients = queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS);
   const ingredients = joinedIngredients ? joinedIngredients.split(';') : [];
 
-  const uniqueIngredients = ingredients.map((ingredient, index) => {
-    return {
-      key: index,
-      label: ingredient,
-    };
-  });
-
-  return uniqueIngredients as SearchedIngredient[];
+  return ingredients;
 };
 
 const setOrDelete = (
@@ -30,12 +22,12 @@ const setOrDelete = (
 export const buildUrl = (
   pathname: string,
   currentQueryParams: URLSearchParams,
-  updatedParamValues: { ingredients: SearchedIngredient[]; page?: number },
+  updatedParamValues: { ingredients: string[]; page?: number },
 ): string => {
   const { ingredients, page = 1 } = updatedParamValues;
   const queryParams = currentQueryParams;
 
-  const encodedIngredients = encodeIngredientsToQueryParam(ingredients);
+  const encodedIngredients = encodeArrayToQueryParam(ingredients);
 
   setOrDelete(queryParams, QUERY_PARAM_NAMES.INGREDIENTS, encodedIngredients);
   setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');
@@ -43,15 +35,8 @@ export const buildUrl = (
   return `${pathname}?${queryParams.toString()}`;
 };
 
-export const encodeIngredientsToQueryParam = (
-  ingredients: SearchedIngredient[],
-): string => {
-  const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
-  const joinedIngredients = ingredientLabels.join(';');
-  const encodedIngredients = encodeURI(joinedIngredients);
-
-  return encodedIngredients;
-};
+export const encodeArrayToQueryParam = (array: string[]): string =>
+  encodeURI(array.join(';'));
 
 export const buildRecipeSearchUrl = (locationSearch: string): string => {
   const searchParams = new URLSearchParams(decodeURI(locationSearch));

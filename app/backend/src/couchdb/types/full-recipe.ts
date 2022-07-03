@@ -1,5 +1,5 @@
-import { LocalizedValue } from './FullIngredient';
-import { RecipeJsonld } from './RecipeJsonld';
+import { LocalizedValue } from './full-ingredient';
+import { RecipeJsonld } from './recipe-jsonld';
 
 export type FullRecipe = {
   _id: string;

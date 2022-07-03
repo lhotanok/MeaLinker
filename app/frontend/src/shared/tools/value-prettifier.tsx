@@ -2,6 +2,7 @@ import { Link, Tooltip } from '@mui/material';
 import humanizeDuration from 'humanize-duration';
 import reactStringReplace from 'react-string-replace';
 import { ALL_SENTENCES_REGEX, MAX_DESCRIPTION_CHARS } from '../../recipes/constants';
+import { FacetItem } from '../../recipes/types/Facets';
 import { PrepTime, RecipeIngredient } from '../../recipes/types/FullRecipe';
 import {
   A_HREF_CONTENT_REGEX,
@@ -181,4 +182,20 @@ export const escapeAHrefContent = (text: string) => {
   });
 
   return escapedText;
+};
+
+export const buildItemsWithCount = (items: FacetItem[]): string[] => {
+  const itemsWithCount = items.map((item) => `${item.name} (${item.count})`);
+
+  return itemsWithCount;
+};
+
+export const getItemWithoutCount = (item: string): string => {
+  return item.replace(/\([^)]*\)$/gi, '').trim();
+};
+
+export const getItemsWithoutCount = (items: string[]): string[] => {
+  const itemsWithoutCount = items.map((item) => getItemWithoutCount(item));
+
+  return itemsWithoutCount;
 };

@@ -1,39 +1,23 @@
-import { useEffect, useState } from 'react';
 import AutocompleteSearchBar from '../../../shared/components/AutocompleteSearchBar';
-import useHttp from '../../../shared/hooks/use-http';
-import { SimpleIngredient } from '../../types/SimpleIngredient';
+import { FacetItem } from '../../types/Facets';
 
 type SearchIngredientBarProps = {
+  ingredientFacets: FacetItem[];
   onSearch: (searchedItems: string[]) => void;
+  onRemove: (removedIngredients: string[]) => void;
 };
 
-export default function SearchIngredientBar({ onSearch }: SearchIngredientBarProps) {
-  const [ingredients, setIngredients] = useState<SimpleIngredient[]>([]);
-
-  const { sendRequest: fetchIngredients } = useHttp();
-
-  useEffect(
-    () => {
-      const requestConfig = {
-        url: `http://localhost:5000/api/ingredients`,
-      };
-
-      const fetchedIngredientsHandler = (ingredients: SimpleIngredient[]) => {
-        setIngredients(ingredients);
-      };
-
-      fetchIngredients(requestConfig, fetchedIngredientsHandler);
-    },
-    [fetchIngredients],
-  );
-
-  const ingredientLabels = ingredients.map((ingredient) => ingredient.label);
-
+export default function SearchIngredientBar({
+  ingredientFacets,
+  onSearch,
+  onRemove,
+}: SearchIngredientBarProps) {
   return (
     <AutocompleteSearchBar
-      hints={ingredientLabels}
+      facetItems={ingredientFacets}
       label='Add ingredients (from the list / your own)'
       onSearch={onSearch}
+      onRemove={onRemove}
     />
   );
 }

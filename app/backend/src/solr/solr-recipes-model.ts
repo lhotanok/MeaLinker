@@ -1,7 +1,10 @@
 import log4js from 'log4js';
+import { Query } from 'solr-client';
+import { MAX_SEARCH_INGREDIENTS_LIMIT } from '../constants';
 
 import { CORES } from './config';
 import SolrModel from './solr-model';
+import { FacetItem } from './types/facets';
 import { Recipe } from './types/recipe';
 import { SolrResponse } from './types/search-response';
 const { RECIPES } = CORES;
@@ -25,14 +28,21 @@ class SolrRecipesModel extends SolrModel {
       reviewsCount: 'desc',
     },
   ): Promise<SolrResponse<Recipe>> {
-    const query = this.client.query().q('*:*').start(offset).rows(rows).sort(sortOptions);
+    const query = this.client
+      .query()
+      .q('*:*')
+      .start(offset)
+      .rows(rows)
+      .sort(sortOptions)
+      .facet({
+        pivot: {
+          fields: ['_ingredientsFacet'],
+          mincount: 1,
+        },
+        field: '_ingredientsFacet',
+      });
 
-    const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
-    const solrResponse: SolrResponse<Recipe> = {
-      docs: searchResponse.response.docs,
-      totalCount: searchResponse.response.numFound,
-    };
-
+    const solrResponse = await this.prepareSolrResponse(query);
     log.info(
       `Found ${solrResponse.totalCount} recipes. Fetched recipes ${offset}-${offset +
         rows}.`,
@@ -56,21 +66,23 @@ class SolrRecipesModel extends SolrModel {
       .query()
       .q(ingredientsQuery)
       .qop('AND')
-      // .mm(ingredients.length)
       .hl({
         fl: 'ingredients',
         preserveMulti: true,
+      })
+      .facet({
+        pivot: {
+          fields: ['_ingredientsFacet'],
+        },
+        field: '_ingredientsFacet',
+        limit: MAX_SEARCH_INGREDIENTS_LIMIT,
+        mincount: 1,
       })
       .start(offset)
       .rows(rows)
       .sort(sortOptions);
 
-    const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
-    const solrResponse: SolrResponse<Recipe> = {
-      docs: searchResponse.response.docs,
-      totalCount: searchResponse.response.numFound,
-      highlighting: searchResponse.highlighting,
-    };
+    const solrResponse = await this.prepareSolrResponse(query);
 
     log.info(
       `Found ${solrResponse.totalCount} recipes for ingredients: ${ingredients}. Fetched recipes ${offset}-${offset +
@@ -99,6 +111,44 @@ class SolrRecipesModel extends SolrModel {
     });
 
     return searchQuery.trim();
+  }
+
+  private buildFacetItems(queryFacets: (string | number)[]): FacetItem[] {
+    const facetItems: FacetItem[] = [];
+
+    let currentFacetName: string;
+
+    queryFacets.forEach((facet, index) => {
+      if (index % 2 === 0) {
+        currentFacetName = facet.toString();
+      } else {
+        facetItems.push({
+          name: currentFacetName,
+          count: Number(facet),
+        });
+      }
+    });
+
+    return facetItems;
+  }
+
+  private async prepareSolrResponse(query: Query): Promise<SolrResponse<Recipe>> {
+    const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
+
+    const solrResponse: SolrResponse<Recipe> = {
+      docs: searchResponse.response.docs,
+      totalCount: searchResponse.response.numFound,
+      highlighting: searchResponse.highlighting,
+      facets: searchResponse.facet_counts
+        ? {
+            ingredientFacets: this.buildFacetItems(
+              searchResponse.facet_counts.facet_fields._ingredientsFacet,
+            ),
+          }
+        : undefined,
+    };
+
+    return solrResponse;
   }
 }
 

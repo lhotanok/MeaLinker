@@ -3,21 +3,29 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
-import { Avatar } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
 import { IconButton } from '@mui/material';
 import { MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING, SECONDARY_COLOR } from '../constants';
 import FlexBox from './FlexBox';
+import { FacetItem } from '../../recipes/types/Facets';
+import {
+  buildItemsWithCount,
+  getItemsWithoutCount,
+  getItemWithoutCount,
+} from '../tools/value-prettifier';
 
 type AutocompleteSearchBarProps = {
-  hints: string[];
+  facetItems: FacetItem[];
   label: string;
   onSearch: (searchedItems: string[]) => void;
+  onRemove: (removedItems: string[]) => void;
 };
 
 export default function AutocompleteSearchBar({
-  hints,
+  facetItems,
   label,
   onSearch,
+  onRemove,
 }: AutocompleteSearchBarProps) {
   const [searchedItems, setSearchedItems] = useState<string[]>([]);
 
@@ -25,13 +33,20 @@ export default function AutocompleteSearchBar({
     _ev: React.SyntheticEvent<Element, Event>,
     value: string[],
   ) => {
-    setSearchedItems(value);
-    onSearch(value);
+    const itemsWithoutCount = getItemsWithoutCount(value);
+    setSearchedItems(itemsWithoutCount);
+
+    if (value.length < searchedItems.length) {
+      const removedItems = searchedItems.filter((item) => !value.includes(item));
+      onRemove(getItemsWithoutCount(removedItems));
+    } else {
+      onSearch(itemsWithoutCount);
+    }
   };
 
   const addIngredientsHandler = () => {
-    onSearch(searchedItems);
     setSearchedItems([]);
+    onSearch(searchedItems);
   };
 
   return (
@@ -40,7 +55,7 @@ export default function AutocompleteSearchBar({
       multiple
       selectOnFocus
       clearOnBlur
-      options={hints}
+      options={buildItemsWithCount(facetItems)}
       filterOptions={(options, state) => {
         const filteredOptions = options
           .filter((option) => {
@@ -54,6 +69,14 @@ export default function AutocompleteSearchBar({
 
         return filteredOptions;
       }}
+      renderOption={(props, option) => (
+        <li {...props}>
+          <Stack direction='row' spacing={1}>
+            <Typography>{getItemWithoutCount(option)}</Typography>
+            <Typography color='secondary'>({option.replace(/[^\d]+/g, '')})</Typography>
+          </Stack>
+        </li>
+      )}
       renderInput={(params) => (
         <Stack direction='row' spacing={1.5}>
           <IconButton size='large' onClick={addIngredientsHandler}>

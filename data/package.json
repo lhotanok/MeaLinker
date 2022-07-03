@@ -3,7 +3,9 @@
     "got": "^12.0.1",
     "html-entities": "^2.3.3",
     "html-escaper": "^3.0.3",
-    "log4js": "^6.5.2"
+    "log4js": "^6.5.2",
+    "nano": "^10.0.0",
+    "solr-client": "^0.10.0-rc10"
   },
   "devDependencies": {
     "eslint": "^8.18.0"

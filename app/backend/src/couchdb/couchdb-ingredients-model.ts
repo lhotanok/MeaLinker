@@ -1,8 +1,9 @@
 import log4js from 'log4js';
+import nano from 'nano';
 import { INGREDIENTS_DATABASE_NAME } from './config';
 
-import NanoDbFactory, { IngredientNanoDb, RecipeNanoDb } from './nano-db-factory';
-import { FullIngredient } from './types/FullIngredient';
+import NanoDbFactory, { IngredientNanoDb } from './nano-db-factory';
+import { FullIngredient } from './types/full-ingredient';
 
 const log = log4js.getLogger('CouchDbModel');
 log.level = 'debug';
@@ -18,9 +19,16 @@ class CouchDbIngredientsModel {
     this.database = NanoDbFactory.getDatabase<FullIngredient>(INGREDIENTS_DATABASE_NAME);
   }
 
-  async getIngredientById(ingredientId: string) {
+  async getIngredientById(
+    ingredientId: string,
+  ): Promise<nano.DocumentGetResponse & FullIngredient> {
     const ingredient = await this.database.get(ingredientId);
     return ingredient;
+  }
+
+  async getAllIngredients(): Promise<nano.DocumentListResponse<FullIngredient>> {
+    const ingredients = await this.database.list();
+    return ingredients;
   }
 }
 

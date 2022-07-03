@@ -1,3 +1,5 @@
+import { Facets } from './Facets';
+
 export type SimpleRecipe = {
   id: string;
   name: string;
@@ -32,5 +34,6 @@ export type HighlightedFields = {
 export type SimpleRecipesResponse = {
   docs: SimpleRecipe[];
   totalCount: number;
+  facets: Facets;
   highlighting?: Record<string, HighlightedFields>;
 };

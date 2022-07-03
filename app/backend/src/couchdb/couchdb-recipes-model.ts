@@ -2,7 +2,7 @@ import log4js from 'log4js';
 import { RECIPES_DATABASE_NAME } from './config';
 
 import NanoDbFactory, { RecipeNanoDb } from './nano-db-factory';
-import { FullRecipe } from './types/FullRecipe';
+import { FullRecipe } from './types/full-recipe';
 
 const log = log4js.getLogger('CouchDbModel');
 log.level = 'debug';

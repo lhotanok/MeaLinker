@@ -1,11 +1,10 @@
 import express from 'express';
 import CouchDbIngredientsModel from '../couchdb/couchdb-ingredients-model';
-import SolrIngredientsModel from '../solr/solr-ingredients-model';
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const ingredientsModel = new SolrIngredientsModel();
+  const ingredientsModel = new CouchDbIngredientsModel();
   const ingredients = await ingredientsModel.getAllIngredients();
   res.status(200).json(ingredients);
 });
