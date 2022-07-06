@@ -2,37 +2,39 @@ const fs = require('fs');
 const log4js = require('log4js');
 const solr = require('solr-client');
 const {
-  COUCHDB: { RECIPES_DB_NAME, INGREDIENTS_DB_NAME, USERNAME, PASSWORD, PORT },
+  COUCHDB: { RECIPES_DB_NAME, USERNAME, PASSWORD, PORT },
   SOLR,
 } = require('./config');
 const {
-  RECIPES_PATH,
-  INGREDIENTS_PATH,
   FOOD_COM_DEFAULT_IMAGE_SRC,
+  FILE_ENCODING,
+  FOOD_COM_SEARCH_INGREDIENTS_PATH,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
 const log = log4js.getLogger('Solr documents manager');
 log.level = 'debug';
 
-function writeFileFromCurrentDir(filePath, content) {
-  return fs.writeFileSync(`${__dirname}/${filePath}`, content);
+function readFileFromCurrentDir(filePath) {
+  return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
-async function fillWithDatabaseDocuments(recipes, ingredients) {
+function loadJsonFromFile(filePath) {
+  const fileContent = readFileFromCurrentDir(filePath);
+  return JSON.parse(fileContent);
+}
+
+async function fetchRecipesFromDb() {
+  const recipes = [];
+
   const recipesDatabase = nano.use(RECIPES_DB_NAME);
-  const ingredientsDatabase = nano.use(INGREDIENTS_DB_NAME);
 
   log.info(`Fetching CouchDB collection: ${RECIPES_DB_NAME} ...`);
   const recipeDocuments = await recipesDatabase.list({ include_docs: true });
 
-  log.info(`Fetching CouchDB collection: ${INGREDIENTS_DB_NAME} ...`);
-  const ingredientDocuments = await ingredientsDatabase.list({ include_docs: true });
-
   recipeDocuments.rows.forEach(({ doc }) => recipes.push(filterRecipeIndexedFields(doc)));
-  ingredientDocuments.rows.forEach(({ doc }) =>
-    ingredients.push(filterIngredientIndexedFields(doc)),
-  );
+
+  return recipes;
 }
 
 function getFilteredIngredients(ingredients) {
@@ -116,18 +118,6 @@ function filterRecipeIndexedFields(recipe) {
   return filteredRecipe;
 }
 
-function filterIngredientIndexedFields(ingredient) {
-  const { _id, label, thumbnail } = ingredient;
-
-  const filteredIngredient = {
-    id: _id,
-    label: label['@value'],
-    thumbnail,
-  };
-
-  return filteredIngredient;
-}
-
 function removeRecipesWithoutImage(recipes) {
   log.info('Removing recipes without image...');
 
@@ -170,36 +160,6 @@ async function pushDocumentsToSolr(documents, core) {
   log.info(`Commit response: ${JSON.stringify(commitResponse, null, 2)}`);
 }
 
-async function buildScoredIngredientsBasedOnUsage(ingredients) {
-  const scoredIngredients = [];
-
-  const { HOST, PORT, SECURE } = SOLR;
-
-  const client = solr.createClient({
-    host: HOST,
-    port: PORT,
-    core: SOLR.CORES.RECIPES,
-    secure: SECURE,
-  });
-
-  log.info(
-    `Adding ingredient scores based on their usage. Processing ${ingredients.length} recipe search queries...`,
-  );
-
-  for (const ingredient of ingredients) {
-    const query = client.query().q(`ingredients: "${ingredient.label}"`).qop('AND');
-    const searchResponse = await client.search(query);
-    const recipesFound = searchResponse.response.numFound;
-
-    scoredIngredients.push({
-      ...ingredient,
-      recipesCount: recipesFound,
-    });
-  }
-
-  return scoredIngredients;
-}
-
 async function injectSearchIngredientsToRecipes(ingredients, recipes) {
   const recipesMap = {};
   recipes.forEach((recipe) => (recipesMap[recipe.id] = recipe));
@@ -218,11 +178,8 @@ async function injectSearchIngredientsToRecipes(ingredients, recipes) {
   );
 
   for (const ingredient of ingredients) {
-    const query = client
-      .query()
-      .q(`ingredients: "${ingredient.label}"`)
-      .qop('AND')
-      .rows(500000);
+    const label = ingredient.label['@value'];
+    const query = client.query().q(`ingredients: "${label}"`).qop('AND').rows(500000);
     const searchResponse = await client.search(query);
     const { docs } = searchResponse.response;
 
@@ -231,80 +188,32 @@ async function injectSearchIngredientsToRecipes(ingredients, recipes) {
         recipesMap[doc.id]._ingredientsFacet = [];
       }
 
-      recipesMap[doc.id]._ingredientsFacet.push(ingredient.label);
+      recipesMap[doc.id]._ingredientsFacet.push(label);
     });
   }
 
   return Object.values(recipesMap);
 }
 
-function filterIngredients(scoredIngredients) {
-  log.info(
-    `Performing the following filter operations:
-     - removing ingredients that are not used in any recipe from the current collection
-     - removing duplicate ingredients`,
-  );
-
-  const scoreMapping = {};
-  scoredIngredients.forEach((ingredient) => {
-    scoreMapping[ingredient.recipesCount] = scoreMapping[ingredient.recipesCount]
-      ? [...scoreMapping[ingredient.recipesCount], ingredient]
-      : [ingredient];
-  });
-
-  const filteredIngredients = scoredIngredients
-    .filter((ingredient) => ingredient.recipesCount !== 0)
-    .filter((ingredient) => {
-      const sameScoreIngredients = scoreMapping[ingredient.recipesCount];
-
-      for (const ingr of sameScoreIngredients) {
-        const currentLabelRoot = ingredient.label.slice(0, ingredient.label.length - 1);
-        const storedLabelRoot = ingr.label.slice(0, ingr.label.length - 1);
-        if (
-          currentLabelRoot.replace(/-/g, ' ').startsWith(storedLabelRoot) &&
-          ingredient.label !== ingr.label
-        ) {
-          // There's another ingredient with the same score and shorter name, we'll include only that ingredient
-          return false;
-        }
-      }
-
-      return true;
-    });
-
-  log.info(`Filtered: ${filteredIngredients.length} ingredients`);
-  return filteredIngredients;
-}
-
 async function main() {
-  const recipes = [];
-  const ingredients = [];
-
-  await fillWithDatabaseDocuments(recipes, ingredients);
+  const recipes = await fetchRecipesFromDb();
+  const searchIngredients = loadJsonFromFile(FOOD_COM_SEARCH_INGREDIENTS_PATH);
 
   log.info(
-    `Extracted ${recipes.length} recipes and ${ingredients.length} ingredients from CouchDB`,
+    `Extracted ${recipes.length} recipes from CouchDB,
+    ${searchIngredients.length} search ingredients from ${FOOD_COM_SEARCH_INGREDIENTS_PATH}`,
   );
 
-  writeFileFromCurrentDir(RECIPES_PATH, JSON.stringify(recipes, null, 2));
-  writeFileFromCurrentDir(INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2));
-
-  log.info(`Saved recipes and ingredients prepared for Solr into documents directory`);
-
-  const { CORES: { RECIPES, INGREDIENTS } } = SOLR;
+  const { CORES: { RECIPES } } = SOLR;
 
   const filteredRecipes = removeRecipesWithoutImage(recipes);
   await pushDocumentsToSolr(filteredRecipes, RECIPES);
 
-  const scoredIngredients = await buildScoredIngredientsBasedOnUsage(ingredients);
   const extendedRecipes = await injectSearchIngredientsToRecipes(
-    ingredients,
+    searchIngredients,
     filteredRecipes,
   );
   await pushDocumentsToSolr(extendedRecipes, RECIPES);
-
-  const filteredIngredients = await filterIngredients(scoredIngredients);
-  await pushDocumentsToSolr(filteredIngredients, INGREDIENTS);
 }
 
 (async () => {

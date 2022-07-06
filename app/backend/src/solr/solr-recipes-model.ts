@@ -37,9 +37,10 @@ class SolrRecipesModel extends SolrModel {
       .facet({
         pivot: {
           fields: ['_ingredientsFacet'],
-          mincount: 1,
         },
         field: '_ingredientsFacet',
+        limit: MAX_SEARCH_INGREDIENTS_LIMIT,
+        mincount: 1,
       });
 
     const solrResponse = await this.prepareSolrResponse(query);
@@ -88,6 +89,7 @@ class SolrRecipesModel extends SolrModel {
       `Found ${solrResponse.totalCount} recipes for ingredients: ${ingredients}. Fetched recipes ${offset}-${offset +
         rows}.`,
     );
+
     return solrResponse;
   }
 

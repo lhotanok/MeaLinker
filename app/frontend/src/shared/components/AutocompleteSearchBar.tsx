@@ -69,14 +69,14 @@ export default function AutocompleteSearchBar({
 
         return filteredOptions;
       }}
-      renderOption={(props, option) => (
-        <li {...props}>
-          <Stack direction='row' spacing={1}>
-            <Typography>{getItemWithoutCount(option)}</Typography>
-            <Typography color='secondary'>({option.replace(/[^\d]+/g, '')})</Typography>
-          </Stack>
-        </li>
-      )}
+      // renderOption={(props, option) => (
+      //   <li {...props}>
+      //     <Stack direction='row' spacing={1}>
+      //       <Typography>{getItemWithoutCount(option)}</Typography>
+      //       <Typography color='secondary'>({option.replace(/[^\d]+/g, '')})</Typography>
+      //     </Stack>
+      //   </li>
+      // )}
       renderInput={(params) => (
         <Stack direction='row' spacing={1.5}>
           <IconButton size='large' onClick={addIngredientsHandler}>

@@ -14,15 +14,14 @@ exports.SEARCH_INGREDIENTS_PATH = 'ingredients/search_ingredients.json';
 exports.FOOD_DBPEDIA_INGREDIENTS_PATH = 'rdf-data/food-dbpedia-same-ingr.nt'; // sameAs links between food.com ingredients and DBpedia ingredients
 exports.RDF_INGREDIENTS_PATH = 'rdf-data/ingredients.ttl'; // food.com ingredients with IRIs composed of ingredient ids
 exports.DBPEDIA_INGREDIENTS_PATH = 'rdf-data/dbpedia-ingredients.json'; // collections of jsonlds representing DBpedia ingredient entities
+exports.RAW_RECIPES_CSV_PATH = 'recipes/RAW_recipes.csv';
+exports.RAW_RECIPES_JSON_PATH = 'recipes/RAW_recipes.json';
+
+exports.RECIPES_TO_EXTRACT = 231637;
 
 exports.FILE_ENCODING = 'utf8';
 
 exports.NAMESPACE_UUID = '6ad552f0-7f96-11ec-82d2-0d4c9c611065';
-
-exports.RDF_PREFIXES = {
-  INGREDIENT_PREFIX: `http://example.org/ingredients#`,
-  RDFS_PREFIX: 'http://www.w3.org/2000/01/rdf-schema#',
-};
 
 exports.SEARCH_INGREDIENT_MAX_WORDS = 3;
 

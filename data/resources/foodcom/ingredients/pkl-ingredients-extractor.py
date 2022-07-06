@@ -9,15 +9,15 @@ data = pickle.load(file)
 # close the file
 file.close()
 
-print('Showing the pickled data:')
+# print('Showing the pickled data:')
 
 cnt = 0
 
-print(type(data))
-print(data)
+# print(type(data))
+# print(data)
 
 for item in data:
-    print('The data ', cnt, ' is : ', item)
+    # print('The data ', cnt, ' is : ', item)
     cnt += 1
 
 data.to_csv ('ingr_map.csv', index=False, header=True)

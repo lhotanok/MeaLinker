@@ -1,3 +1,5 @@
+#!/bin/bash
+
 node recipes-preprocessing.js
 node ingredients-preprocessing.js
 

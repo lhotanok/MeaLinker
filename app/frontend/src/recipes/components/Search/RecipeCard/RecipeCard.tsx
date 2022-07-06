@@ -1,12 +1,10 @@
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
 import RecipeCardContent from './RecipeCardContent';
 import RecipeCardCollapse from './RecipeCardCollapse';
 import RecipeCardActions from './RecipeCardActions';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { SimpleRecipe } from '../../../types/SimpleRecipesResponse';
-import { CardActionArea } from '@mui/material';
 import { PAGINATION_RESULTS_COUNT } from '../../../constants';
 
 interface RecipeCardProps extends SimpleRecipe {
@@ -69,16 +67,14 @@ export default function RecipeCard(props: RecipeCardProps) {
         justifyContent: 'space-between',
       }}
     >
-      <CardActionArea onClick={handleViewClick}>
-        <CardMedia component='img' height='250' image={image} alt={name} />
-      </CardActionArea>
-
       <RecipeCardContent
         name={name}
         rating={rating}
         reviewsCount={reviewsCount}
         description={description}
         mins={totalMinutes}
+        image={image}
+        onViewClick={handleViewClick}
       />
       <RecipeCardActions
         expanded={expanded}

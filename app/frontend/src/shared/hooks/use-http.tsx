@@ -36,10 +36,12 @@ export default function useHttp() {
         const data = await response.json();
         processDataFn(data);
       } catch (err) {
-        console.debug(`Error catched: ${JSON.stringify(err)}`);
-        if (err instanceof Error) {
-          setError(err.message || 'Something went wrong!');
-        }
+        console.debug(
+          `Error catched: ${err instanceof Error && err.message
+            ? err.message
+            : 'Something went wrong!'}`,
+        );
+        setError(`Something went wrong... ${err instanceof Error && err.message}`);
       }
 
       setIsLoading(false);

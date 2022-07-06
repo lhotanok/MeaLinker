@@ -9,10 +9,6 @@ const {
   UNIQUE_INGR_WITH_IDS_PATH,
   EXTENDED_INGREDIENTS_PATH,
   EXTENDED_RECIPES_PATH,
-  SEARCH_INGREDIENT_TRUNCATE_REGEX,
-  SEARCH_INGREDIENT_MAX_WORDS,
-  SEARCH_INGREDIENTS_PATH,
-  SEARCH_INGREDIENT_EXCLUDE_REGEX,
 } = require('./constants');
 
 function readFile(filePath) {
@@ -67,56 +63,7 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds, uniqueIngredients) {
     };
   });
 
-  return mergedIngredients;
-}
-
-function buildSearchIngredients(irisWithIds, jsonlds, uniqueIngredients) {
-  const foodcomIdToJsonldMapping = {};
-
-  jsonlds.forEach((jsonld) => {
-    const iri = jsonld['@id'];
-    const foodComId = irisWithIds[iri];
-    foodcomIdToJsonldMapping[foodComId] = jsonld;
-  });
-
-  const searchIngredients = {};
-
-  Object.entries(uniqueIngredients).forEach(([foodComId, { identifier, name }]) => {
-    // Filter ingredients suitable for searching
-
-    if ((!name.match(/[,.]/) && name[0].match(/[a-z]/gi)) || name === '7-up') {
-      const truncatedName = name
-        .replace(SEARCH_INGREDIENT_TRUNCATE_REGEX, '')
-        .replaceAll('chily', 'chili')
-        .trim();
-
-      const words = truncatedName.split(' ');
-
-      if (words.length <= SEARCH_INGREDIENT_MAX_WORDS) {
-        if (!truncatedName.match(SEARCH_INGREDIENT_EXCLUDE_REGEX)) {
-          if (!truncatedName.includes('condensed') || !truncatedName.includes('soup')) {
-            const firstCapitalLetter = truncatedName[0].toUpperCase();
-            const jsonld = foodcomIdToJsonldMapping[foodComId] || {};
-
-            const label = jsonld.label
-              ? jsonld.label
-              : {
-                  '@value': firstCapitalLetter + truncatedName.slice(1),
-                  '@language': 'en',
-                };
-
-            searchIngredients[label['@value'].replaceAll(' ', '-')] = {
-              identifier,
-              label,
-              thumbnail: jsonld.thumbnail,
-            };
-          }
-        }
-      }
-    }
-  });
-
-  return searchIngredients;
+  return Object.values(mergedIngredients);
 }
 
 function extendRecipesByIngredientThumbnails(recipes, jsonldIngredients) {
@@ -158,27 +105,12 @@ function main() {
     uniqueIngredients,
   );
 
-  const searchIngredients = buildSearchIngredients(
-    irisWithIds,
-    dbpediaIngredients,
-    uniqueIngredients,
-  );
-
   const mergedRecipes = extendRecipesByIngredientThumbnails(
     extendedRecipes,
     mergedIngredients,
   );
 
-  writeFileFromCurrentDir(
-    EXTENDED_INGREDIENTS_PATH,
-    JSON.stringify(Object.values(mergedIngredients), null, 2),
-  );
-
-  writeFileFromCurrentDir(
-    SEARCH_INGREDIENTS_PATH,
-    JSON.stringify(Object.values(searchIngredients), null, 2),
-  );
-
+  writeFileFromCurrentDir(EXTENDED_INGREDIENTS_PATH, JSON.stringify(mergedIngredients));
   writeFileFromCurrentDir(EXTENDED_RECIPES_PATH, JSON.stringify(mergedRecipes));
 }
 

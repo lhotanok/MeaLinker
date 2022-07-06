@@ -42,7 +42,7 @@ export default function Recipes() {
     severity: 'success' | 'info';
   } | null>(null);
 
-  const { sendRequest: fetchRecipes } = useHttp();
+  const { sendRequest: fetchRecipes, error } = useHttp();
 
   useEffect(
     () => {
@@ -181,7 +181,7 @@ export default function Recipes() {
             onSearch={searchByIngredientsHandler}
             onRemove={searchIngredientRemoveHandler}
           />
-          <SearchHeader recipesCount={totalCount} />
+          <SearchHeader recipesCount={totalCount} error={error} />
           <SearchedIngredients
             ingredients={ingredients}
             onRemove={searchIngredientRemoveHandler}
