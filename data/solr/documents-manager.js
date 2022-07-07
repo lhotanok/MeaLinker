@@ -37,12 +37,6 @@ async function fetchRecipesFromDb() {
   return recipes;
 }
 
-function getFilteredIngredients(ingredients) {
-  return ingredients.map(({ amount, text }) =>
-    `${amount ? amount + ' ' : ''}${text}`.trim(),
-  );
-}
-
 function getDurationInMinutes(duration) {
   if (!duration) return null;
 
@@ -75,8 +69,8 @@ function getParsedDate(datePublished) {
 function filterRecipeIndexedFields(recipe) {
   const { _id, jsonld, structured } = recipe;
 
-  const { name, image, description, recipeCategory, datePublished } = jsonld;
-  const { tags, rating, stepsCount, ingredients, time, nutritionInfo } = structured;
+  const { name, image, description, recipeCategory: categories, datePublished, recipeIngredient: ingredients } = jsonld;
+  const { tags, rating, stepsCount, time, nutritionInfo } = structured;
   const {
     calories,
     fat,
@@ -89,6 +83,8 @@ function filterRecipeIndexedFields(recipe) {
     protein,
   } = nutritionInfo;
 
+  const recipeCategory = Array.isArray(categories) ? categories : [categories];
+
   const filteredRecipe = {
     id: _id,
     name,
@@ -99,7 +95,7 @@ function filterRecipeIndexedFields(recipe) {
     rating: rating.value,
     reviewsCount: rating.reviews,
     tags,
-    ingredients: getFilteredIngredients(ingredients),
+    ingredients,
     cookMinutes: getDurationInMinutes(time.cooking),
     prepMinutes: getDurationInMinutes(time.preparation),
     totalMinutes: getDurationInMinutes(time.total),

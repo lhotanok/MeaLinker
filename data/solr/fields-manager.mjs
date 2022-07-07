@@ -57,7 +57,7 @@ async function postRecipesAddFields() {
   const addFields = {
     name: { type: TEXT },
     description: { type: TEXT },
-    recipeCategory: { type: TEXT },
+    recipeCategory: { type: TEXT, multiValued: true },
     ingredients: { multiValued: true },
     tags: { multiValued: true },
     rating: { type: FLOAT },
@@ -80,7 +80,7 @@ async function postRecipesAddFields() {
   };
 
   const facetFields = {
-    _recipeCategoryFacet: { type: STRING, stored: false },
+    _recipeCategoryFacet: { type: STRING, multiValued: true, stored: false },
     _ingredientsFacet: { type: STRING, multiValued: true, stored: false },
   };
 

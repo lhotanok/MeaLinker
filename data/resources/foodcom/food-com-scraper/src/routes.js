@@ -2,15 +2,13 @@ const Apify = require('apify');
 const cheerio = require('cheerio');
 const uuid = require('uuid');
 
-const { NAMESPACE_UUID } = require('./constants');
+const { NAMESPACE_UUID, JSON_LD_SELECTOR } = require('./constants');
 const { normalizeObject, getStructuredRecipeInfo } = require('./parser');
 
 const { utils: { log } } = Apify;
 
 exports.handleDetail = async (context, recipes) => {
     const { request: { url } } = context;
-
-    const JSON_LD_SELECTOR = 'script[type="application/ld+json"]';
 
     const $ = cheerio.load(context.$.html(), {
         decodeEntities: false,
