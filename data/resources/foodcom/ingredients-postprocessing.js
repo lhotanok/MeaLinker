@@ -1,7 +1,7 @@
 const fs = require('fs');
+const { FILE_ENCODING } = require('../../constants');
 
 const {
-  FILE_ENCODING,
   FOOD_DBPEDIA_INGREDIENTS_PATH,
   DBPEDIA_INGREDIENTS_PATH,
   NON_DIGIT_REGEX,

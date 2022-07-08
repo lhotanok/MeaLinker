@@ -11,7 +11,6 @@ const {
   EXTENDED_RECIPES_PATH,
   UNIQUE_INGR_WITH_IDS_PATH,
   INGR_MAP_PATH,
-  FILE_ENCODING,
   JSON_RECIPES_PATH,
   SEARCH_INGREDIENT_TRUNCATE_REGEX,
   SEARCH_INGREDIENT_MAX_WORDS,
@@ -19,7 +18,7 @@ const {
   SEARCH_INGREDIENT_EXCLUDE_REGEX,
 } = require('./constants');
 
-const { NAMESPACE_UUID } = require('./constants');
+const { NAMESPACE_UUID, FILE_ENCODING } = require('../../constants');
 
 function readFileFromCurrentDir(filePath) {
   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
@@ -90,7 +89,7 @@ function getUniqueIngredients(mappedIngredients) {
   mappedIngredients.forEach((ingredient) => {
     const { id, replaced } = ingredient;
     const name = replaced;
-    const identifier = uuid.v5(name || id, NAMESPACE_UUID);
+    const identifier = uuid.v5(name, NAMESPACE_UUID);
 
     uniqueIngredients[id] = {
       identifier,

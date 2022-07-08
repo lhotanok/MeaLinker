@@ -14,7 +14,7 @@ const {
   SEARCH_INGREDIENT_EXCLUDE_REGEX,
 } = require('./constants');
 
-const { NAMESPACE_UUID } = require('./constants');
+const { NAMESPACE_UUID } = require('../../constants');
 
 function writeFileFromCurrentDir(filePath, content) {
   return fs.writeFileSync(`${__dirname}/${filePath}`, content);
@@ -31,7 +31,7 @@ function getUniqueIngredients(mappedIngredients) {
   mappedIngredients.forEach((ingredient) => {
     const { id, replaced } = ingredient;
     const name = replaced;
-    const identifier = uuid.v5(name || id, NAMESPACE_UUID);
+    const identifier = uuid.v5(name, NAMESPACE_UUID);
 
     uniqueIngredients[id] = {
       identifier,
@@ -45,7 +45,8 @@ function getUniqueIngredients(mappedIngredients) {
 function buildSearchIngredients(uniqueIngredients) {
   const searchIngredients = {};
 
-  Object.entries(uniqueIngredients).forEach(([{ identifier, name }]) => {
+  // eslint-disable-next-line no-unused-vars
+  Object.entries(uniqueIngredients).forEach(([_foodcomId, { identifier, name }]) => {
     // Filter ingredients suitable for searching
 
     if ((!name.match(/[,.]/) && name[0].match(/[a-z]/gi)) || name === '7-up') {

@@ -19,10 +19,6 @@ exports.RAW_RECIPES_JSON_PATH = 'recipes/RAW_recipes.json';
 
 exports.RECIPES_TO_EXTRACT = 231637;
 
-exports.FILE_ENCODING = 'utf8';
-
-exports.NAMESPACE_UUID = '6ad552f0-7f96-11ec-82d2-0d4c9c611065';
-
 exports.SEARCH_INGREDIENT_MAX_WORDS = 3;
 
 exports.NON_DIGIT_REGEX = /[^0-9]/g;

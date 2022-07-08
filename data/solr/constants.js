@@ -15,5 +15,3 @@ exports.FOOD_COM_DEFAULT_IMAGE_SRC =
 
 exports.FOOD_COM_SEARCH_INGREDIENTS_PATH =
   '../resources/foodcom/ingredients/search_ingredients.json';
-
-exports.FILE_ENCODING = 'utf8';

@@ -7,6 +7,11 @@ const { normalizeObject, getStructuredRecipeInfo } = require('./parser');
 
 const { utils: { log } } = Apify;
 
+/**
+ *
+ * @param {Apify.CheerioHandlePageInputs} context
+ * @param {any[]} recipes
+ */
 exports.handleDetail = async (context, recipes) => {
     const { request: { url } } = context;
 

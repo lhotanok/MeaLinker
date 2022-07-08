@@ -1,13 +1,12 @@
 const ISODuration = require('iso8601-duration');
 
-const { AMOUNT_UNIT, QUOTE, AMOUNT_REGEX } = require('./constants');
+const { AMOUNT_UNIT, QUOTE } = require('./constants');
 
 const { parse } = ISODuration;
 
 const getStructuredRecipeInfo = (recipe) => {
     const recipeInfo = {
         time: getStructuredPrepTime(recipe),
-        servings: parseServings(recipe),
         tags: getStructuredTags(recipe),
         rating: getStructuredRating(recipe),
         nutritionInfo: getStructuredNutritionInfo(recipe),
@@ -87,6 +86,10 @@ const parseFloatValue = (textValue, unit) => {
 };
 
 const getStructuredNutritionInfo = ({ nutrition }) => {
+    if (!nutrition) {
+        return nutrition;
+    }
+
     const {
         calories,
         fatContent,
@@ -131,20 +134,6 @@ const getStructuredRating = ({ aggregateRating }) => {
     };
 
     return rating;
-};
-
-const parseServings = ({ recipeYield }) => {
-    return parseQuantity(recipeYield);
-};
-
-const parseQuantity = (ingredient) => {
-    const amountMatches = ingredient.match(AMOUNT_REGEX);
-
-    if (!amountMatches || !amountMatches.length || !amountMatches[0]) {
-        return null;
-    }
-
-    return amountMatches[0].replaceAll(' -', '-').trim();
 };
 
 module.exports = {

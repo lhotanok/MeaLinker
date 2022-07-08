@@ -1,11 +1,11 @@
 const Apify = require('apify');
-const { RECIPES_RESULT } = require('./constants');
-const { handleDetail } = require('./routes');
+const { RECIPES_RESULT, LABELS } = require('./constants');
+const { handleDetail, handleList } = require('./routes');
 
 const { utils: { log } } = Apify;
 
 Apify.main(async () => {
-    const { startUrls } = await Apify.getInput();
+    const startUrls = [{ url: 'https://www.allrecipes.com/recipes' }];
 
     const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
@@ -22,7 +22,12 @@ Apify.main(async () => {
         handlePageFunction: async (context) => {
             const { url, userData: { label } } = context.request;
             log.info('Page opened.', { label, url });
-            return handleDetail(context, recipes);
+
+            if (label === LABELS.DETAIL) {
+                return handleDetail(context, recipes);
+            }
+
+            return handleList(context);
         },
     });
 

@@ -12,8 +12,8 @@ const {
     INGREDIENTS_GROUP_SIZE,
     CONTEXT_KEY_DATATYPE_REGEX,
     DBPEDIA_INGREDIENT_TYPE,
-    FILE_ENCODING,
 } = require('./constants');
+const { FILE_ENCODING } = require('../../constants');
 
 function readFileFromCurrentDir(filePath) {
     return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);

@@ -11,5 +11,3 @@ exports.DBPEDIA_INGREDIENT_TYPE = 'http://dbpedia.org/ontology/ingredient';
 exports.DBPEDIA_INGREDIENTS_QUERY = 'ingredients-dbpedia.sparql';
 
 exports.INGREDIENTS_GROUP_SIZE = 20;
-
-exports.FILE_ENCODING = 'utf8';

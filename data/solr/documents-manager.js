@@ -1,13 +1,13 @@
 const fs = require('fs');
 const log4js = require('log4js');
 const solr = require('solr-client');
+const { FILE_ENCODING } = require('../constants');
 const {
   COUCHDB: { RECIPES_DB_NAME, USERNAME, PASSWORD, PORT },
   SOLR,
 } = require('./config');
 const {
   FOOD_COM_DEFAULT_IMAGE_SRC,
-  FILE_ENCODING,
   FOOD_COM_SEARCH_INGREDIENTS_PATH,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);

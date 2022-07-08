@@ -16,7 +16,6 @@ const log = getLogger('CouchDB manager');
 log.level = 'debug';
 
 import {
-  FILE_ENCODING,
   FOOD_COM_RECIPES_PATH,
   FOOD_COM_INGREDIENTS_PATH,
   RECIPES_DATABASE_NAME,
@@ -24,6 +23,7 @@ import {
 } from './constants.mjs';
 
 import nanoRoot from 'nano';
+import { FILE_ENCODING } from '../constants.js';
 
 const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
