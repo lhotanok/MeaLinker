@@ -4,7 +4,7 @@ import { MAX_SEARCH_INGREDIENTS_LIMIT } from '../constants';
 
 import { CORES } from './config';
 import SolrModel from './solr-model';
-import { FacetItem } from './types/facets';
+import { FacetItem, Facets, QueryFacets } from './types/facets';
 import { Recipe } from './types/recipe';
 import { SolrResponse } from './types/search-response';
 const { RECIPES } = CORES;
@@ -50,7 +50,10 @@ class SolrRecipesModel extends SolrModel {
   ): Promise<SolrResponse<Recipe>> {
     const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
 
-    const query = this.buildQuery(ingredientsQuery, offset, rows, sortOptions);
+    const query = this.buildQuery(ingredientsQuery, offset, rows, sortOptions).hl({
+      fl: 'ingredients',
+      preserveMulti: true,
+    });
 
     const solrResponse = await this.prepareSolrResponse(query);
 
@@ -84,15 +87,11 @@ class SolrRecipesModel extends SolrModel {
       .query()
       .q(q)
       .qop('AND')
-      .hl({
-        fl: 'ingredients',
-        preserveMulti: true,
-      })
       .facet({
         pivot: {
-          fields: ['_ingredientsFacet'],
+          fields: ['_ingredientsFacet', '_tagsFacet', '_cuisinesFacet'],
         },
-        field: '_ingredientsFacet',
+        field: ['_ingredientsFacet', '_tagsFacet', '_cuisinesFacet'],
         limit: MAX_SEARCH_INGREDIENTS_LIMIT,
         mincount: 1,
       })
@@ -132,6 +131,14 @@ class SolrRecipesModel extends SolrModel {
     return facetItems;
   }
 
+  private buildFacets(facetFields: QueryFacets): Facets {
+    return {
+      ingredientFacets: this.buildFacetItems(facetFields._ingredientsFacet),
+      tagFacets: this.buildFacetItems(facetFields._tagsFacet),
+      cuisineFacets: this.buildFacetItems(facetFields._cuisinesFacet),
+    };
+  }
+
   private async prepareSolrResponse(query: Query): Promise<SolrResponse<Recipe>> {
     const searchResponse = await this.fetchHighlightedDocumentsByQuery<Recipe>(query);
 
@@ -139,13 +146,7 @@ class SolrRecipesModel extends SolrModel {
       docs: searchResponse.response.docs,
       totalCount: searchResponse.response.numFound,
       highlighting: searchResponse.highlighting,
-      facets: searchResponse.facet_counts
-        ? {
-            ingredientFacets: this.buildFacetItems(
-              searchResponse.facet_counts.facet_fields._ingredientsFacet,
-            ),
-          }
-        : undefined,
+      facets: this.buildFacets(searchResponse.facet_counts.facet_fields),
     };
 
     return solrResponse;

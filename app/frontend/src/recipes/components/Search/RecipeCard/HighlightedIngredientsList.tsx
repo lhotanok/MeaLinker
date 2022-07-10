@@ -1,7 +1,13 @@
-import { ListItem, ListItemIcon, ListItemText, Divider, List } from '@mui/material';
-import React, { Fragment } from 'react';
+import {
+  ListItem,
+  ListItemText,
+  Divider,
+  List,
+  Avatar,
+  ListItemAvatar,
+} from '@mui/material';
+import { Fragment } from 'react';
 import reactStringReplace from 'react-string-replace';
-import ImageIcon from '../../../../shared/components/ImageIcon';
 import {
   CONTINUOUS_HIGHLIGHTINGS_REGEX,
   HIGHLIGHTED_ITEM_REGEX,
@@ -33,9 +39,14 @@ export default function HighlightedIngredientsList({
     return (
       <Fragment key={index}>
         <ListItem>
-          <ListItemIcon>
-            <ImageIcon src={vegetableIcon} alt={ingredient} size={20} />
-          </ListItemIcon>
+          <ListItemAvatar>
+            <Avatar
+              variant='rounded'
+              src={vegetableIcon}
+              sx={{ width: 20, height: 20 }}
+            />
+          </ListItemAvatar>
+
           <ListItemText secondary={ingredientItem} />
         </ListItem>
         <Divider variant='inset' component='li' />

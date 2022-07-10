@@ -10,13 +10,17 @@ import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../constants';
 import {
   buildRecipeSearchUrl,
   buildUrl,
-  parseIngredients,
+  parseFilters,
 } from '../../shared/tools/request-parser';
 import SearchHeader from '../components/Search/SearchHeader';
-import SearchedIngredients from '../components/Search/SearchedIngredients';
 import RecipesPagination from '../components/Search/RecipesPagination';
 import { Snackbar, Alert } from '@mui/material';
 import { Facets } from '../types/Facets';
+import {
+  buildItemsAddedSnackbar,
+  buildItemsRemovedSnackbar,
+} from '../../shared/tools/snackbar-builder';
+import SearchedFilters from '../components/Search/SearchedFilters';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -25,12 +29,16 @@ export default function Recipes() {
   const { pathname, search } = location;
 
   const queryParams = new URLSearchParams(decodeURI(search));
-  const ingredients = parseIngredients(queryParams);
+  const filters = parseFilters(queryParams);
   const page = Number(queryParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
 
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
-  const [facets, setFacets] = useState<Facets>({ ingredientFacets: [] });
+  const [facets, setFacets] = useState<Facets>({
+    ingredientFacets: [],
+    tagFacets: [],
+    cuisineFacets: [],
+  });
 
   const [addSnackbarOpen, setAddSnackbarOpen] = useState(false);
   const [addSnackbarText, setAddSnackbarText] = useState<{
@@ -46,11 +54,11 @@ export default function Recipes() {
 
   useEffect(
     () => {
-      document.title = `Recipe Search${ingredients.length > 0
-        ? ` |${ingredients.join(' ')}`
+      document.title = `Recipe Search${filters.ingredients.length > 0
+        ? ` |${filters.ingredients.join(' ')}`
         : ''}`;
     },
-    [ingredients],
+    [filters.ingredients],
   );
 
   useEffect(
@@ -85,74 +93,87 @@ export default function Recipes() {
     [addSnackbarOpen, addSnackbarText, newSnackbarText],
   );
 
-  const searchByIngredientsHandler = (searchIngredientLabels: string[]) => {
-    if (searchIngredientLabels.length > 0) {
-      const mergedIngredients = mergeSearchIngredients(
-        ingredients,
-        searchIngredientLabels,
+  const searchHandler = (
+    originalFilters: string[],
+    searchFilters: string[],
+    filterName: 'ingredients' | 'tags' | 'cuisines',
+  ) => {
+    if (searchFilters.length > 0) {
+      const mergedFilters = mergeSearchFilters(originalFilters, searchFilters);
+      const addedFilters = mergedFilters.filter(
+        (filter) => !originalFilters.includes(filter),
       );
 
-      const addedIngredients = mergedIngredients.filter(
-        (ingr) => !ingredients.includes(ingr),
-      );
-
-      if (addedIngredients.length > 0) {
+      if (addedFilters.length > 0) {
+        // Some filter(s) changed, recipe results need to be updated
         setTotalCount(null);
 
-        const snackbarText =
-          addedIngredients.length === 1
-            ? `${addedIngredients[0]} added`
-            : `${addedIngredients.length} ingredients added`;
-
+        const snackbarText = buildItemsAddedSnackbar(addedFilters, filterName);
         setNewSnackbarText({ text: snackbarText, severity: 'success' });
 
         navigate(
           buildUrl(pathname, queryParams, {
-            ingredients: mergedIngredients,
+            [filterName]: mergedFilters,
           }),
         );
       }
     }
   };
 
-  const searchIngredientRemoveHandler = (removedIngredients: string[]) => {
-    const filteredIngredients = ingredients.filter(
-      (ingredient) => !removedIngredients.includes(ingredient),
+  const removeHandler = (
+    originalFilters: string[],
+    removedFilters: string[],
+    filterName: 'ingredients' | 'tags' | 'cuisines',
+  ) => {
+    const filteredLabels = originalFilters.filter(
+      (filter) => !removedFilters.includes(filter),
     );
 
-    if (filteredIngredients.length === ingredients.length) {
+    if (filteredLabels.length === originalFilters.length) {
       return;
     }
 
     setTotalCount(null);
 
-    let snackbarText = `${removedIngredients.length === 1
-      ? removedIngredients[0]
-      : `${removedIngredients.length} ingredients`} removed`;
+    const snackbarText = buildItemsRemovedSnackbar(
+      originalFilters,
+      removedFilters,
+      filteredLabels,
+      filterName,
+    );
 
-    if (filteredIngredients.length === 0) {
-      snackbarText =
-        ingredients.length === 1
-          ? `${ingredients[0]} removed`
-          : `${ingredients.length === 2
-              ? 'Both'
-              : `All ${ingredients.length}`} ingredients removed`;
-    }
-
-    setNewSnackbarText({
-      text: snackbarText,
-      severity: 'info',
-    });
+    setNewSnackbarText({ text: snackbarText, severity: 'info' });
 
     navigate(
       buildUrl(pathname, queryParams, {
-        ingredients: filteredIngredients,
-        page: 1,
+        [filterName]: filteredLabels,
       }),
     );
   };
 
-  const handleAddSnackbarClose = (
+  const filterHandlers = {
+    ingredients: {
+      search: (labels: string[]) =>
+        searchHandler(filters.ingredients, labels, 'ingredients'),
+      remove: (removed: string[]) =>
+        removeHandler(filters.ingredients, removed, 'ingredients'),
+    },
+    tags: {
+      search: (labels: string[]) => searchHandler(filters.tags, labels, 'tags'),
+      remove: (removed: string[]) => removeHandler(filters.tags, removed, 'tags'),
+    },
+    cuisines: {
+      search: (labels: string[]) => searchHandler(filters.cuisines, labels, 'cuisines'),
+      remove: (removed: string[]) => removeHandler(filters.cuisines, removed, 'cuisines'),
+    },
+  };
+
+  const removeAllFiltersHandler = () => {
+    setTotalCount(null);
+    navigate(buildUrl(pathname, queryParams, { page: 1 }));
+  };
+
+  const handleSnackbarClose = (
     _event?: React.SyntheticEvent | Event,
     reason?: string,
   ) => {
@@ -178,18 +199,21 @@ export default function Recipes() {
             ingredientFacets={facets.ingredientFacets.filter(
               (facet) => facet.count !== totalCount,
             )}
-            onSearch={searchByIngredientsHandler}
-            onRemove={searchIngredientRemoveHandler}
+            onSearch={(labels: string[]) =>
+              searchHandler(filters.ingredients, labels, 'ingredients')}
+            onRemove={filterHandlers.ingredients.remove}
           />
           <SearchHeader recipesCount={totalCount} error={error} />
-          <SearchedIngredients
-            ingredients={ingredients}
-            onRemove={searchIngredientRemoveHandler}
+          <SearchedFilters
+            filters={filters}
+            onTagRemove={(name) => filterHandlers.tags.remove([name])}
+            onIngredientRemove={(name) => filterHandlers.ingredients.remove([name])}
+            onRemoveAll={removeAllFiltersHandler}
           />
           <Snackbar
             key={addSnackbarText ? addSnackbarText.text : ''}
             open={addSnackbarOpen}
-            onClose={handleAddSnackbarClose}
+            onClose={handleSnackbarClose}
             autoHideDuration={4000}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           >
@@ -213,19 +237,19 @@ export default function Recipes() {
   );
 }
 
-const mergeSearchIngredients = (
-  originalIngredients: string[],
-  newIngredients: string[],
+const mergeSearchFilters = (
+  originalFilters: string[],
+  newFilters: string[],
 ): string[] => {
-  const mergedIngredients: string[] = [...originalIngredients];
+  const mergedFilters: string[] = [...originalFilters];
 
-  newIngredients.forEach((ingredientLabel) => {
-    if (!mergedIngredients.includes(ingredientLabel)) {
-      mergedIngredients.push(ingredientLabel);
+  newFilters.forEach((ingredientLabel) => {
+    if (!mergedFilters.includes(ingredientLabel)) {
+      mergedFilters.push(ingredientLabel);
     }
   });
 
-  return mergedIngredients;
+  return mergedFilters;
 };
 
 const prepareRecipes = (

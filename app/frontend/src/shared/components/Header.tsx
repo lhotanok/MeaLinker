@@ -13,10 +13,6 @@ const pages = [
     name: 'Search Recipes',
     path: '/recipes',
   },
-  {
-    name: 'Cusines', // just a testing menu tab
-    path: '/recipes',
-  },
 ];
 
 export default function Header() {

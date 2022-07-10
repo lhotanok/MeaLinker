@@ -1,42 +1,36 @@
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Container from '@mui/material/Container';
-import { Avatar, IconButton } from '@mui/material';
-import { PRIMARY_COLOR } from '../constants';
+import Stack from '@mui/material/Stack';
+
 import FlexBox from './FlexBox';
 
-type RemovableChipsProps = {
-  items: string[];
-  onRemove: (items: string[]) => void;
+export type RemovableChipItem = {
+  name: string;
+  onRemove: (itemName: string) => void;
 };
 
-export default function RemovableChips({ items, onRemove }: RemovableChipsProps) {
-  const listItems = items.map((item, index) => {
+type RemovableChipsProps = {
+  items: RemovableChipItem[];
+  color?: 'default' | 'success' | 'info' | 'error' | 'warning' | 'primary' | 'secondary';
+};
+
+export default function RemovableChips({
+  items,
+  color = 'secondary',
+}: RemovableChipsProps) {
+  const chips = items.map((item, index) => {
     return (
       <Grid item key={index} justifyContent='center' margin={1}>
-        <FlexBox>
-          <Chip color='secondary' label={item} onDelete={() => onRemove([item])} />
-        </FlexBox>
+        <Chip color={color} label={item.name} onDelete={() => item.onRemove(item.name)} />
       </Grid>
     );
   });
 
-  if (listItems.length > 0) {
-    listItems.push(
-      <IconButton key='remove-all-chips' size='large' onClick={() => onRemove(items)}>
-        <Avatar sx={{ bgcolor: PRIMARY_COLOR }}>
-          <DeleteIcon />
-        </Avatar>
-      </IconButton>,
-    );
-  }
-
   return (
-    <Container maxWidth='md'>
+    <FlexBox>
       <Grid container justifyContent='center'>
-        {listItems}
+        <Stack direction='row'>{chips}</Stack>
       </Grid>
-    </Container>
+    </FlexBox>
   );
 }

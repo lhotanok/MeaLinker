@@ -73,6 +73,7 @@ export default function RecipeDetail() {
                   headline={headlineText}
                   description={recipe.jsonld.description}
                   rating={recipe.structured.rating}
+                  author={recipe.structured.author}
                 />
                 <PrepTimeDivider totalTime={(recipe.structured.time || {}).total} />
                 <PrepTimeBox time={recipe.structured.time || {}} />

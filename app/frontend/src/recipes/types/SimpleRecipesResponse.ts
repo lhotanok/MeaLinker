@@ -5,11 +5,11 @@ export type SimpleRecipe = {
   name: string;
   image: string;
   description: string;
-  recipeCategory: string;
   stepsCount: number;
   rating: number;
   reviewsCount: number;
   tags: string[];
+  cuisines: string[];
   ingredients: string[];
   cookMinutes: number;
   prepMinutes: number;
@@ -25,6 +25,7 @@ export type SimpleRecipe = {
   sugar: number;
   protein: number;
   _version_: number;
+  _ingredientsFacet: string[];
 };
 
 export type HighlightedFields = {

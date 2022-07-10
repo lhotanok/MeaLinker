@@ -9,6 +9,7 @@ const {
 const {
   FOOD_COM_DEFAULT_IMAGE_SRC,
   FOOD_COM_SEARCH_INGREDIENTS_PATH,
+  CUSINES,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -73,7 +74,7 @@ function filterRecipeIndexedFields(recipe) {
     name,
     image,
     description,
-    recipeCategory: categories,
+    recipeCategory,
     datePublished,
     recipeIngredient: ingredients,
   } = jsonld;
@@ -90,18 +91,29 @@ function filterRecipeIndexedFields(recipe) {
     protein,
   } = nutritionInfo;
 
-  const recipeCategory = Array.isArray(categories) ? categories : [categories];
+  const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
+  const mergedTags = [...tags, ...categories].filter((tag) => tag);
+  const cuisines = CUSINES.filter((cusine) => {
+    for (const tag of mergedTags) {
+      if (tag.toLowerCase().startsWith(cusine.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  const filteredTags = mergedTags.filter((tag) => !cuisines.includes(tag));
 
   const filteredRecipe = {
     id: _id,
     name,
     image,
     description,
-    recipeCategory,
     stepsCount,
     rating: rating.value,
     reviewsCount: rating.reviews,
-    tags,
+    tags: filteredTags,
+    cuisines,
     ingredients,
     cookMinutes: getDurationInMinutes(time.cooking),
     prepMinutes: getDurationInMinutes(time.preparation),

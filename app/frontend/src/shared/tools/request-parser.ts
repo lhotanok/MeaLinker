@@ -1,10 +1,22 @@
 import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../../recipes/constants';
+import { Filters } from '../../recipes/types/Filters';
 
-export const parseIngredients = (queryParams: URLSearchParams): string[] => {
+export const parseFilters = (queryParams: URLSearchParams): Filters => {
   const joinedIngredients = queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS);
-  const ingredients = joinedIngredients ? joinedIngredients.split(';') : [];
+  const joinedTags = queryParams.get(QUERY_PARAM_NAMES.TAGS);
+  const joinedCuisines = queryParams.get(QUERY_PARAM_NAMES.CUISINES);
 
-  return ingredients;
+  const filters: Filters = {
+    ingredients: splitParamValue(joinedIngredients),
+    tags: splitParamValue(joinedTags),
+    cuisines: splitParamValue(joinedCuisines),
+  };
+
+  return filters;
+};
+
+const splitParamValue = (paramValue: string | null, delimiter = ';'): string[] => {
+  return paramValue ? paramValue.split(delimiter) : [];
 };
 
 const setOrDelete = (
@@ -22,12 +34,17 @@ const setOrDelete = (
 export const buildUrl = (
   pathname: string,
   currentQueryParams: URLSearchParams,
-  updatedParamValues: { ingredients: string[]; page?: number },
+  updatedParamValues: {
+    ingredients?: string[];
+    tags?: string[];
+    cuisines?: string[];
+    page?: number;
+  },
 ): string => {
   const { ingredients, page = 1 } = updatedParamValues;
   const queryParams = currentQueryParams;
 
-  const encodedIngredients = encodeArrayToQueryParam(ingredients);
+  const encodedIngredients = encodeArrayToQueryParam(ingredients || []);
 
   setOrDelete(queryParams, QUERY_PARAM_NAMES.INGREDIENTS, encodedIngredients);
   setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');

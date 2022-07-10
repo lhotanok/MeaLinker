@@ -32,7 +32,8 @@ export default function Footer() {
           recipe details.
         </Typography>
         <Typography align='center'>
-          <FlaticonLink iconCategory='Vegetable' author='justicon and Icongeek26' />
+          <FlaticonLink iconCategory='Carrot' author='Eucalyp' />
+          <FlaticonLink iconCategory='Sodium' author='Smashicons' />
           <FlaticonLink iconCategory='Food' author='Freepik' />
           <FlaticonLink iconCategory='Nutrition' author='Freepik' />
           <FlaticonLink iconCategory='Cook' author='Freepik' />
