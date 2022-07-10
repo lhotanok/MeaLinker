@@ -1,11 +1,5 @@
 import { useState, useCallback } from 'react';
-
-type RequestConfig = {
-  url: string;
-  method?: string;
-  headers?: HeadersInit;
-  body?: Record<string, any>;
-};
+import { RequestConfig } from '../types/RequestConfig';
 
 export default function useHttp() {
   const [isLoading, setIsLoading] = useState(false);

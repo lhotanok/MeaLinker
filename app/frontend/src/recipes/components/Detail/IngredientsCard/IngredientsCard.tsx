@@ -3,7 +3,6 @@ import { RecipeIngredient } from '../../../types/FullRecipe';
 import ingredientsIcon from '../../../../assets/diet-icon.png';
 import IngredientsList from './IngredientsList';
 import InfoCard from '../../../../shared/components/InfoCard';
-import { buildPlural } from '../../../../shared/tools/value-prettifier';
 
 type IngredientsCardProps = {
   ingredients?: RecipeIngredient[];
@@ -14,7 +13,7 @@ export default function IngredientsCard({
   ingredients = [],
   servings,
 }: IngredientsCardProps) {
-  const subheader = servings ? `Yield: ${buildPlural('serving', servings)}` : '';
+  const subheader = servings ? `Yield: ${servings}` : '';
   return (
     <Box pt={6}>
       <InfoCard

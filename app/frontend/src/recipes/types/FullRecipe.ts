@@ -16,7 +16,14 @@ export type FullRecipe = {
     nutritionInfo: RecipeNutrition;
     ingredients: RecipeIngredient[];
     stepsCount: number;
+    author: Author;
   };
+};
+
+export type Author = {
+  id: string;
+  name: string;
+  url: string;
 };
 
 export type RecipeTime = {

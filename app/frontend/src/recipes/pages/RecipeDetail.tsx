@@ -94,7 +94,7 @@ export default function RecipeDetail() {
             <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
             <IngredientsCard
               ingredients={recipe.structured.ingredients}
-              servings={recipe.structured.servings}
+              servings={recipe.jsonld.recipeYield}
             />
           </Grid>
         </Grid>

@@ -19,7 +19,6 @@ module.exports = {
     text: 'Fork me on GitHub',
   },
   styleguideDir: '../../docs',
-  pagePerSection: true,
   sections: [
     {
       name: 'Recipes',

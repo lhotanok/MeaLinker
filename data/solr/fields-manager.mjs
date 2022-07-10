@@ -51,6 +51,29 @@ async function postAddFields(addFields, schemaUrl, fieldCategory = 'add-field') 
   log.info(`Add Fields posted`, { schemaUrl });
 }
 
+async function postCopyFields(copyFields, schemaUrl) {
+  log.info(`Posting new Copy Fields if any...`, { schemaUrl });
+  const fieldSources = Object.keys(copyFields);
+  for (const source of fieldSources) {
+    try {
+      const result = await got
+        .post(schemaUrl, {
+          json: {
+            'add-copy-field': {
+              source,
+              dest: copyFields[source],
+            },
+          },
+        })
+        .json();
+      log.info(`${source} Copy Field response: ${JSON.stringify(result, null, 2)}`);
+    } catch (e) {
+      log.info(`Copy fields for '${source}' were already added`);
+    }
+  }
+  log.info(`Copy fields posted`, { schemaUrl });
+}
+
 async function postRecipesAddFields() {
   const { INT, FLOAT, TEXT, STRING } = FIELD_TYPES;
 
@@ -84,8 +107,13 @@ async function postRecipesAddFields() {
     _ingredientsFacet: { type: STRING, multiValued: true, stored: false },
   };
 
+  const copyFields = {
+    recipeCategory: ['_recipeCategoryFacet'],
+  };
+
   await postAddFields(addFields, SOLR_RECIPES_SCHEMA);
   await postAddFields(facetFields, SOLR_RECIPES_SCHEMA);
+  await postCopyFields(copyFields, SOLR_RECIPES_SCHEMA);
 }
 
 async function main() {

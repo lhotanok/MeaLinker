@@ -28,20 +28,7 @@ class SolrRecipesModel extends SolrModel {
       reviewsCount: 'desc',
     },
   ): Promise<SolrResponse<Recipe>> {
-    const query = this.client
-      .query()
-      .q('*:*')
-      .start(offset)
-      .rows(rows)
-      .sort(sortOptions)
-      .facet({
-        pivot: {
-          fields: ['_ingredientsFacet'],
-        },
-        field: '_ingredientsFacet',
-        limit: MAX_SEARCH_INGREDIENTS_LIMIT,
-        mincount: 1,
-      });
+    const query = this.buildQuery('*:*', offset, rows, sortOptions);
 
     const solrResponse = await this.prepareSolrResponse(query);
     log.info(
@@ -63,25 +50,7 @@ class SolrRecipesModel extends SolrModel {
   ): Promise<SolrResponse<Recipe>> {
     const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
 
-    const query = this.client
-      .query()
-      .q(ingredientsQuery)
-      .qop('AND')
-      .hl({
-        fl: 'ingredients',
-        preserveMulti: true,
-      })
-      .facet({
-        pivot: {
-          fields: ['_ingredientsFacet'],
-        },
-        field: '_ingredientsFacet',
-        limit: MAX_SEARCH_INGREDIENTS_LIMIT,
-        mincount: 1,
-      })
-      .start(offset)
-      .rows(rows)
-      .sort(sortOptions);
+    const query = this.buildQuery(ingredientsQuery, offset, rows, sortOptions);
 
     const solrResponse = await this.prepareSolrResponse(query);
 
@@ -103,6 +72,35 @@ class SolrRecipesModel extends SolrModel {
       )}`,
     );
     return recipe;
+  }
+
+  private buildQuery(
+    q: string,
+    offset: number,
+    rows: number,
+    sortOptions: Record<string, any>,
+  ): Query {
+    const query = this.client
+      .query()
+      .q(q)
+      .qop('AND')
+      .hl({
+        fl: 'ingredients',
+        preserveMulti: true,
+      })
+      .facet({
+        pivot: {
+          fields: ['_ingredientsFacet'],
+        },
+        field: '_ingredientsFacet',
+        limit: MAX_SEARCH_INGREDIENTS_LIMIT,
+        mincount: 1,
+      })
+      .start(offset)
+      .rows(rows)
+      .sort(sortOptions);
+
+    return query;
   }
 
   private buildIngredientsPhraseQuery(ingredients: string[]): string {
