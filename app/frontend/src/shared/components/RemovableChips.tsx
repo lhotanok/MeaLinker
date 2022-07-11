@@ -1,6 +1,5 @@
 import Chip from '@mui/material/Chip';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 
 import FlexBox from './FlexBox';
 
@@ -21,16 +20,20 @@ export default function RemovableChips({
   const chips = items.map((item, index) => {
     return (
       <Grid item key={index} justifyContent='center' margin={1}>
-        <Chip color={color} label={item.name} onDelete={() => item.onRemove(item.name)} />
+        <FlexBox>
+          <Chip
+            color={color}
+            label={item.name}
+            onDelete={() => item.onRemove(item.name)}
+          />
+        </FlexBox>
       </Grid>
     );
   });
 
   return (
-    <FlexBox>
-      <Grid container justifyContent='center'>
-        <Stack direction='row'>{chips}</Stack>
-      </Grid>
-    </FlexBox>
+    <Grid container justifyContent='center'>
+      {chips}
+    </Grid>
   );
 }

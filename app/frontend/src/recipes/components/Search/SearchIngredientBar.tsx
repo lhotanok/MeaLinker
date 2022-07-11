@@ -16,6 +16,7 @@ export default function SearchIngredientBar({
     <AutocompleteSearchBar
       facetItems={ingredientFacets}
       label='Add ingredients (from the list / your own)'
+      placeholder='Ingredients'
       onSearch={onSearch}
       onRemove={onRemove}
     />

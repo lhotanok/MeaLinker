@@ -11,6 +11,7 @@ import {
   buildRecipeSearchUrl,
   buildUrl,
   parseFilters,
+  prepareRecipes,
 } from '../../shared/tools/request-parser';
 import SearchHeader from '../components/Search/SearchHeader';
 import RecipesPagination from '../components/Search/RecipesPagination';
@@ -54,11 +55,9 @@ export default function Recipes() {
 
   useEffect(
     () => {
-      document.title = `Recipe Search${filters.ingredients.length > 0
-        ? ` |${filters.ingredients.join(' ')}`
-        : ''}`;
+      document.title = `Recipe Search | ${totalCount} recipes`;
     },
-    [filters.ingredients],
+    [totalCount],
   );
 
   useEffect(
@@ -170,7 +169,7 @@ export default function Recipes() {
 
   const removeAllFiltersHandler = () => {
     setTotalCount(null);
-    navigate(buildUrl(pathname, queryParams, { page: 1 }));
+    navigate(buildUrl(pathname, queryParams, null));
   };
 
   const handleSnackbarClose = (
@@ -199,14 +198,14 @@ export default function Recipes() {
             ingredientFacets={facets.ingredientFacets.filter(
               (facet) => facet.count !== totalCount,
             )}
-            onSearch={(labels: string[]) =>
-              searchHandler(filters.ingredients, labels, 'ingredients')}
+            onSearch={filterHandlers.ingredients.search}
             onRemove={filterHandlers.ingredients.remove}
           />
           <SearchHeader recipesCount={totalCount} error={error} />
           <SearchedFilters
             filters={filters}
             onTagRemove={(name) => filterHandlers.tags.remove([name])}
+            onCuisineRemove={(name) => filterHandlers.cuisines.remove([name])}
             onIngredientRemove={(name) => filterHandlers.ingredients.remove([name])}
             onRemoveAll={removeAllFiltersHandler}
           />
@@ -250,40 +249,4 @@ const mergeSearchFilters = (
   });
 
   return mergedFilters;
-};
-
-const prepareRecipes = (
-  recipeResponse: SimpleRecipesResponse,
-  offset: number = 0,
-): SimpleRecipe[] => {
-  const { docs, highlighting = {} } = recipeResponse;
-
-  const searchedRecipes = docs
-    .slice(offset, offset + PAGINATION_RESULTS_COUNT)
-    .map((recipeDoc) => {
-      const { id } = recipeDoc;
-      const recipeHighlighting = highlighting[id];
-      const ingredients: string[] = [];
-
-      recipeDoc.ingredients.forEach((ingredient, index) => {
-        if (
-          recipeHighlighting &&
-          recipeHighlighting.ingredients &&
-          !ingredient.includes('href') // Solr highlighting truncates <a href> content
-        ) {
-          ingredients.push(recipeHighlighting.ingredients[index]);
-        } else {
-          ingredients.push(ingredient);
-        }
-      });
-
-      const searchedRecipe: SimpleRecipe = {
-        ...recipeDoc,
-        ingredients,
-      };
-
-      return searchedRecipe;
-    });
-
-  return searchedRecipes;
 };

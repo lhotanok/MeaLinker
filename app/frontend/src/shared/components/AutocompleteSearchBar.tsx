@@ -13,6 +13,7 @@ import { buildItemsWithCount, getItemsWithoutCount } from '../tools/value-pretti
 type AutocompleteSearchBarProps = {
   facetItems: FacetItem[];
   label: string;
+  placeholder?: string;
   limitTags?: number;
   onSearch: (searchedItems: string[]) => void;
   onRemove: (removedItems: string[]) => void;
@@ -21,6 +22,7 @@ type AutocompleteSearchBarProps = {
 export default function AutocompleteSearchBar({
   facetItems,
   label,
+  placeholder,
   limitTags = 6,
   onSearch,
   onRemove,
@@ -76,7 +78,7 @@ export default function AutocompleteSearchBar({
             </Avatar>
           </IconButton>
           <FlexBox>
-            <TextField {...params} label={label} placeholder='Ingredients' />
+            <TextField {...params} label={label} placeholder={placeholder} />
           </FlexBox>
         </Stack>
       )}

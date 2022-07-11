@@ -10,8 +10,9 @@ import FlexBox from '../../../shared/components/FlexBox';
 
 type SearchedFiltersProps = {
   filters: Filters;
-  onIngredientRemove: (ingrName: string) => void;
-  onTagRemove: (tagName: string) => void;
+  onIngredientRemove: (name: string) => void;
+  onTagRemove: (name: string) => void;
+  onCuisineRemove: (name: string) => void;
   onRemoveAll: () => void;
 };
 
@@ -19,6 +20,7 @@ export default function SearchedFilters({
   filters,
   onIngredientRemove,
   onTagRemove,
+  onCuisineRemove,
   onRemoveAll,
 }: SearchedFiltersProps) {
   const { ingredients, tags, cuisines } = filters;
@@ -29,21 +31,31 @@ export default function SearchedFilters({
   }));
 
   const otherFiltersChips: RemovableChipItem[] = [
-    ...tags.map((tag) => ({
-      name: tag,
+    ...tags.map((name) => ({
+      name,
       onRemove: onTagRemove,
+    })),
+    ...cuisines.map((name) => ({
+      name,
+      onRemove: onCuisineRemove,
     })),
   ];
 
   return (
     <Container maxWidth='md'>
       <Grid container justifyContent='center'>
-        <Stack direction='row'>
-          <Stack>
-            {ingredientChips.length > 0 && <RemovableChips items={ingredientChips} />}
-            {otherFiltersChips.length > 0 && <RemovableChips items={otherFiltersChips} />}
-          </Stack>
-          {ingredients.length + tags.length + cuisines.length > 0 && (
+        <Grid item maxWidth='91%'>
+          <FlexBox>
+            <Stack>
+              {ingredientChips.length > 0 && <RemovableChips items={ingredientChips} />}
+              {otherFiltersChips.length > 0 && (
+                <RemovableChips items={otherFiltersChips} color='default' />
+              )}
+            </Stack>
+          </FlexBox>
+        </Grid>
+        {ingredients.length + tags.length + cuisines.length > 0 && (
+          <Grid item xs={1}>
             <FlexBox>
               <IconButton
                 key='remove-all-chips'
@@ -55,8 +67,8 @@ export default function SearchedFilters({
                 </Avatar>
               </IconButton>
             </FlexBox>
-          )}
-        </Stack>
+          </Grid>
+        )}
       </Grid>
     </Container>
   );

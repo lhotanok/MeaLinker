@@ -1,5 +1,10 @@
 import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../../recipes/constants';
 import { Filters } from '../../recipes/types/Filters';
+import {
+  SimpleRecipesResponse,
+  SimpleRecipe,
+} from '../../recipes/types/SimpleRecipesResponse';
+import { QueryParameters } from '../types/QueryParameters';
 
 export const parseFilters = (queryParams: URLSearchParams): Filters => {
   const joinedIngredients = queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS);
@@ -34,19 +39,30 @@ const setOrDelete = (
 export const buildUrl = (
   pathname: string,
   currentQueryParams: URLSearchParams,
-  updatedParamValues: {
-    ingredients?: string[];
-    tags?: string[];
-    cuisines?: string[];
-    page?: number;
-  },
+  updatedParamValues: QueryParameters | null,
 ): string => {
-  const { ingredients, page = 1 } = updatedParamValues;
+  if (!updatedParamValues) {
+    return pathname;
+  }
+
+  const { ingredients, tags, cuisines, page = 1 } = updatedParamValues;
   const queryParams = currentQueryParams;
 
-  const encodedIngredients = encodeArrayToQueryParam(ingredients || []);
+  if (ingredients) {
+    const encoded = encodeArrayToQueryParam(ingredients);
+    setOrDelete(queryParams, QUERY_PARAM_NAMES.INGREDIENTS, encoded);
+  }
 
-  setOrDelete(queryParams, QUERY_PARAM_NAMES.INGREDIENTS, encodedIngredients);
+  if (tags) {
+    const encoded = encodeArrayToQueryParam(tags);
+    setOrDelete(queryParams, QUERY_PARAM_NAMES.TAGS, encoded);
+  }
+
+  if (cuisines) {
+    const encoded = encodeArrayToQueryParam(cuisines);
+    setOrDelete(queryParams, QUERY_PARAM_NAMES.CUISINES, encoded);
+  }
+
   setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');
 
   return `${pathname}?${queryParams.toString()}`;
@@ -68,4 +84,40 @@ export const buildRecipeSearchUrl = (locationSearch: string): string => {
   });
 
   return `http://localhost:5000/api/recipes?${apiSearchParams.toString()}`;
+};
+
+export const prepareRecipes = (
+  recipeResponse: SimpleRecipesResponse,
+  offset: number = 0,
+): SimpleRecipe[] => {
+  const { docs, highlighting = {} } = recipeResponse;
+
+  const searchedRecipes = docs
+    .slice(offset, offset + PAGINATION_RESULTS_COUNT)
+    .map((recipeDoc) => {
+      const { id } = recipeDoc;
+      const recipeHighlighting = highlighting[id];
+      const ingredients: string[] = [];
+
+      recipeDoc.ingredients.forEach((ingredient, index) => {
+        if (
+          recipeHighlighting &&
+          recipeHighlighting.ingredients &&
+          !ingredient.includes('href') // Solr highlighting truncates <a href> content
+        ) {
+          ingredients.push(recipeHighlighting.ingredients[index]);
+        } else {
+          ingredients.push(ingredient);
+        }
+      });
+
+      const searchedRecipe: SimpleRecipe = {
+        ...recipeDoc,
+        ingredients,
+      };
+
+      return searchedRecipe;
+    });
+
+  return searchedRecipes;
 };
