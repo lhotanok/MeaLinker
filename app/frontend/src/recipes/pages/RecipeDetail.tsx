@@ -60,7 +60,7 @@ export default function RecipeDetail() {
     <Fragment>
       <Helmet>
         <script className='recipe-jsonld' type='application/ld+json'>
-          {JSON.stringify(recipe.jsonld)}
+          {JSON.stringify({ ...recipe.jsonld, identifier: undefined })}
         </script>
       </Helmet>
       <Container maxWidth='xl'>
