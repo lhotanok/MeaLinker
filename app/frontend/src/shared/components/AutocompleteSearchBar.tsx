@@ -5,6 +5,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Stack from '@mui/material/Stack';
 import { Avatar } from '@mui/material';
 import { IconButton } from '@mui/material';
+import parse from 'autosuggest-highlight/parse';
+import match from 'autosuggest-highlight/match';
 import { MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING, SECONDARY_COLOR } from '../constants';
 import FlexBox from './FlexBox';
 import { FacetItem } from '../../recipes/types/Facets';
@@ -23,7 +25,7 @@ export default function AutocompleteSearchBar({
   facetItems,
   label,
   placeholder,
-  limitTags = 6,
+  limitTags = 5,
   onSearch,
   onRemove,
 }: AutocompleteSearchBarProps) {
@@ -57,6 +59,8 @@ export default function AutocompleteSearchBar({
       clearOnBlur
       options={buildItemsWithCount(facetItems)}
       limitTags={limitTags}
+      onChange={onChangeHandler}
+      value={searchedItems}
       filterOptions={(options, state) => {
         const filteredOptions = options
           .filter((option) => {
@@ -82,8 +86,27 @@ export default function AutocompleteSearchBar({
           </FlexBox>
         </Stack>
       )}
-      onChange={onChangeHandler}
-      value={searchedItems}
+      renderOption={(props, option, { inputValue }) => {
+        const matches = match(option, inputValue);
+        const parts = parse(option, matches);
+
+        return (
+          <li {...props}>
+            <div>
+              {parts.map((part, index) => (
+                <span
+                  key={index}
+                  style={{
+                    fontWeight: part.highlight ? 'bolder' : 'normal',
+                  }}
+                >
+                  {part.text}
+                </span>
+              ))}
+            </div>
+          </li>
+        );
+      }}
     />
   );
 }
