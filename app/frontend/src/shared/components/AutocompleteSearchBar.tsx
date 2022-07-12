@@ -1,19 +1,18 @@
-import { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import AddIcon from '@mui/icons-material/Add';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
+import SearchIcon from '@mui/icons-material/Search';
 import Stack from '@mui/material/Stack';
-import { Avatar } from '@mui/material';
-import { IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+
 import parse from 'autosuggest-highlight/parse';
 import match from 'autosuggest-highlight/match';
-import { MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING, SECONDARY_COLOR } from '../constants';
-import FlexBox from './FlexBox';
+import { MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING } from '../constants';
 import { FacetItem } from '../../recipes/types/Facets';
 import { buildItemsWithCount, getItemsWithoutCount } from '../tools/value-prettifier';
 
 type AutocompleteSearchBarProps = {
   facetItems: FacetItem[];
+  searchedItems: string[];
   label: string;
   placeholder?: string;
   limitTags?: number;
@@ -22,6 +21,7 @@ type AutocompleteSearchBarProps = {
 };
 
 export default function AutocompleteSearchBar({
+  searchedItems,
   facetItems,
   label,
   placeholder,
@@ -29,14 +29,12 @@ export default function AutocompleteSearchBar({
   onSearch,
   onRemove,
 }: AutocompleteSearchBarProps) {
-  const [searchedItems, setSearchedItems] = useState<string[]>([]);
-
   const onChangeHandler = (
     _ev: React.SyntheticEvent<Element, Event>,
     value: string[],
   ) => {
     const itemsWithoutCount = getItemsWithoutCount(value);
-    setSearchedItems(itemsWithoutCount);
+    onSearch(itemsWithoutCount);
 
     if (value.length < searchedItems.length) {
       const removedItems = searchedItems.filter((item) => !value.includes(item));
@@ -46,44 +44,25 @@ export default function AutocompleteSearchBar({
     }
   };
 
-  const addIngredientsHandler = () => {
-    setSearchedItems([]);
-    onSearch(searchedItems);
-  };
-
   return (
     <Autocomplete
       freeSolo
       multiple
       selectOnFocus
       clearOnBlur
+      clearOnEscape
       options={buildItemsWithCount(facetItems)}
       limitTags={limitTags}
       onChange={onChangeHandler}
       value={searchedItems}
-      filterOptions={(options, state) => {
-        const filteredOptions = options
-          .filter((option) => {
-            if (!state.inputValue) {
-              return option;
-            }
-
-            return option.toLowerCase().includes(state.inputValue.toLowerCase());
-          })
-          .slice(0, MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING);
-
-        return filteredOptions;
-      }}
+      filterOptions={createFilterOptions({
+        limit: MAX_ITEMS_FOR_FAST_AUTOCOMPLETE_RENDERING,
+      })}
+      clearIcon={<DeleteIcon />}
       renderInput={(params) => (
-        <Stack direction='row' spacing={1.5}>
-          <IconButton size='large' onClick={addIngredientsHandler}>
-            <Avatar sx={{ bgcolor: SECONDARY_COLOR }}>
-              <AddIcon />
-            </Avatar>
-          </IconButton>
-          <FlexBox>
-            <TextField {...params} label={label} placeholder={placeholder} />
-          </FlexBox>
+        <Stack direction='row' spacing={1.5} alignItems='center'>
+          <SearchIcon fontSize='large' color='secondary' />
+          <TextField {...params} label={label} placeholder={placeholder} />
         </Stack>
       )}
       renderOption={(props, option, { inputValue }) => {

@@ -1,10 +1,11 @@
-import { Avatar, Link, Stack, Tooltip } from '@mui/material';
+import { Avatar, Icon, Link, Stack, SvgIcon, Tooltip } from '@mui/material';
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
 import { A_HREF_GROUPS_REGEX, PRIMARY_COLOR } from '../../../../shared/constants';
 import { escapeAHrefContent } from '../../../../shared/tools/value-prettifier';
 import { RecipeIngredient } from '../../../types/FullRecipe';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 type HighlightedIngredientProps = {
   ingredient: RecipeIngredient;
@@ -34,6 +35,7 @@ export default function HighlightedIngredient({
             return (
               <Tooltip
                 key={index}
+                placement='bottom-start'
                 title={
                   <Stack>
                     See more
@@ -41,7 +43,11 @@ export default function HighlightedIngredient({
                       <Avatar
                         onClick={() => handleViewClick(identifier)}
                         src={thumbnail}
-                      />
+                        alt={match}
+                        sx={{ bgcolor: 'transparent' }}
+                      >
+                        <MenuBookIcon fontSize='large' />
+                      </Avatar>
                     )}
                   </Stack>
                 }

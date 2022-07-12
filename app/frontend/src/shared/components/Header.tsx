@@ -27,7 +27,7 @@ export default function Header() {
       onClick={() => {
         navigate(page.path);
       }}
-      sx={{ padding: 2.5, color: 'inherit' }}
+      sx={{ color: 'inherit' }}
     >
       {page.name}
     </Button>

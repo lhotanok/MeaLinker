@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/build/bundle.00f6b8cb.js",
+    "main.js": "/build/bundle.0321ccc5.js",
     "fiber-icon.png": "/891ad3b0352949e191f7.png",
     "directions-icon.png": "/dccdb66d3083ac7dc1f7.png",
     "grain-icon.png": "/db8f07c4ce5abf3a4fd3.png",
     "diet-icon.png": "/d4f51796ee8b9b966919.png",
-    "vegetable-icon.png": "/fc7940b089ba84dbab33.png",
+    "vegetable-icon.png": "/33986ab89d0ad3f997e7.png",
     "icon.png": "/900f1578d859a5cd26b9.png",
     "pyramid-icon.png": "/099317493cdf5198a2ac.png",
     "fat-icon.png": "/a0485bee2c3a51e7465f.png",
@@ -17,6 +17,6 @@
     "index.html": "/index.html"
   },
   "entrypoints": [
-    "build/bundle.00f6b8cb.js"
+    "build/bundle.0321ccc5.js"
   ]
 }

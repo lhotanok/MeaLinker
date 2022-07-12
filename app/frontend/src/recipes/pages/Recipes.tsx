@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import SearchIngredientBar from '../components/Search/SearchIngredientBar';
+import SearchIngredientBar from '../components/Search/Filters/SearchIngredientBar';
 import RecipesGrid from '../components/Search/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
 import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
@@ -15,13 +15,14 @@ import {
 } from '../../shared/tools/request-parser';
 import SearchHeader from '../components/Search/SearchHeader';
 import RecipesPagination from '../components/Search/RecipesPagination';
-import { Snackbar, Alert } from '@mui/material';
 import { Facets } from '../types/Facets';
 import {
   buildItemsAddedSnackbar,
   buildItemsRemovedSnackbar,
 } from '../../shared/tools/snackbar-builder';
-import SearchedFilters from '../components/Search/SearchedFilters';
+import SearchedFilters from '../components/Search/Filters/SearchedFilters';
+import SecondaryFilters from '../components/Search/Filters/SecondaryFilters';
+import useSnackbar from '../../shared/hooks/use-snackbar';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -41,17 +42,8 @@ export default function Recipes() {
     cuisineFacets: [],
   });
 
-  const [addSnackbarOpen, setAddSnackbarOpen] = useState(false);
-  const [addSnackbarText, setAddSnackbarText] = useState<{
-    text: string;
-    severity: 'success' | 'info';
-  } | null>(null);
-  const [newSnackbarText, setNewSnackbarText] = useState<{
-    text: string;
-    severity: 'success' | 'info';
-  } | null>(null);
-
   const { sendRequest: fetchRecipes, error } = useHttp();
+  const { snackbar, setNewSnackbarText: setSnackbar } = useSnackbar();
 
   useEffect(
     () => {
@@ -77,21 +69,6 @@ export default function Recipes() {
     [fetchRecipes, search],
   );
 
-  useEffect(
-    () => {
-      if (newSnackbarText && !addSnackbarOpen) {
-        // Set a new snack when we don't have an active one
-        setAddSnackbarText({ ...newSnackbarText });
-        setAddSnackbarOpen(true);
-        setNewSnackbarText(null);
-      } else if (addSnackbarOpen && newSnackbarText) {
-        // Close an active snack when a new one is added
-        setAddSnackbarOpen(false);
-      }
-    },
-    [addSnackbarOpen, addSnackbarText, newSnackbarText],
-  );
-
   const searchHandler = (
     originalFilters: string[],
     searchFilters: string[],
@@ -99,16 +76,21 @@ export default function Recipes() {
   ) => {
     if (searchFilters.length > 0) {
       const mergedFilters = mergeSearchFilters(originalFilters, searchFilters);
-      const addedFilters = mergedFilters.filter(
-        (filter) => !originalFilters.includes(filter),
-      );
+      const lowercaseOriginal = originalFilters.map((filter) => filter.toLowerCase());
+      const addedFilters = mergedFilters.filter((filter) => {
+        const included = lowercaseOriginal.includes(filter.toLowerCase());
+        if (included) {
+          setSnackbar({ text: `${filter} was already added`, severity: 'error' });
+        }
+        return !included;
+      });
 
       if (addedFilters.length > 0) {
         // Some filter(s) changed, recipe results need to be updated
         setTotalCount(null);
 
         const snackbarText = buildItemsAddedSnackbar(addedFilters, filterName);
-        setNewSnackbarText({ text: snackbarText, severity: 'success' });
+        setSnackbar({ text: snackbarText, severity: 'success' });
 
         navigate(
           buildUrl(pathname, queryParams, {
@@ -134,14 +116,15 @@ export default function Recipes() {
 
     setTotalCount(null);
 
-    const snackbarText = buildItemsRemovedSnackbar(
-      originalFilters,
-      removedFilters,
-      filteredLabels,
-      filterName,
-    );
-
-    setNewSnackbarText({ text: snackbarText, severity: 'info' });
+    setSnackbar({
+      text: buildItemsRemovedSnackbar(
+        originalFilters,
+        removedFilters,
+        filteredLabels,
+        filterName,
+      ),
+      severity: 'error',
+    });
 
     navigate(
       buildUrl(pathname, queryParams, {
@@ -169,23 +152,13 @@ export default function Recipes() {
 
   const removeAllFiltersHandler = () => {
     setTotalCount(null);
+    setSnackbar({ text: 'Cleared all filters', severity: 'error' });
     navigate(buildUrl(pathname, queryParams, null));
-  };
-
-  const handleSnackbarClose = (
-    _event?: React.SyntheticEvent | Event,
-    reason?: string,
-  ) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    setAddSnackbarOpen(false);
-    setAddSnackbarText(null);
   };
 
   return (
     <Container>
+      {snackbar}
       <Box
         sx={{
           bgcolor: 'background.paper',
@@ -198,9 +171,18 @@ export default function Recipes() {
             ingredientFacets={facets.ingredientFacets.filter(
               (facet) => facet.count !== totalCount,
             )}
+            searchedItems={filters.ingredients}
             onSearch={filterHandlers.ingredients.search}
             onRemove={filterHandlers.ingredients.remove}
           />
+          <Box
+            sx={{
+              bgcolor: 'background.paper',
+              pt: 4,
+            }}
+          >
+            <SecondaryFilters />
+          </Box>
           <SearchHeader recipesCount={totalCount} error={error} />
           <SearchedFilters
             filters={filters}
@@ -209,17 +191,6 @@ export default function Recipes() {
             onIngredientRemove={(name) => filterHandlers.ingredients.remove([name])}
             onRemoveAll={removeAllFiltersHandler}
           />
-          <Snackbar
-            key={addSnackbarText ? addSnackbarText.text : ''}
-            open={addSnackbarOpen}
-            onClose={handleSnackbarClose}
-            autoHideDuration={4000}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          >
-            <Alert severity={addSnackbarText ? addSnackbarText.severity : 'info'}>
-              {addSnackbarText ? addSnackbarText.text : ''}
-            </Alert>
-          </Snackbar>
         </Container>
       </Box>
       <RecipesGrid recipes={paginatedRecipes} />
