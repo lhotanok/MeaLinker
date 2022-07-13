@@ -11,6 +11,7 @@ const {
   FOOD_COM_SEARCH_INGREDIENTS_PATH,
   CUISINES,
   DIETS,
+  MEAL_TYPES,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -110,8 +111,9 @@ function filterRecipeIndexedFields(recipe) {
 
   const cuisines = extractSpecificTags(mergedTags, CUISINES);
   const diets = extractSpecificTags(mergedTags, DIETS);
+  const mealTypes = extractSpecificTags(mergedTags, MEAL_TYPES);
 
-  const specificTags = [...cuisines, ...diets];
+  const specificTags = [...cuisines, ...diets, ...mealTypes];
   const filteredTags = mergedTags.filter((tag) => !specificTags.includes(tag));
 
   const filteredRecipe = {
@@ -139,6 +141,7 @@ function filterRecipeIndexedFields(recipe) {
     sugar: sugar.value,
     protein: protein.value,
     _dietsFacet: diets,
+    _mealTypesFacet: mealTypes,
   };
 
   return filteredRecipe;

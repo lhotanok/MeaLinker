@@ -112,6 +112,10 @@ const onChangeHandler = (
     if (searched) {
       onRemove([searched]);
     }
-    onSearch(getItemsWithoutCount([value]));
+    onSearch(getItemsWithoutCount([value || '']));
+  } else if (!value) {
+    if (searched) {
+      onRemove([searched]);
+    }
   }
 };

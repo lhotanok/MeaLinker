@@ -5,9 +5,10 @@ export const CORES = {
 };
 export const SECURE = false;
 
-export const FACET_FIELDS = [
-  '_ingredientsFacet',
-  '_tagsFacet',
-  '_cuisinesFacet',
-  '_dietsFacet',
-];
+export const FACET_FIELDS = {
+  INGREDIENTS: '_ingredientsFacet',
+  TAGS: '_tagsFacet',
+  CUISINES: '_cuisinesFacet',
+  DIETS: '_dietsFacet',
+  MEAL_TYPES: '_mealTypesFacet',
+};

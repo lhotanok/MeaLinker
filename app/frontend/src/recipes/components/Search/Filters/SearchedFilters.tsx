@@ -19,7 +19,7 @@ export default function SearchedFilters({
   filterHandlers,
   onRemoveAll,
 }: SearchedFiltersProps) {
-  const { ingredients, tags, cuisine, diets } = filters;
+  const { ingredients, tags, cuisine, diets, mealTypes } = filters;
 
   const ingredientChips: RemovableChipItem[] = ingredients.map((ingr) => ({
     name: ingr,
@@ -41,6 +41,10 @@ export default function SearchedFilters({
       onRemove: (name: string) => filterHandlers.tags.onRemove([name]),
     })),
     ...cuisines,
+    ...mealTypes.map((name) => ({
+      name,
+      onRemove: (name: string) => filterHandlers.mealTypes.onRemove([name]),
+    })),
     ...diets.map((name) => ({
       name,
       onRemove: (name: string) => filterHandlers.diets.onRemove([name]),

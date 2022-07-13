@@ -5,7 +5,11 @@ import Container from '@mui/material/Container';
 import RecipesGrid from '../components/Search/RecipesGrid';
 import useHttp from '../../shared/hooks/use-http';
 import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
-import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../constants';
+import {
+  INITIAL_FACETS,
+  PAGINATION_RESULTS_COUNT,
+  QUERY_PARAM_NAMES,
+} from '../constants';
 import {
   buildRecipeSearchUrl,
   buildUrl,
@@ -22,7 +26,7 @@ import {
 import SearchedFilters from '../components/Search/Filters/SearchedFilters';
 import InputFilters from '../components/Search/Filters/InputFilters';
 import useSnackbar from '../../shared/hooks/use-snackbar';
-import { FilterHandlers, FilterName, Filters } from '../types/Filters';
+import { FilterName, Filters } from '../types/Filters';
 import { getFilterHandlers } from '../../shared/tools/filter-handler-builder';
 
 export default function Recipes() {
@@ -37,12 +41,7 @@ export default function Recipes() {
 
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
-  const [facets, setFacets] = useState<Facets>({
-    ingredientFacets: [],
-    tagFacets: [],
-    cuisineFacets: [],
-    dietFacets: [],
-  });
+  const [facets, setFacets] = useState<Facets>(INITIAL_FACETS);
 
   const { sendRequest: fetchRecipes, error } = useHttp();
   const { snackbar, setNewSnackbarText: setSnackbar } = useSnackbar();
@@ -108,11 +107,6 @@ export default function Recipes() {
     removedFilters: string[],
     filterName: FilterName,
   ) => {
-    console.log(
-      `Remove handler, original: ${JSON.stringify(
-        originalFilters,
-      )}, removedFilters: ${JSON.stringify(removedFilters)}`,
-    );
     const filteredLabels = originalFilters.filter(
       (filter) => !removedFilters.includes(filter),
     );

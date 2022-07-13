@@ -28,6 +28,8 @@ class SolrRecipesModel extends SolrModel {
       reviewsCount: 'desc',
     },
   ): Promise<SolrResponse<Recipe>> {
+    log.info('Fetching all recipes...');
+
     const query = this.buildQuery('*:*', offset, rows, sortOptions);
 
     const solrResponse = await this.prepareSolrResponse(query);
@@ -39,18 +41,44 @@ class SolrRecipesModel extends SolrModel {
     return solrResponse;
   }
 
-  public async getRecipesByIngredients(
-    ingredients: string[],
-    rows: number,
-    offset: number,
+  public async getRecipesByFilters(
+    searchParameters: SearchParameters,
     sortOptions: Record<string, any> | undefined = {
       rating: 'desc',
       reviewsCount: 'desc',
     },
   ): Promise<SolrResponse<Recipe>> {
-    const ingredientsQuery = this.buildIngredientsPhraseQuery(ingredients);
+    log.info('Fetching recipes by filters...', { filters: searchParameters });
 
-    const query = this.buildQuery(ingredientsQuery, offset, rows, sortOptions).hl({
+    const {
+      ingredients,
+      tags,
+      cuisine,
+      diets,
+      mealTypes,
+      rows,
+      offset,
+    } = searchParameters;
+
+    const filters: Record<string, string[]> = {
+      ingredients,
+      tags,
+      cuisine: [cuisine].filter((cuisine) => cuisine),
+      _dietsFacet: diets,
+      _mealTypesFacet: mealTypes,
+    };
+
+    const qStringValues: string[] = [];
+
+    Object.entries(filters).forEach(([filterName, filterValue]) => {
+      if (filterValue.length > 0) {
+        qStringValues.push(this.buildPhraseQuery(filterValue, filterName));
+      }
+    });
+
+    const qString = qStringValues.join('\n');
+
+    const query = this.buildQuery(qString, offset, rows, sortOptions).hl({
       fl: 'ingredients',
       preserveMulti: true,
     });
@@ -89,9 +117,9 @@ class SolrRecipesModel extends SolrModel {
       .qop('AND')
       .facet({
         pivot: {
-          fields: FACET_FIELDS,
+          fields: Object.values(FACET_FIELDS),
         },
-        field: FACET_FIELDS,
+        field: Object.values(FACET_FIELDS),
         limit: MAX_SEARCH_INGREDIENTS_LIMIT,
         mincount: 1,
       })
@@ -102,11 +130,11 @@ class SolrRecipesModel extends SolrModel {
     return query;
   }
 
-  private buildIngredientsPhraseQuery(ingredients: string[]): string {
+  private buildPhraseQuery(requiredValues: string[], fieldName: string): string {
     let searchQuery = '';
 
-    ingredients.forEach((ingredient) => {
-      searchQuery += `\ningredients: "${ingredient}"`;
+    requiredValues.forEach((value) => {
+      searchQuery += `\n${fieldName}: "${value}"`;
     });
 
     return searchQuery.trim();
@@ -137,6 +165,7 @@ class SolrRecipesModel extends SolrModel {
       tagFacets: this.buildFacetItems(facetFields._tagsFacet),
       cuisineFacets: this.buildFacetItems(facetFields._cuisinesFacet),
       dietFacets: this.buildFacetItems(facetFields._dietsFacet),
+      mealTypeFacets: this.buildFacetItems(facetFields._mealTypesFacet),
     };
   }
 

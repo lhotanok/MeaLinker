@@ -6,12 +6,18 @@ import {
 } from '../../recipes/types/SimpleRecipesResponse';
 import { QueryParameters } from '../types/QueryParameters';
 
+type FilterParam = {
+  value: string | string[] | undefined;
+  name: string;
+};
+
 export const parseFilters = (queryParams: URLSearchParams): Filters => {
   const filters: Filters = {
     ingredients: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS)),
     tags: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.TAGS)),
     cuisine: queryParams.get(QUERY_PARAM_NAMES.CUISINE) || '',
     diets: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.DIETS)),
+    mealTypes: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.MEAL_TYPES)),
   };
 
   return filters;
@@ -24,7 +30,7 @@ const splitParamValue = (paramValue: string | null, delimiter = ';'): string[] =
 const setOrDelete = (
   queryParams: URLSearchParams,
   paramKey: string,
-  paramValue: string,
+  paramValue?: string,
 ) => {
   if (paramValue) {
     queryParams.set(paramKey, paramValue);
@@ -42,32 +48,53 @@ export const buildUrl = (
     return pathname;
   }
 
-  const { ingredients, tags, cuisine, diets, page = 1 } = updatedParamValues;
-  const queryParams = currentQueryParams;
+  const filterParams = buildFilterParams(updatedParamValues);
 
-  if (ingredients) {
-    const encoded = encodeArrayToQueryParam(ingredients);
-    setOrDelete(queryParams, QUERY_PARAM_NAMES.INGREDIENTS, encoded);
+  filterParams.forEach((filter) => {
+    const encodedParam = getEncodedParam(filter.value);
+    if (encodedParam !== undefined) {
+      setOrDelete(currentQueryParams, filter.name, encodedParam);
+    }
+  });
+
+  const { page = 1 } = updatedParamValues;
+  setOrDelete(
+    currentQueryParams,
+    QUERY_PARAM_NAMES.PAGE,
+    page !== 1 ? page.toString() : '',
+  );
+
+  console.log(`queryparams`, {
+    queryparams: currentQueryParams.toString(),
+  });
+
+  return `${pathname}?${currentQueryParams.toString()}`;
+};
+
+const buildFilterParams = (filtersQueryParameters: QueryParameters): FilterParam[] => {
+  const { ingredients, tags, cuisine, diets, mealTypes } = filtersQueryParameters;
+
+  const filterParams: FilterParam[] = [
+    { value: ingredients, name: QUERY_PARAM_NAMES.INGREDIENTS },
+    { value: tags, name: QUERY_PARAM_NAMES.TAGS },
+    { value: cuisine, name: QUERY_PARAM_NAMES.CUISINE },
+    { value: diets, name: QUERY_PARAM_NAMES.DIETS },
+    { value: mealTypes, name: QUERY_PARAM_NAMES.MEAL_TYPES },
+  ];
+
+  return filterParams;
+};
+
+const getEncodedParam = (param?: string | string[]): string | undefined => {
+  if (param) {
+    const encoded = Array.isArray(param)
+      ? encodeArrayToQueryParam(param)
+      : encodeURI(param);
+
+    return encoded;
   }
 
-  if (tags) {
-    const encoded = encodeArrayToQueryParam(tags);
-    setOrDelete(queryParams, QUERY_PARAM_NAMES.TAGS, encoded);
-  }
-
-  if (cuisine) {
-    const encoded = encodeURI(cuisine);
-    setOrDelete(queryParams, QUERY_PARAM_NAMES.CUISINE, encoded);
-  }
-
-  if (diets) {
-    const encoded = encodeArrayToQueryParam(diets);
-    setOrDelete(queryParams, QUERY_PARAM_NAMES.DIETS, encoded);
-  }
-
-  setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');
-
-  return `${pathname}?${queryParams.toString()}`;
+  return param;
 };
 
 export const encodeArrayToQueryParam = (array: string[]): string =>
@@ -75,14 +102,22 @@ export const encodeArrayToQueryParam = (array: string[]): string =>
 
 export const buildRecipeSearchUrl = (locationSearch: string): string => {
   const searchParams = new URLSearchParams(decodeURI(locationSearch));
-  const page = Number(searchParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
+  const filterParams: Record<string, string> = {};
 
+  Object.values(QUERY_PARAM_NAMES).forEach((name) => {
+    const value = searchParams.get(name);
+    if (value) {
+      filterParams[name] = value;
+    }
+  });
+
+  const page = Number(searchParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
   const offset = (page - 1) * PAGINATION_RESULTS_COUNT;
 
   const apiSearchParams = new URLSearchParams({
-    ingredients: searchParams.get(QUERY_PARAM_NAMES.INGREDIENTS) || '',
     rows: PAGINATION_RESULTS_COUNT.toString(),
     offset: offset.toString(),
+    ...filterParams,
   });
 
   return `http://localhost:5000/api/recipes?${apiSearchParams.toString()}`;

@@ -18,8 +18,14 @@ export const getFilterHandlers = (
   searchHandler: FilterChangeHandler,
   removeHandler: FilterChangeHandler,
 ): FilterHandlers => {
-  const { ingredients: ings, tags, cuisine, diets } = filters;
-  const { ingredientFacets: ingFacets, tagFacets, cuisineFacets, dietFacets } = facets;
+  const { ingredients: ings, tags, cuisine, diets, mealTypes: meals } = filters;
+  const {
+    ingredientFacets: ingFacets,
+    tagFacets,
+    cuisineFacets,
+    dietFacets,
+    mealTypeFacets: mealFacets,
+  } = facets;
   const handlers: [FilterChangeHandler, FilterChangeHandler] = [
     searchHandler,
     removeHandler,
@@ -30,6 +36,7 @@ export const getFilterHandlers = (
     tags: buildMultipleFilterHandler(tags, tagFacets, 'tags', ...handlers),
     cuisine: buildSingleFilterHandler(cuisine, cuisineFacets, 'cuisine', ...handlers),
     diets: buildMultipleFilterHandler(diets, dietFacets, 'diets', ...handlers),
+    mealTypes: buildMultipleFilterHandler(meals, mealFacets, 'mealTypes', ...handlers),
   };
 
   return filterHandlers;

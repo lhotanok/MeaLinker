@@ -3,6 +3,7 @@ export type QueryFacets = {
   _tagsFacet: string[];
   _cuisinesFacet: string[];
   _dietsFacet: string[];
+  _mealTypesFacet: string[];
 };
 
 export type FacetItem = {
@@ -15,4 +16,5 @@ export type Facets = {
   tagFacets: FacetItem[];
   cuisineFacets: FacetItem[];
   dietFacets: FacetItem[];
+  mealTypeFacets: FacetItem[];
 };

@@ -3,5 +3,6 @@ export type QueryParameters = {
   tags?: string[];
   cuisine?: string;
   diets?: string[];
+  mealTypes?: string[];
   page?: number;
 };

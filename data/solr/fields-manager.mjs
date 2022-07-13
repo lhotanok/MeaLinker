@@ -107,6 +107,7 @@ async function postRecipesAddFields() {
     _tagsFacet: { type: STRING, multiValued: true, stored: false },
     _cuisinesFacet: { type: STRING, stored: false },
     _dietsFacet: { type: STRING, multiValued: true, stored: false },
+    _mealTypesFacet: { type: STRING, multiValued: true, stored: false },
   };
 
   const copyFields = {

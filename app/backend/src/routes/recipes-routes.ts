@@ -1,6 +1,7 @@
 import express from 'express';
 import { DEFAULT_PAGINATION_RESULTS_COUNT, MAX_RESULTS_COUNT } from '../constants';
 import CouchDbRecipesModel from '../couchdb/couchdb-recipes-model';
+import { parseSearchParameters } from '../query-parser';
 import SolrRecipesModel from '../solr/solr-recipes-model';
 import { Recipe } from '../solr/types/recipe';
 import { SolrResponse } from '../solr/types/search-response';
@@ -11,21 +12,31 @@ router.get('/', async (req, res) => {
   const recipesModel = new SolrRecipesModel();
 
   const {
-    ingredients: encodedIngredients = '',
-    rows: requestedRows = `${DEFAULT_PAGINATION_RESULTS_COUNT}`,
-    offset: requestedOffset = '0',
+    ingredients = '',
+    tags = '',
+    cuisine = '',
+    diets = '',
+    mealTypes = '',
+    rows = `${DEFAULT_PAGINATION_RESULTS_COUNT}`,
+    offset = '0',
   } = req.query;
 
-  const ingredientsText = decodeURI(encodedIngredients.toString());
-  const ingredients = ingredientsText.split(';').filter((ingredient) => ingredient);
+  const searchQueryParams = {
+    ingredients,
+    tags,
+    cuisine,
+    diets,
+    mealTypes,
+    rows,
+    offset,
+  } as SearchQueryParameters;
 
-  const rows = Math.min(Number(requestedRows), MAX_RESULTS_COUNT);
-  const offset = Number(requestedOffset);
+  const searchParameters = parseSearchParameters(searchQueryParams);
 
   const recipes: SolrResponse<Recipe> =
-    ingredients.length > 0
-      ? await recipesModel.getRecipesByIngredients(ingredients, rows, offset)
-      : await recipesModel.getAllRecipes(rows, offset);
+    !ingredients && !tags && !cuisine && !diets && !mealTypes
+      ? await recipesModel.getAllRecipes(searchParameters.rows, searchParameters.offset)
+      : await recipesModel.getRecipesByFilters(searchParameters);
 
   res.status(200).json(recipes);
 });

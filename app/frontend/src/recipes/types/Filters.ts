@@ -5,6 +5,7 @@ export type Filters = {
   tags: string[];
   cuisine: string;
   diets: string[];
+  mealTypes: string[];
 };
 
 export type FilterHandlers = {
@@ -12,6 +13,7 @@ export type FilterHandlers = {
   tags: FilterHandler;
   cuisine: FilterHandler;
   diets: FilterHandler;
+  mealTypes: FilterHandler;
 };
 
 export type FilterHandler = {
@@ -21,4 +23,4 @@ export type FilterHandler = {
   onRemove: (removed: string[]) => void;
 };
 
-export type FilterName = 'ingredients' | 'tags' | 'cuisine' | 'diets';
+export type FilterName = 'ingredients' | 'tags' | 'cuisine' | 'diets' | 'mealTypes';
