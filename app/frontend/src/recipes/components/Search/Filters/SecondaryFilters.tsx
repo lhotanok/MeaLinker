@@ -7,7 +7,10 @@ import { Fragment, useState } from 'react';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import CuisineIcon from '@mui/icons-material/RamenDining';
 import RatingIcon from '@mui/icons-material/Star';
+import CloseIcon from '@mui/icons-material/Close';
+import DietIcon from '@mui/icons-material/MonitorWeight';
 import AutocompleteSearchBar from '../../../../shared/components/AutocompleteSearchBar';
+import { IconButton, Stack, Tooltip } from '@mui/material';
 
 type SecondaryFiltersProps = {
   filterHandlers: FilterHandlers;
@@ -16,13 +19,13 @@ type SecondaryFiltersProps = {
 enum Filters {
   Tags,
   Cuisine,
-  Rating,
+  Diets,
 }
 
 export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersProps) {
-  const [currentTab, setCurrentTab] = useState(0);
+  const [currentTab, setCurrentTab] = useState(-1);
 
-  const { tags, cuisine } = filterHandlers;
+  const { tags, cuisine, diets } = filterHandlers;
 
   const tabs = [
     {
@@ -36,9 +39,9 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
       filterHandler: cuisine,
     },
     {
-      index: Filters.Rating,
-      label: 'Rating',
-      filterHandler: cuisine,
+      index: Filters.Diets,
+      label: 'Diet',
+      filterHandler: diets,
     },
   ];
 
@@ -64,41 +67,54 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
       sx={{
         width: '100%',
         bgcolor: 'background.paper',
-        pt: 4,
+        pt: 5,
+        pb: 5,
       }}
     >
       <Fragment>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-          <Tabs
-            value={currentTab}
-            onChange={(_ev, value: number) => setCurrentTab(value)}
-            aria-label='secondary filters'
-            variant='scrollable'
-            scrollButtons='auto'
-          >
-            {tabElements}
-          </Tabs>
+        <Box mb={1} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Stack direction='row' spacing={1.5} alignItems='center'>
+            <Tabs
+              value={currentTab === -1 ? false : currentTab}
+              onChange={(_ev, value: number) => setCurrentTab(value)}
+              aria-label='secondary filters'
+              variant='scrollable'
+              scrollButtons='auto'
+            >
+              {tabElements}
+            </Tabs>
+            {currentTab !== -1 && (
+              <Tooltip title='Hide filters' enterDelay={500} placement='right-end'>
+                <IconButton onClick={() => setCurrentTab(-1)}>
+                  <CloseIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+          </Stack>
         </Box>
-        <TabPanel value={currentTab} index={Filters.Tags}>
-          <AutocompleteSearchBar
-            {...tabPanels[Filters.Tags]}
-            searchIcon={<LoyaltyIcon color='secondary' />}
-          />
-        </TabPanel>
-        <TabPanel value={currentTab} index={Filters.Cuisine}>
-          <AutocompleteSearchBar
-            {...tabPanels[Filters.Cuisine]}
-            multiple={false}
-            searchIcon={<CuisineIcon color='secondary' />}
-          />
-        </TabPanel>
-        <TabPanel value={currentTab} index={Filters.Rating}>
-          <AutocompleteSearchBar
-            multiple={false}
-            searchIcon={<RatingIcon color='secondary' />}
-            {...tabPanels[Filters.Rating]}
-          />
-        </TabPanel>
+        {currentTab !== -1 && (
+          <Fragment>
+            <TabPanel value={currentTab} index={Filters.Tags}>
+              <AutocompleteSearchBar
+                {...tabPanels[Filters.Tags]}
+                searchIcon={<LoyaltyIcon color='secondary' />}
+              />
+            </TabPanel>
+            <TabPanel value={currentTab} index={Filters.Cuisine}>
+              <AutocompleteSearchBar
+                {...tabPanels[Filters.Cuisine]}
+                multiple={false}
+                searchIcon={<CuisineIcon color='secondary' />}
+              />
+            </TabPanel>
+            <TabPanel value={currentTab} index={Filters.Diets}>
+              <AutocompleteSearchBar
+                searchIcon={<DietIcon color='secondary' />}
+                {...tabPanels[Filters.Diets]}
+              />
+            </TabPanel>
+          </Fragment>
+        )}
       </Fragment>
     </Box>
   );

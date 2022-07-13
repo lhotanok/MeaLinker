@@ -9,7 +9,8 @@ const {
 const {
   FOOD_COM_DEFAULT_IMAGE_SRC,
   FOOD_COM_SEARCH_INGREDIENTS_PATH,
-  CUSINES,
+  CUISINES,
+  DIETS,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -67,6 +68,19 @@ function getParsedDate(datePublished) {
   return dateMatches ? dateMatches[0] : '';
 }
 
+function extractSpecificTags(tags, specificTags) {
+  const specifics = specificTags.filter((specific) => {
+    for (const tag of tags) {
+      if (tag.toLowerCase().startsWith(specific.toLowerCase())) {
+        return true;
+      }
+    }
+    return false;
+  });
+
+  return specifics;
+}
+
 function filterRecipeIndexedFields(recipe) {
   const { _id, jsonld, structured } = recipe;
 
@@ -93,16 +107,12 @@ function filterRecipeIndexedFields(recipe) {
 
   const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
   const mergedTags = [...tags, ...categories].filter((tag) => tag);
-  const cuisines = CUSINES.filter((cuisine) => {
-    for (const tag of mergedTags) {
-      if (tag.toLowerCase().startsWith(cuisine.toLowerCase())) {
-        return true;
-      }
-    }
-    return false;
-  });
 
-  const filteredTags = mergedTags.filter((tag) => !cuisines.includes(tag));
+  const cuisines = extractSpecificTags(mergedTags, CUISINES);
+  const diets = extractSpecificTags(mergedTags, DIETS);
+
+  const specificTags = [...cuisines, ...diets];
+  const filteredTags = mergedTags.filter((tag) => !specificTags.includes(tag));
 
   const filteredRecipe = {
     id: _id,
@@ -128,6 +138,7 @@ function filterRecipeIndexedFields(recipe) {
     fiber: fiber.value,
     sugar: sugar.value,
     protein: protein.value,
+    _dietsFacet: diets,
   };
 
   return filteredRecipe;

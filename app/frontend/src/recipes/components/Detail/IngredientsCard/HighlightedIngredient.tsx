@@ -1,4 +1,4 @@
-import { Avatar, Icon, Link, Stack, SvgIcon, Tooltip } from '@mui/material';
+import { Avatar, Link, Stack, Tooltip } from '@mui/material';
 import { Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';

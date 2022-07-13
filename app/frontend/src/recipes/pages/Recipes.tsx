@@ -22,7 +22,8 @@ import {
 import SearchedFilters from '../components/Search/Filters/SearchedFilters';
 import InputFilters from '../components/Search/Filters/InputFilters';
 import useSnackbar from '../../shared/hooks/use-snackbar';
-import { FilterHandlers, Filters } from '../types/Filters';
+import { FilterHandlers, FilterName, Filters } from '../types/Filters';
+import { getFilterHandlers } from '../../shared/tools/filter-handler-builder';
 
 export default function Recipes() {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ export default function Recipes() {
     ingredientFacets: [],
     tagFacets: [],
     cuisineFacets: [],
+    dietFacets: [],
   });
 
   const { sendRequest: fetchRecipes, error } = useHttp();
@@ -72,13 +74,8 @@ export default function Recipes() {
   const searchHandler = (
     originalFilters: string[],
     searchFilters: string[],
-    filterName: 'ingredients' | 'tags' | 'cuisine',
+    filterName: FilterName,
   ) => {
-    console.log(
-      `Search handler, original: ${JSON.stringify(
-        originalFilters,
-      )}, search: ${JSON.stringify(searchFilters)}`,
-    );
     if (searchFilters.length > 0) {
       const mergedFilters = mergeSearchFilters(originalFilters, searchFilters);
       const lowercaseOriginal = originalFilters.map((filter) => filter.toLowerCase());
@@ -99,7 +96,7 @@ export default function Recipes() {
 
         navigate(
           buildUrl(pathname, queryParams, {
-            [filterName]: mergedFilters,
+            [filterName]: searchFilters,
           }),
         );
       }
@@ -109,7 +106,7 @@ export default function Recipes() {
   const removeHandler = (
     originalFilters: string[],
     removedFilters: string[],
-    filterName: 'ingredients' | 'tags' | 'cuisine',
+    filterName: FilterName,
   ) => {
     console.log(
       `Remove handler, original: ${JSON.stringify(
@@ -143,29 +140,7 @@ export default function Recipes() {
     );
   };
 
-  const filterHandlers: FilterHandlers = {
-    ingredients: {
-      value: filters.ingredients,
-      facets: facets.ingredientFacets,
-      onSearch: (labels: string[]) =>
-        searchHandler(filters.ingredients, labels, 'ingredients'),
-      onRemove: (removed: string[]) =>
-        removeHandler(filters.ingredients, removed, 'ingredients'),
-    },
-    tags: {
-      value: filters.tags,
-      facets: facets.tagFacets,
-      onSearch: (labels: string[]) => searchHandler(filters.tags, labels, 'tags'),
-      onRemove: (removed: string[]) => removeHandler(filters.tags, removed, 'tags'),
-    },
-    cuisine: {
-      value: filters.cuisine || '',
-      facets: facets.cuisineFacets,
-      onSearch: (labels: string[]) => searchHandler([filters.cuisine], labels, 'cuisine'),
-      onRemove: (removed: string[]) =>
-        removeHandler([filters.cuisine], removed, 'cuisine'),
-    },
-  };
+  const filterHandlers = getFilterHandlers(filters, facets, searchHandler, removeHandler);
 
   const removeAllFiltersHandler = () => {
     setTotalCount(null);
@@ -188,9 +163,7 @@ export default function Recipes() {
           <SearchHeader recipesCount={totalCount} error={error} />
           <SearchedFilters
             filters={filters}
-            onTagRemove={(name) => filterHandlers.tags.onRemove([name])}
-            onCuisineRemove={(name) => filterHandlers.cuisine.onRemove([name])}
-            onIngredientRemove={(name) => filterHandlers.ingredients.onRemove([name])}
+            filterHandlers={filterHandlers}
             onRemoveAll={removeAllFiltersHandler}
           />
         </Container>

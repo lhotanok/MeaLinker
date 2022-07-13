@@ -5,36 +5,32 @@ import RemovableChips, {
   RemovableChipItem,
 } from '../../../../shared/components/RemovableChips';
 import { PRIMARY_COLOR } from '../../../../shared/constants';
-import { Filters } from '../../../types/Filters';
+import { FilterHandlers, Filters } from '../../../types/Filters';
 import FlexBox from '../../../../shared/components/FlexBox';
 
 type SearchedFiltersProps = {
   filters: Filters;
-  onIngredientRemove: (name: string) => void;
-  onTagRemove: (name: string) => void;
-  onCuisineRemove: (name: string) => void;
+  filterHandlers: FilterHandlers;
   onRemoveAll: () => void;
 };
 
 export default function SearchedFilters({
   filters,
-  onIngredientRemove,
-  onTagRemove,
-  onCuisineRemove,
+  filterHandlers,
   onRemoveAll,
 }: SearchedFiltersProps) {
-  const { ingredients, tags, cuisine } = filters;
+  const { ingredients, tags, cuisine, diets } = filters;
 
   const ingredientChips: RemovableChipItem[] = ingredients.map((ingr) => ({
     name: ingr,
-    onRemove: onIngredientRemove,
+    onRemove: (name) => filterHandlers.ingredients.onRemove([name]),
   }));
 
   const cuisines = cuisine
     ? [
         {
           name: cuisine,
-          onRemove: onCuisineRemove,
+          onRemove: (name: string) => filterHandlers.cuisine.onRemove([name]),
         },
       ]
     : [];
@@ -42,9 +38,13 @@ export default function SearchedFilters({
   const otherFiltersChips: RemovableChipItem[] = [
     ...tags.map((name) => ({
       name,
-      onRemove: onTagRemove,
+      onRemove: (name: string) => filterHandlers.tags.onRemove([name]),
     })),
     ...cuisines,
+    ...diets.map((name) => ({
+      name,
+      onRemove: (name: string) => filterHandlers.diets.onRemove([name]),
+    })),
   ];
 
   return (

@@ -2,7 +2,7 @@ import log4js from 'log4js';
 import { Query } from 'solr-client';
 import { MAX_SEARCH_INGREDIENTS_LIMIT } from '../constants';
 
-import { CORES } from './config';
+import { CORES, FACET_FIELDS } from './config';
 import SolrModel from './solr-model';
 import { FacetItem, Facets, QueryFacets } from './types/facets';
 import { Recipe } from './types/recipe';
@@ -89,9 +89,9 @@ class SolrRecipesModel extends SolrModel {
       .qop('AND')
       .facet({
         pivot: {
-          fields: ['_ingredientsFacet', '_tagsFacet', '_cuisinesFacet'],
+          fields: FACET_FIELDS,
         },
-        field: ['_ingredientsFacet', '_tagsFacet', '_cuisinesFacet'],
+        field: FACET_FIELDS,
         limit: MAX_SEARCH_INGREDIENTS_LIMIT,
         mincount: 1,
       })
@@ -136,6 +136,7 @@ class SolrRecipesModel extends SolrModel {
       ingredientFacets: this.buildFacetItems(facetFields._ingredientsFacet),
       tagFacets: this.buildFacetItems(facetFields._tagsFacet),
       cuisineFacets: this.buildFacetItems(facetFields._cuisinesFacet),
+      dietFacets: this.buildFacetItems(facetFields._dietsFacet),
     };
   }
 

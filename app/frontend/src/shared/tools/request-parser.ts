@@ -11,6 +11,7 @@ export const parseFilters = (queryParams: URLSearchParams): Filters => {
     ingredients: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS)),
     tags: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.TAGS)),
     cuisine: queryParams.get(QUERY_PARAM_NAMES.CUISINE) || '',
+    diets: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.DIETS)),
   };
 
   return filters;
@@ -41,7 +42,7 @@ export const buildUrl = (
     return pathname;
   }
 
-  const { ingredients, tags, cuisine, page = 1 } = updatedParamValues;
+  const { ingredients, tags, cuisine, diets, page = 1 } = updatedParamValues;
   const queryParams = currentQueryParams;
 
   if (ingredients) {
@@ -57,6 +58,11 @@ export const buildUrl = (
   if (cuisine) {
     const encoded = encodeURI(cuisine);
     setOrDelete(queryParams, QUERY_PARAM_NAMES.CUISINE, encoded);
+  }
+
+  if (diets) {
+    const encoded = encodeArrayToQueryParam(diets);
+    setOrDelete(queryParams, QUERY_PARAM_NAMES.DIETS, encoded);
   }
 
   setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');

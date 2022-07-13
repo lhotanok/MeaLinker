@@ -16,7 +16,7 @@ exports.FOOD_COM_DEFAULT_IMAGE_SRC =
 exports.FOOD_COM_SEARCH_INGREDIENTS_PATH =
   '../resources/foodcom/ingredients/search_ingredients.json';
 
-exports.CUSINES = [
+exports.CUISINES = [
   'European',
   'Asian',
   'Mexican',
@@ -91,4 +91,29 @@ exports.CUSINES = [
   'Sudanese',
   'Mongolian',
   'Somalian',
+  'Finnish',
+];
+
+exports.DIETS = [
+  'Low Cholesterol',
+  'Low Protein',
+  'Vegan',
+  'Very Low Carbs',
+  'High Protein',
+  'Egg Free',
+  'Lactose Free',
+  'Kosher',
+  'High Fiber',
+  'Dairy Free',
+];
+
+exports.MEAL_TYPES = [
+  'Dessert',
+  'Lunch/Snacks',
+  'Brunch',
+  'Breakfast',
+  'Beverages',
+  'Savory',
+  'Salad Dressings',
+  'One Dish Meal',
 ];

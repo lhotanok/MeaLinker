@@ -17,7 +17,6 @@ export default function SearchHeader({ recipesCount, error }: SearchHeaderProps)
         variant='h2'
         align='center'
         color='text.primary'
-        marginTop='5%'
         gutterBottom
       >
         {buildSearchHeader(recipesCount, error)}

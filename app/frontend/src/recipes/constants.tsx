@@ -14,4 +14,5 @@ export const QUERY_PARAM_NAMES = {
   TAGS: 'tags',
   CUISINE: 'cuisine',
   PAGE: 'page',
+  DIETS: 'diets',
 };
