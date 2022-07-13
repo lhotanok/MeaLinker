@@ -191,7 +191,7 @@ export const buildItemsWithCount = (items: FacetItem[]): string[] => {
 };
 
 export const getItemWithoutCount = (item: string): string => {
-  return item.replace(/\([^)]*\)$/gi, '').trim();
+  return item.replace(/\([^)]*\)$/gi, '').replace(/(,)+/gi, '').trim();
 };
 
 export const getItemsWithoutCount = (items: string[]): string[] => {

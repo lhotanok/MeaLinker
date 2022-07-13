@@ -93,9 +93,9 @@ function filterRecipeIndexedFields(recipe) {
 
   const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
   const mergedTags = [...tags, ...categories].filter((tag) => tag);
-  const cuisines = CUSINES.filter((cusine) => {
+  const cuisines = CUSINES.filter((cuisine) => {
     for (const tag of mergedTags) {
-      if (tag.toLowerCase().startsWith(cusine.toLowerCase())) {
+      if (tag.toLowerCase().startsWith(cuisine.toLowerCase())) {
         return true;
       }
     }
@@ -113,7 +113,7 @@ function filterRecipeIndexedFields(recipe) {
     rating: rating.value,
     reviewsCount: rating.reviews,
     tags: filteredTags,
-    cuisines,
+    cuisine: cuisines.length > 0 ? cuisines[0] : '',
     ingredients,
     cookMinutes: getDurationInMinutes(time.cooking),
     prepMinutes: getDurationInMinutes(time.preparation),

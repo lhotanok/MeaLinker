@@ -23,22 +23,28 @@ export default function SearchedFilters({
   onCuisineRemove,
   onRemoveAll,
 }: SearchedFiltersProps) {
-  const { ingredients, tags, cuisines } = filters;
+  const { ingredients, tags, cuisine } = filters;
 
   const ingredientChips: RemovableChipItem[] = ingredients.map((ingr) => ({
     name: ingr,
     onRemove: onIngredientRemove,
   }));
 
+  const cuisines = cuisine
+    ? [
+        {
+          name: cuisine,
+          onRemove: onCuisineRemove,
+        },
+      ]
+    : [];
+
   const otherFiltersChips: RemovableChipItem[] = [
     ...tags.map((name) => ({
       name,
       onRemove: onTagRemove,
     })),
-    ...cuisines.map((name) => ({
-      name,
-      onRemove: onCuisineRemove,
-    })),
+    ...cuisines,
   ];
 
   return (

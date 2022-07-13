@@ -12,6 +12,6 @@ export const ALL_SENTENCES_REGEX = /[^.!?]*[.?!]+[ )]*/gm;
 export const QUERY_PARAM_NAMES = {
   INGREDIENTS: 'ingredients',
   TAGS: 'tags',
-  CUISINES: 'cuisines',
+  CUISINE: 'cuisine',
   PAGE: 'page',
 };

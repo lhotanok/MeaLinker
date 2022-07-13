@@ -80,9 +80,9 @@ async function postRecipesAddFields() {
   const addFields = {
     name: { type: TEXT },
     description: { type: TEXT },
-    ingredients: { multiValued: true },
-    tags: { multiValued: true },
-    cuisines: { multiValued: true },
+    ingredients: { type: TEXT, multiValued: true },
+    tags: { type: TEXT, multiValued: true },
+    cuisine: { type: TEXT },
     rating: { type: FLOAT },
     reviewsCount: { type: INT },
     stepsCount: { type: INT },
@@ -105,12 +105,12 @@ async function postRecipesAddFields() {
   const facetFields = {
     _ingredientsFacet: { type: STRING, multiValued: true, stored: false },
     _tagsFacet: { type: STRING, multiValued: true, stored: false },
-    _cuisinesFacet: { type: STRING, multiValued: true, stored: false },
+    _cuisinesFacet: { type: STRING, stored: false },
   };
 
   const copyFields = {
     tags: ['_tagsFacet'],
-    cuisines: ['_cuisinesFacet'],
+    cuisine: ['_cuisinesFacet'],
   };
 
   await postAddFields(addFields, SOLR_RECIPES_SCHEMA);

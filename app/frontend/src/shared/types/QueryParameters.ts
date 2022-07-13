@@ -1,6 +1,6 @@
 export type QueryParameters = {
   ingredients?: string[];
   tags?: string[];
-  cuisines?: string[];
+  cuisine?: string;
   page?: number;
 };

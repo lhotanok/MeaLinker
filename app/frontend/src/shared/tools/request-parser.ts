@@ -7,14 +7,10 @@ import {
 import { QueryParameters } from '../types/QueryParameters';
 
 export const parseFilters = (queryParams: URLSearchParams): Filters => {
-  const joinedIngredients = queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS);
-  const joinedTags = queryParams.get(QUERY_PARAM_NAMES.TAGS);
-  const joinedCuisines = queryParams.get(QUERY_PARAM_NAMES.CUISINES);
-
   const filters: Filters = {
-    ingredients: splitParamValue(joinedIngredients),
-    tags: splitParamValue(joinedTags),
-    cuisines: splitParamValue(joinedCuisines),
+    ingredients: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.INGREDIENTS)),
+    tags: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.TAGS)),
+    cuisine: queryParams.get(QUERY_PARAM_NAMES.CUISINE) || '',
   };
 
   return filters;
@@ -45,7 +41,7 @@ export const buildUrl = (
     return pathname;
   }
 
-  const { ingredients, tags, cuisines, page = 1 } = updatedParamValues;
+  const { ingredients, tags, cuisine, page = 1 } = updatedParamValues;
   const queryParams = currentQueryParams;
 
   if (ingredients) {
@@ -58,9 +54,9 @@ export const buildUrl = (
     setOrDelete(queryParams, QUERY_PARAM_NAMES.TAGS, encoded);
   }
 
-  if (cuisines) {
-    const encoded = encodeArrayToQueryParam(cuisines);
-    setOrDelete(queryParams, QUERY_PARAM_NAMES.CUISINES, encoded);
+  if (cuisine) {
+    const encoded = encodeURI(cuisine);
+    setOrDelete(queryParams, QUERY_PARAM_NAMES.CUISINE, encoded);
   }
 
   setOrDelete(queryParams, QUERY_PARAM_NAMES.PAGE, page !== 1 ? page.toString() : '');
