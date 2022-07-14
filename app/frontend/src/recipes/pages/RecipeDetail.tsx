@@ -48,7 +48,7 @@ export default function RecipeDetail() {
   if (isLoading) headlineText = '';
 
   const viewSourceButton = (
-    <Tooltip title={recipe.jsonld.url} placement='left'>
+    <Tooltip title={recipe.jsonld.url || ''} placement='left'>
       <Button size='large' href={recipe.jsonld.url}>
         View Source
       </Button>

@@ -16,8 +16,8 @@ const log = getLogger('CouchDB manager');
 log.level = 'debug';
 
 import {
-  FOOD_COM_RECIPES_PATH,
-  FOOD_COM_INGREDIENTS_PATH,
+  RECIPES_PATH,
+  INGREDIENTS_PATH,
   RECIPES_DATABASE_NAME,
   INGREDIENTS_DATABASE_NAME,
 } from './constants.mjs';
@@ -103,24 +103,34 @@ async function tryInsertItem(mealinkerDb, identifier, item) {
 }
 
 async function insertRecipes(mealinkerDb, recipes) {
-  log.info(`Inserting ${recipes.length} recipes into recipes database...`);
+  log.info(`Inserting ${recipes.length} recipes into recipes database in parallel...
+  Use Fauxton web app to watch the results being inserted`);
 
-  for (const recipe of recipes) {
+  const reqFnc = async (recipe) => {
     const { jsonld: { identifier } } = recipe;
     await tryInsertItem(mealinkerDb, identifier, recipe);
-  }
+  };
+
+  await Promise.all(recipes.map((recipe) => reqFnc(recipe))).then(() =>
+    log.info(`Inserted ${recipes.length} recipes`),
+  );
 }
 
 async function insertIngredients(mealinkerDb, ingredients) {
   log.info(
     `Inserting ${ingredients.length} ingredients into ${mealinkerDb.config
-      .db} database...`,
+      .db} database in parallel...
+      Use Fauxton web app to watch the results being inserted`,
   );
 
-  for (const ingredient of ingredients) {
+  const reqFnc = async (ingredient) => {
     const { identifier } = ingredient;
     await tryInsertItem(mealinkerDb, identifier, ingredient);
-  }
+  };
+
+  await Promise.all(ingredients.map((ingredient) => reqFnc(ingredient))).then(() =>
+    log.info(`Inserted ${ingredients.length} ingredients`),
+  );
 }
 
 async function main() {
@@ -138,8 +148,8 @@ async function main() {
   await createDatabase(RECIPES_DATABASE_NAME);
   await createDatabase(INGREDIENTS_DATABASE_NAME);
 
-  const recipes = loadJsonFromFile(FOOD_COM_RECIPES_PATH);
-  const ingredients = loadJsonFromFile(FOOD_COM_INGREDIENTS_PATH);
+  const recipes = loadJsonFromFile(RECIPES_PATH);
+  const ingredients = loadJsonFromFile(INGREDIENTS_PATH);
 
   insertRecipes(recipeDb, recipes);
   insertIngredients(ingredientsDb, ingredients);

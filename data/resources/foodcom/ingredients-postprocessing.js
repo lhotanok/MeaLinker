@@ -8,7 +8,7 @@ const {
   IRI_DEREFERENCE_REGEX,
   UNIQUE_INGR_WITH_IDS_PATH,
   EXTENDED_INGREDIENTS_PATH,
-  EXTENDED_RECIPES_PATH,
+  MIN_INGREDIENT_NAME_LENGTH,
 } = require('./constants');
 
 function readFile(filePath) {
@@ -55,49 +55,30 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds, uniqueIngredients) {
     const ingredient = uniqueIngredients[foodComId];
     const { identifier, name } = ingredient;
 
-    mergedIngredients[identifier] = {
-      identifier,
-      foodComId,
-      name,
-      jsonld,
-    };
+    if (name.length >= MIN_INGREDIENT_NAME_LENGTH) {
+      mergedIngredients[identifier] = {
+        identifier,
+        foodComId,
+        name,
+        jsonld,
+      };
+    }
   });
 
   return Object.values(mergedIngredients);
-}
-
-function extendRecipesByIngredientThumbnails(recipes, jsonldIngredients) {
-  const extendedRecipes = recipes.map((recipe) => {
-    const { structured: { ingredients } } = recipe;
-
-    const extendedIngredients = ingredients.map((ingredient) => {
-      const { identifier } = ingredient;
-      if (identifier && jsonldIngredients[identifier]) {
-        const jsonldIngredient = jsonldIngredients[identifier];
-        const { jsonld: { thumbnail, label } } = jsonldIngredient;
-
-        return thumbnail ? { ...ingredient, thumbnail, label } : ingredient;
-      }
-
-      return ingredient;
-    });
-
-    const extendedRecipe = recipe;
-    extendedRecipe.structured.ingredients = extendedIngredients;
-
-    return extendedRecipe;
-  });
-
-  return extendedRecipes;
 }
 
 function main() {
   const irisWithIds = getDbpediaIrisMappedToIngredientIds();
 
   const dbpediaIngredients = readJsonFromFile(DBPEDIA_INGREDIENTS_PATH);
-  const extendedRecipes = readJsonFromFile(EXTENDED_RECIPES_PATH);
-
   const uniqueIngredients = readJsonFromFile(UNIQUE_INGR_WITH_IDS_PATH);
+
+  console.log(
+    `Loaded ${dbpediaIngredients.length} dbpedia ingredients and ${Object.keys(
+      uniqueIngredients,
+    ).length} unique ingredients`,
+  );
 
   const mergedIngredients = mergeIngredientsWithJsonlds(
     irisWithIds,
@@ -105,13 +86,12 @@ function main() {
     uniqueIngredients,
   );
 
-  const mergedRecipes = extendRecipesByIngredientThumbnails(
-    extendedRecipes,
-    mergedIngredients,
-  );
+  console.log(`Created ${mergedIngredients.length} merged ingredients`);
 
-  writeFileFromCurrentDir(EXTENDED_INGREDIENTS_PATH, JSON.stringify(mergedIngredients));
-  writeFileFromCurrentDir(EXTENDED_RECIPES_PATH, JSON.stringify(mergedRecipes));
+  writeFileFromCurrentDir(
+    EXTENDED_INGREDIENTS_PATH,
+    JSON.stringify(mergedIngredients, null, 2),
+  );
 }
 
 main();

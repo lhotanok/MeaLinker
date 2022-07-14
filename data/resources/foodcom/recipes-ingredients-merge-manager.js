@@ -16,6 +16,7 @@ const {
   SEARCH_INGREDIENT_MAX_WORDS,
   SEARCH_INGREDIENTS_PATH,
   SEARCH_INGREDIENT_EXCLUDE_REGEX,
+  FOOD_COM_DEFAULT_IMAGE_SRC,
 } = require('./constants');
 
 const { NAMESPACE_UUID, FILE_ENCODING } = require('../../constants');
@@ -103,7 +104,7 @@ function getUniqueIngredients(mappedIngredients) {
 function buildSearchIngredients(uniqueIngredients) {
   const searchIngredients = {};
 
-  Object.entries(uniqueIngredients).forEach(([{ identifier, name }]) => {
+  Object.values(uniqueIngredients).forEach(({ identifier, name }) => {
     // Filter ingredients suitable for searching
 
     if ((!name.match(/[,.]/) && name[0].match(/[a-z]/gi)) || name === '7-up') {
@@ -158,39 +159,45 @@ async function main() {
   const rawRecipesIdMap = {};
   rawRecipes.forEach((recipe) => (rawRecipesIdMap[recipe.id] = recipe));
 
-  const extendedRecipes = generatedRecipes.map((recipe) => {
-    const { structured, jsonld } = recipe;
-    const { foodComId, ingredients } = structured;
+  const extendedRecipes = generatedRecipes
+    .map((recipe) => {
+      const { structured, jsonld } = recipe;
+      const { foodComId, ingredients } = structured;
 
-    const ingredientIds = recipeIdsWithIngrIds[foodComId];
+      const ingredientIds = recipeIdsWithIngrIds[foodComId];
 
-    const mergedIngredients = mergeIngredientIdsWithNames(
-      ingredientIds,
-      uniqueIngredients,
-    );
-    const extendedIngredients = mergeRawIngrWithNormalizedIngr(
-      ingredients,
-      mergedIngredients,
-    );
+      const mergedIngredients = mergeIngredientIdsWithNames(
+        ingredientIds,
+        uniqueIngredients,
+      );
+      const extendedIngredients = mergeRawIngrWithNormalizedIngr(
+        ingredients,
+        mergedIngredients,
+      );
 
-    const author = {
-      id: rawRecipesIdMap[foodComId].contributor_id,
-      name: jsonld.author,
-      url: `https://www.food.com/user/${rawRecipesIdMap[foodComId].contributor_id}`,
-    };
+      const author = {
+        id: rawRecipesIdMap[foodComId].contributor_id,
+        name: jsonld.author,
+        url: `https://www.food.com/user/${rawRecipesIdMap[foodComId].contributor_id}`,
+      };
 
-    const extendedRecipe = recipe;
+      const extendedRecipe = recipe;
 
-    extendedRecipe.structured.ingredients = extendedIngredients;
-    extendedRecipe.structured.stepsCount = jsonld.recipeInstructions.length;
-    extendedRecipe.structured.author = author;
+      extendedRecipe.structured.ingredients = extendedIngredients;
+      extendedRecipe.structured.stepsCount = jsonld.recipeInstructions.length;
+      extendedRecipe.structured.author = author;
 
-    return extendedRecipe;
-  });
+      return extendedRecipe;
+    })
+    .filter((recipe) => recipe.jsonld.image !== FOOD_COM_DEFAULT_IMAGE_SRC);
 
   console.log(`${extendedRecipes.length} recipes merged with extended ingredients info`);
+  console.log(`Saving ${extendedRecipes.length} recipes to ${EXTENDED_RECIPES_PATH}...`);
 
-  writeFileFromCurrentDir(EXTENDED_RECIPES_PATH, JSON.stringify(extendedRecipes));
+  writeFileFromCurrentDir(
+    EXTENDED_RECIPES_PATH,
+    '[' + extendedRecipes.map((el) => JSON.stringify(el)).join(',\n') + ']',
+  );
 }
 
 (async () => {

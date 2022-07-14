@@ -7,7 +7,6 @@ const {
   SOLR,
 } = require('./config');
 const {
-  FOOD_COM_DEFAULT_IMAGE_SRC,
   FOOD_COM_SEARCH_INGREDIENTS_PATH,
   CUISINES,
   DIETS,
@@ -183,27 +182,6 @@ function filterRecipeIndexedFields(recipe) {
   return filteredRecipe;
 }
 
-function removeRecipesWithoutImage(recipes) {
-  log.info('Removing recipes without image...');
-
-  const imageRecipes = [];
-  const nonImageRecipes = [];
-
-  recipes.forEach((recipe) => {
-    if (recipe.image && recipe.image !== FOOD_COM_DEFAULT_IMAGE_SRC) {
-      imageRecipes.push(recipe);
-    } else {
-      nonImageRecipes.push(recipe);
-    }
-  });
-
-  log.info(
-    `Found ${imageRecipes.length} recipes with images and ${nonImageRecipes.length} recipes without any image.`,
-  );
-
-  return imageRecipes; // .concat(nonImageRecipes);
-}
-
 async function pushDocumentsToSolr(documents, core) {
   const { HOST, PORT, SECURE } = SOLR;
 
@@ -271,12 +249,11 @@ async function main() {
 
   const { CORES: { RECIPES } } = SOLR;
 
-  const filteredRecipes = removeRecipesWithoutImage(recipes);
-  await pushDocumentsToSolr(filteredRecipes, RECIPES);
+  await pushDocumentsToSolr(recipes, RECIPES);
 
   const extendedRecipes = await injectSearchIngredientsToRecipes(
     searchIngredients,
-    filteredRecipes,
+    recipes,
   );
   await pushDocumentsToSolr(extendedRecipes, RECIPES);
 }

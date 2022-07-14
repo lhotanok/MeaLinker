@@ -2,7 +2,7 @@ const Apify = require('apify');
 const cheerio = require('cheerio');
 const uuid = require('uuid');
 
-const { NAMESPACE_UUID, JSON_LD_SELECTOR } = require('./constants');
+const { NAMESPACE_UUID, JSON_LD_SELECTOR, DEFAULT_IMAGE } = require('./constants');
 const { normalizeObject, getStructuredRecipeInfo } = require('./parser');
 
 const { utils: { log } } = Apify;
@@ -38,7 +38,9 @@ exports.handleDetail = async (context, recipes) => {
         },
     };
 
-    recipes.push(recipe);
+    if (recipe.jsonld.image !== DEFAULT_IMAGE) {
+        recipes.push(recipe);
+    }
 
     log.info(`Saved ${recipes.length} recipes in jsonld format into dataset`);
     // log.info(`jsonld: ${JSON.stringify(recipe, null, 2)}`);

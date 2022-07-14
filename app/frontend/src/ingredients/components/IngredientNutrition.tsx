@@ -35,10 +35,14 @@ export default function IngredientNutrition({ ingredient }: IngredientNutritionP
 
   nutritionWithIcons.forEach((nutrition) => {
     if (nutrition.value) {
+      const measuredValue = Array.isArray(nutrition.value)
+        ? nutrition.value[0]
+        : nutrition.value;
+
       const value =
-        typeof nutrition.value === 'object'
-          ? Number(nutrition.value['@value'])
-          : nutrition.value;
+        typeof measuredValue === 'object'
+          ? Number(measuredValue['@value'])
+          : measuredValue;
 
       const nutritionValue: NutritionIconValue = { ...nutrition, value };
       nutritionItems.push(nutritionValue);

@@ -35,7 +35,7 @@ export default function useHttp() {
             ? err.message
             : 'Something went wrong!'}`,
         );
-        setError(`Something went wrong... ${err instanceof Error && err.message}`);
+        setError(`Something went wrong`);
       }
 
       setIsLoading(false);

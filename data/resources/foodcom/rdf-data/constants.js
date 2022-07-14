@@ -1,4 +1,4 @@
-exports.FOOD_DBPEDIA_INGREDIENTS_PATH = 'allrecipes-dbpedia-same-ingr.nt';
+exports.FOOD_DBPEDIA_INGREDIENTS_PATH = 'food-dbpedia-same-ingr.nt';
 exports.DBPEDIA_INGREDIENTS_PATH = 'dbpedia-ingredients.json';
 exports.RDF_INGREDIENTS_PATH = 'ingredients.ttl';
 exports.UNIQUE_INGR_WITH_IDS_PATH = '../ingredients/unique_ingr_map.json';

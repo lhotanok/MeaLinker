@@ -4,6 +4,7 @@ node_modules
 *.nt
 *ttl
 
+/data/resources/*.json
 /data/resources/foodcom/recipes/*.json
 /data/resources/foodcom/recipes/*.csv
 /data/resources/foodcom/ingredients/*.json

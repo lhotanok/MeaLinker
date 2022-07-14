@@ -29,11 +29,11 @@ export type FullIngredient = {
     ingredient?: string[];
     abstract?: LocalizedValue;
     isPrimaryTopicOf: string;
-    sugars?: MeasuredValue;
-    carbs?: MeasuredValue;
-    fat?: MeasuredValue;
-    fiber?: MeasuredValue;
-    protein?: MeasuredValue;
+    sugars?: MeasuredValue | MeasuredValue[];
+    carbs?: MeasuredValue | MeasuredValue[];
+    fat?: MeasuredValue | MeasuredValue[];
+    fiber?: MeasuredValue | MeasuredValue[];
+    protein?: MeasuredValue | MeasuredValue[];
     kj?: number;
   };
 };
