@@ -18,6 +18,7 @@ export const parseFilters = (queryParams: URLSearchParams): Filters => {
     cuisine: queryParams.get(QUERY_PARAM_NAMES.CUISINE) || '',
     diets: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.DIETS)),
     mealTypes: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.MEAL_TYPES)),
+    time: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.TIME)),
   };
 
   return filters;
@@ -72,7 +73,7 @@ export const buildUrl = (
 };
 
 const buildFilterParams = (filtersQueryParameters: QueryParameters): FilterParam[] => {
-  const { ingredients, tags, cuisine, diets, mealTypes } = filtersQueryParameters;
+  const { ingredients, tags, cuisine, diets, mealTypes, time } = filtersQueryParameters;
 
   const filterParams: FilterParam[] = [
     { value: ingredients, name: QUERY_PARAM_NAMES.INGREDIENTS },
@@ -80,6 +81,7 @@ const buildFilterParams = (filtersQueryParameters: QueryParameters): FilterParam
     { value: cuisine, name: QUERY_PARAM_NAMES.CUISINE },
     { value: diets, name: QUERY_PARAM_NAMES.DIETS },
     { value: mealTypes, name: QUERY_PARAM_NAMES.MEAL_TYPES },
+    { value: time, name: QUERY_PARAM_NAMES.TIME },
   ];
 
   return filterParams;

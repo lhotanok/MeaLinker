@@ -9,4 +9,5 @@ export type Facets = {
   cuisineFacets: FacetItem[];
   dietFacets: FacetItem[];
   mealTypeFacets: FacetItem[];
+  timeFacets: FacetItem[];
 };

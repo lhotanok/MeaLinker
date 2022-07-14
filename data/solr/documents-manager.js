@@ -12,6 +12,7 @@ const {
   CUISINES,
   DIETS,
   MEAL_TYPES,
+  TIME,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -112,8 +113,9 @@ function filterRecipeIndexedFields(recipe) {
   const cuisines = extractSpecificTags(mergedTags, CUISINES);
   const diets = extractSpecificTags(mergedTags, DIETS);
   const mealTypes = extractSpecificTags(mergedTags, MEAL_TYPES);
+  const timeTags = extractSpecificTags(mergedTags, TIME);
 
-  const specificTags = [...cuisines, ...diets, ...mealTypes];
+  const specificTags = [...cuisines, ...diets, ...mealTypes, ...timeTags];
   const filteredTags = mergedTags.filter((tag) => !specificTags.includes(tag));
 
   const filteredRecipe = {
@@ -127,6 +129,7 @@ function filterRecipeIndexedFields(recipe) {
     tags: filteredTags,
     cuisine: cuisines.length > 0 ? cuisines[0] : '',
     diets,
+    time: timeTags,
     mealTypes,
     ingredients,
     cookMinutes: getDurationInMinutes(time.cooking),

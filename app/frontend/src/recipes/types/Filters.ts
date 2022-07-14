@@ -6,12 +6,14 @@ export type Filters = {
   cuisine: string;
   diets: string[];
   mealTypes: string[];
+  time: string[];
 };
 
 export type FilterHandlers = {
   ingredients: FilterHandler;
   tags: FilterHandler;
   cuisine: FilterHandler;
+  time: FilterHandler;
   diets: FilterHandler;
   mealTypes: FilterHandler;
 };
@@ -23,4 +25,10 @@ export type FilterHandler = {
   onRemove: (removed: string[]) => void;
 };
 
-export type FilterName = 'ingredients' | 'tags' | 'cuisine' | 'diets' | 'mealTypes';
+export type FilterName =
+  | 'ingredients'
+  | 'tags'
+  | 'cuisine'
+  | 'time'
+  | 'diets'
+  | 'mealTypes';

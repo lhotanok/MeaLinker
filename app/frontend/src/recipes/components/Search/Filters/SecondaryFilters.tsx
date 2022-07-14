@@ -7,6 +7,7 @@ import { Fragment, useState } from 'react';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import CuisineIcon from '@mui/icons-material/RamenDining';
 import RatingIcon from '@mui/icons-material/Star';
+import TimeIcon from '@mui/icons-material/AccessTime';
 import MealTypeIcon from '@mui/icons-material/BrunchDining';
 import CloseIcon from '@mui/icons-material/Close';
 import DietIcon from '@mui/icons-material/MonitorWeight';
@@ -21,13 +22,14 @@ enum Filters {
   Tags,
   Cuisine,
   MealTypes,
+  Time,
   Diets,
 }
 
 export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersProps) {
   const [currentTab, setCurrentTab] = useState(-1);
 
-  const { tags, cuisine, diets, mealTypes } = filterHandlers;
+  const { tags, cuisine, diets, mealTypes, time } = filterHandlers;
 
   const tabs = [
     {
@@ -44,6 +46,11 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
       index: Filters.MealTypes,
       label: 'Meal Type',
       filterHandler: mealTypes,
+    },
+    {
+      index: Filters.Time,
+      label: 'Ready in',
+      filterHandler: time,
     },
     {
       index: Filters.Diets,
@@ -118,6 +125,12 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
               <AutocompleteSearchBar
                 searchIcon={<MealTypeIcon color='secondary' />}
                 {...tabPanels[Filters.MealTypes]}
+              />
+            </TabPanel>
+            <TabPanel value={currentTab} index={Filters.Time}>
+              <AutocompleteSearchBar
+                searchIcon={<TimeIcon color='secondary' />}
+                {...tabPanels[Filters.Time]}
               />
             </TabPanel>
             <TabPanel value={currentTab} index={Filters.Diets}>

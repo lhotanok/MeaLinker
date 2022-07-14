@@ -3,7 +3,7 @@ import { MAX_RESULTS_COUNT } from './constants';
 export const parseSearchParameters = (
   parameters: SearchQueryParameters,
 ): SearchParameters => {
-  const { ingredients, tags, cuisine, diets, mealTypes, rows, offset } = parameters;
+  const { ingredients, tags, cuisine, diets, mealTypes, time, rows, offset } = parameters;
 
   const searchParameters: SearchParameters = {
     ingredients: parseArrayParam(ingredients),
@@ -11,6 +11,7 @@ export const parseSearchParameters = (
     cuisine: decodeURI(cuisine),
     diets: parseArrayParam(diets),
     mealTypes: parseArrayParam(mealTypes),
+    time: parseArrayParam(time),
     rows: Math.min(Number(rows), MAX_RESULTS_COUNT),
     offset: Number(offset),
   };

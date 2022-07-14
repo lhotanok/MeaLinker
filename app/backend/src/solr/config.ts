@@ -11,4 +11,5 @@ export const FACET_FIELDS = {
   CUISINES: '_cuisinesFacet',
   DIETS: '_dietsFacet',
   MEAL_TYPES: '_mealTypesFacet',
+  TIME: '_timeFacet',
 };

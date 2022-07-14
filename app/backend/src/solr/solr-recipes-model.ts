@@ -48,7 +48,7 @@ class SolrRecipesModel extends SolrModel {
       reviewsCount: 'desc',
     },
   ): Promise<SolrResponse<Recipe>> {
-    log.info('Fetching recipes by filters...', { filters: searchParameters });
+    log.info('Fetching recipes by filters...', { searchParameters });
 
     const {
       ingredients,
@@ -56,6 +56,7 @@ class SolrRecipesModel extends SolrModel {
       cuisine,
       diets,
       mealTypes,
+      time,
       rows,
       offset,
     } = searchParameters;
@@ -65,6 +66,7 @@ class SolrRecipesModel extends SolrModel {
       tags,
       cuisine: [cuisine].filter((cuisine) => cuisine),
       diets,
+      time,
       mealTypes,
     };
 
@@ -167,6 +169,7 @@ class SolrRecipesModel extends SolrModel {
       cuisineFacets: this.buildFacetItems(facetFields._cuisinesFacet),
       dietFacets: this.buildFacetItems(facetFields._dietsFacet),
       mealTypeFacets: this.buildFacetItems(facetFields._mealTypesFacet),
+      timeFacets: this.buildFacetItems(facetFields._timeFacet),
     };
   }
 

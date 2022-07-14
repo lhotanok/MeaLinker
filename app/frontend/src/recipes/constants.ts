@@ -18,6 +18,7 @@ export const QUERY_PARAM_NAMES: Record<string, string> = {
   PAGE: 'page',
   DIETS: 'diets',
   MEAL_TYPES: 'mealTypes',
+  TIME: 'time',
 };
 
 export const INITIAL_FACETS: Facets = {
@@ -26,4 +27,5 @@ export const INITIAL_FACETS: Facets = {
   cuisineFacets: [],
   dietFacets: [],
   mealTypeFacets: [],
+  timeFacets: [],
 };

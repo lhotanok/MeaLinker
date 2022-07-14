@@ -117,3 +117,5 @@ exports.MEAL_TYPES = [
   'Salad Dressings',
   'One Dish Meal',
 ];
+
+exports.TIME = ['< 60 Mins', '< 30 Mins', '< 15 Mins', '< 4 Hours'];

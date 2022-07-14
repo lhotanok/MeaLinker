@@ -4,6 +4,7 @@ type SearchParameters = {
   cuisine: string;
   diets: string[];
   mealTypes: string[];
+  time: string[];
   rows: number;
   offset: number;
 };
@@ -13,6 +14,7 @@ type SearchQueryParameters = {
   tags: string;
   cuisine: string;
   diets: string;
+  time: string;
   mealTypes: string;
   rows: string;
   offset: string;

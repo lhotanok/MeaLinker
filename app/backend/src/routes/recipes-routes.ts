@@ -16,6 +16,7 @@ router.get('/', async (req, res) => {
     tags = '',
     cuisine = '',
     diets = '',
+    time = '',
     mealTypes = '',
     rows = `${DEFAULT_PAGINATION_RESULTS_COUNT}`,
     offset = '0',
@@ -26,6 +27,7 @@ router.get('/', async (req, res) => {
     tags,
     cuisine,
     diets,
+    time,
     mealTypes,
     rows,
     offset,
@@ -34,7 +36,7 @@ router.get('/', async (req, res) => {
   const searchParameters = parseSearchParameters(searchQueryParams);
 
   const recipes: SolrResponse<Recipe> =
-    !ingredients && !tags && !cuisine && !diets && !mealTypes
+    !ingredients && !tags && !cuisine && !diets && !mealTypes && !time
       ? await recipesModel.getAllRecipes(searchParameters.rows, searchParameters.offset)
       : await recipesModel.getRecipesByFilters(searchParameters);
 
