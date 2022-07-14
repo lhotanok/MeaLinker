@@ -49,7 +49,7 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
     },
     {
       index: Filters.Time,
-      label: 'Ready in',
+      label: 'Prep Time',
       filterHandler: time,
     },
     {
@@ -89,6 +89,7 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
         <Box mb={1} sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Stack direction='row' spacing={1.5} alignItems='center'>
             <Tabs
+              selectionFollowsFocus
               value={currentTab === -1 ? false : currentTab}
               onChange={(_ev, value: number) => setCurrentTab(value)}
               aria-label='secondary filters'
@@ -129,8 +130,9 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
             </TabPanel>
             <TabPanel value={currentTab} index={Filters.Time}>
               <AutocompleteSearchBar
-                searchIcon={<TimeIcon color='secondary' />}
                 {...tabPanels[Filters.Time]}
+                multiple={false}
+                searchIcon={<TimeIcon color='secondary' />}
               />
             </TabPanel>
             <TabPanel value={currentTab} index={Filters.Diets}>

@@ -6,7 +6,7 @@ export type Filters = {
   cuisine: string;
   diets: string[];
   mealTypes: string[];
-  time: string[];
+  time: string;
 };
 
 export type FilterHandlers = {

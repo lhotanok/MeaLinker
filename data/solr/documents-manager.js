@@ -12,7 +12,8 @@ const {
   CUISINES,
   DIETS,
   MEAL_TYPES,
-  TIME,
+  NO_COOK_TAG,
+  WITHOUT_COOKING_TAG,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -83,6 +84,28 @@ function extractSpecificTags(tags, specificTags) {
   return specifics;
 }
 
+function buildTimeTags(totalMinutes) {
+  const timeBounds = [
+    { minutes: 15 },
+    { minutes: 30 },
+    { minutes: 45 },
+    { minutes: 60 },
+    { minutes: 90, text: '1.5 Hours' },
+    { minutes: 120, text: '2 Hours' },
+    { minutes: 180, text: '3 Hours' },
+    { minutes: 240, text: '4 Hours' },
+    { minutes: 360, text: '6 Hours' },
+  ];
+
+  const timeTags = timeBounds
+    .filter(({ minutes }) => totalMinutes < minutes)
+    .map(({ minutes, text }) => {
+      return `< ${text ? text : `${minutes} Mins`}`;
+    });
+
+  return timeTags;
+}
+
 function filterRecipeIndexedFields(recipe) {
   const { _id, jsonld, structured } = recipe;
 
@@ -107,16 +130,28 @@ function filterRecipeIndexedFields(recipe) {
     protein,
   } = nutritionInfo;
 
+  const totalMinutes = getDurationInMinutes(time.total);
+  const cookMinutes = getDurationInMinutes(time.cooking);
+
+  const noCookTags = cookMinutes ? [] : [WITHOUT_COOKING_TAG];
+
   const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
-  const mergedTags = [...tags, ...categories].filter((tag) => tag);
+  const mergedTags = [
+    ...tags.filter((tag) => tag !== NO_COOK_TAG),
+    ...categories,
+    ...noCookTags,
+  ].filter((tag) => tag);
 
   const cuisines = extractSpecificTags(mergedTags, CUISINES);
   const diets = extractSpecificTags(mergedTags, DIETS);
   const mealTypes = extractSpecificTags(mergedTags, MEAL_TYPES);
-  const timeTags = extractSpecificTags(mergedTags, TIME);
+
+  const timeTags = buildTimeTags(totalMinutes);
 
   const specificTags = [...cuisines, ...diets, ...mealTypes, ...timeTags];
-  const filteredTags = mergedTags.filter((tag) => !specificTags.includes(tag));
+  const filteredTags = mergedTags.filter(
+    (tag) => !specificTags.includes(tag) && !tag.startsWith('<'),
+  );
 
   const filteredRecipe = {
     id: _id,
@@ -132,9 +167,7 @@ function filterRecipeIndexedFields(recipe) {
     time: timeTags,
     mealTypes,
     ingredients,
-    cookMinutes: getDurationInMinutes(time.cooking),
-    prepMinutes: getDurationInMinutes(time.preparation),
-    totalMinutes: getDurationInMinutes(time.total),
+    totalMinutes,
     date: getParsedDate(datePublished),
     calories: calories.value,
     fat: fat.value,

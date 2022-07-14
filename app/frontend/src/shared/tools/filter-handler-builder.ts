@@ -32,13 +32,16 @@ export const getFilterHandlers = (
     removeHandler,
   ];
 
+  // Show shorter prep time at the top
+  const reversedtimeFacets = [...timeFacets].reverse();
+
   const filterHandlers: FilterHandlers = {
     ingredients: buildMultipleFilterHandler(ings, ingFacets, 'ingredients', ...handlers),
     tags: buildMultipleFilterHandler(tags, tagFacets, 'tags', ...handlers),
     cuisine: buildSingleFilterHandler(cuisine, cuisineFacets, 'cuisine', ...handlers),
     diets: buildMultipleFilterHandler(diets, dietFacets, 'diets', ...handlers),
     mealTypes: buildMultipleFilterHandler(meals, mealFacets, 'mealTypes', ...handlers),
-    time: buildMultipleFilterHandler(time, timeFacets, 'time', ...handlers),
+    time: buildSingleFilterHandler(time, reversedtimeFacets, 'time', ...handlers),
   };
 
   return filterHandlers;

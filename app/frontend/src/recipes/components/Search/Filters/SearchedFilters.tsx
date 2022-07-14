@@ -5,7 +5,7 @@ import RemovableChips, {
   RemovableChipItem,
 } from '../../../../shared/components/RemovableChips';
 import { PRIMARY_COLOR } from '../../../../shared/constants';
-import { FilterHandlers, Filters } from '../../../types/Filters';
+import { FilterHandler, FilterHandlers, Filters } from '../../../types/Filters';
 import FlexBox from '../../../../shared/components/FlexBox';
 
 type SearchedFiltersProps = {
@@ -26,33 +26,12 @@ export default function SearchedFilters({
     onRemove: (name) => filterHandlers.ingredients.onRemove([name]),
   }));
 
-  const cuisines = cuisine
-    ? [
-        {
-          name: cuisine,
-          onRemove: (name: string) => filterHandlers.cuisine.onRemove([name]),
-        },
-      ]
-    : [];
-
   const otherFiltersChips: RemovableChipItem[] = [
-    ...tags.map((name) => ({
-      name,
-      onRemove: (name: string) => filterHandlers.tags.onRemove([name]),
-    })),
-    ...cuisines,
-    ...mealTypes.map((name) => ({
-      name,
-      onRemove: (name: string) => filterHandlers.mealTypes.onRemove([name]),
-    })),
-    ...diets.map((name) => ({
-      name,
-      onRemove: (name: string) => filterHandlers.diets.onRemove([name]),
-    })),
-    ...time.map((name) => ({
-      name,
-      onRemove: (name: string) => filterHandlers.time.onRemove([name]),
-    })),
+    ...buildMultipleChips(tags, filterHandlers.tags),
+    ...buildChipsFromSingleChip(cuisine, filterHandlers.cuisine),
+    ...buildMultipleChips(mealTypes, filterHandlers.mealTypes),
+    ...buildMultipleChips(diets, filterHandlers.diets),
+    ...buildChipsFromSingleChip(time, filterHandlers.time),
   ];
 
   return (
@@ -67,7 +46,7 @@ export default function SearchedFilters({
           </Stack>
         </FlexBox>
       </Grid>
-      {ingredients.length + tags.length + cuisines.length > 0 && (
+      {otherFiltersChips.length > 0 && (
         <Grid item>
           <FlexBox>
             <IconButton key='remove-all-chips' size='large' onClick={() => onRemoveAll()}>
@@ -83,3 +62,23 @@ export default function SearchedFilters({
     </Grid>
   );
 }
+
+const buildMultipleChips = (items: string[], filterHandler: FilterHandler) => {
+  return items.map((name) => ({
+    name,
+    onRemove: (name: string) => filterHandler.onRemove([name]),
+  }));
+};
+
+const buildChipsFromSingleChip = (item: string, filterHandler: FilterHandler) => {
+  const items = item
+    ? [
+        {
+          name: item,
+          onRemove: (name: string) => filterHandler.onRemove([name]),
+        },
+      ]
+    : [];
+
+  return items;
+};

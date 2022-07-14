@@ -9,8 +9,10 @@ export type SimpleRecipe = {
   rating: number;
   reviewsCount: number;
   tags: string[];
-  cuisines: string[];
+  cuisine: string;
+  diets: string[];
   ingredients: string[];
+  time: string[];
   cookMinutes: number;
   prepMinutes: number;
   totalMinutes: number;

@@ -4,7 +4,7 @@ import LinearLoadingProgress from '../../shared/components/LinearLoadingProgress
 import useHttp from '../../shared/hooks/use-http';
 import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
-import { Button, Card, CardContent, Grid, Typography } from '@mui/material';
+import { Button, Card, CardContent, Grid, Tooltip, Typography } from '@mui/material';
 import ZoomableImage from '../../shared/components/ZoomableImage';
 import { convertToReadableDate } from '../../shared/tools/value-prettifier';
 import RecipeHeader from '../components/Detail/RecipeHeader';
@@ -48,9 +48,11 @@ export default function RecipeDetail() {
   if (isLoading) headlineText = '';
 
   const viewSourceButton = (
-    <Button size='large' href={recipe.jsonld.url}>
-      View Source
-    </Button>
+    <Tooltip title={recipe.jsonld.url} placement='left'>
+      <Button size='large' href={recipe.jsonld.url}>
+        View Source
+      </Button>
+    </Tooltip>
   );
 
   const directions = (recipe.jsonld.recipeInstructions || [])

@@ -72,7 +72,7 @@ export default function AutocompleteSearchBar({
         </Fragment>
       )}
       renderOption={(props, option, { inputValue }) => {
-        const matches = match(option, inputValue);
+        const matches = match(option, inputValue, {});
         const parts = parse(option, matches);
 
         return (

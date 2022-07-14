@@ -1,5 +1,4 @@
-import { Typography } from '@mui/material';
-import { Fragment } from 'react';
+import { Box, Typography } from '@mui/material';
 import LinearLoadingProgress from '../../shared/components/LinearLoadingProgress';
 import ZoomableImage from '../../shared/components/ZoomableImage';
 import { FullIngredient } from '../types/FullIngredient';
@@ -14,14 +13,14 @@ const IngredientHeader: React.FC<{
   if (isLoading) headlineText = '';
 
   return (
-    <Fragment>
+    <Box>
       {isLoading && <LinearLoadingProgress />}
-      <Typography component='h1' variant='h4' color='text.primary'>
+      <Typography component='h1' variant='h4' color='text.primary' gutterBottom>
         {headlineText}
       </Typography>
       {ingredient.jsonld.country && (
-        <Typography color='text.secondary'>
-          Region: {ingredient.jsonld.country.replace(/^.*\//gi, '')}
+        <Typography color='text.secondary' gutterBottom>
+          Origin: {ingredient.jsonld.country.replace(/^.*\//gi, '').replace(/_+/g, ' ')}
         </Typography>
       )}
       {ingredient.jsonld.thumbnail && (
@@ -34,12 +33,12 @@ const IngredientHeader: React.FC<{
               ingredient.name
             )
           }
-          imageFixedHeight={220}
+          maxHeight={400}
           buttonGroupSize='small'
-          buttonGroupPb={2}
+          buttonGroupPb={1}
         />
       )}
-    </Fragment>
+    </Box>
   );
 };
 

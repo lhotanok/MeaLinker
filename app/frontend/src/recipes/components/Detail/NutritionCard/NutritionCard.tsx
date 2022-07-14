@@ -1,16 +1,7 @@
 import { RecipeNutrition } from '../../../types/FullRecipe';
-import nutritionIcon from '../../../../assets/pyramid-icon.png';
-import caloriesIcon from '../../../../assets/kcal-icon.png';
-import carbohydratesIcon from '../../../../assets/grain-icon.png';
-import proteinIcon from '../../../../assets/protein-icon.png';
-import fatIcon from '../../../../assets/fat-icon.png';
-import fiberIcon from '../../../../assets/fiber-icon.png';
-import sugarIcon from '../../../../assets/sugar-icon.png';
-import sodiumIcon from '../../../../assets/sodium-icon.png';
-import cholesterolIcon from '../../../../assets/cholesterol-icon.png';
 import InfoCard from '../../../../shared/components/InfoCard';
-import { Grid } from '@mui/material';
-import NutritionItem from './NutritionItem';
+import { ICON_PATHS } from '../../../../shared/constants';
+import NutritionGrid from '../../../../shared/components/NutritionGrid';
 
 type NutritionCardProps = {
   nutrition: RecipeNutrition;
@@ -29,6 +20,18 @@ export default function NutritionCard({ nutrition }: NutritionCardProps) {
     sodium,
   } = nutrition;
 
+  const {
+    caloriesIcon,
+    fiberIcon,
+    cholesterolIcon,
+    carbohydratesIcon,
+    sugarIcon,
+    sodiumIcon,
+    proteinIcon,
+    fatIcon,
+    nutritionIcon,
+  } = ICON_PATHS;
+
   const nutritionItems = [
     { name: 'Calories', icon: caloriesIcon, value: calories },
     { name: 'Fiber', icon: fiberIcon, value: fiber },
@@ -41,15 +44,11 @@ export default function NutritionCard({ nutrition }: NutritionCardProps) {
     { name: 'Saturated fat', icon: fatIcon, value: saturatedFat },
   ];
 
-  const nutritionGrid = (
-    <Grid component='ul' container spacing={1.5} sx={{ padding: 0 }}>
-      {nutritionItems.map(({ name, icon, value }) => (
-        <Grid component='li' item key={name} xs sx={{ listStyle: 'none' }}>
-          <NutritionItem name={name} icon={icon} nutritionValue={value} />
-        </Grid>
-      ))}
-    </Grid>
+  return (
+    <InfoCard
+      title='Nutrition'
+      iconSrc={nutritionIcon}
+      content={<NutritionGrid nutritionItems={nutritionItems} />}
+    />
   );
-
-  return <InfoCard title='Nutrition' iconSrc={nutritionIcon} content={nutritionGrid} />;
 }

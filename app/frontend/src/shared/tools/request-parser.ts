@@ -18,7 +18,7 @@ export const parseFilters = (queryParams: URLSearchParams): Filters => {
     cuisine: queryParams.get(QUERY_PARAM_NAMES.CUISINE) || '',
     diets: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.DIETS)),
     mealTypes: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.MEAL_TYPES)),
-    time: splitParamValue(queryParams.get(QUERY_PARAM_NAMES.TIME)),
+    time: queryParams.get(QUERY_PARAM_NAMES.TIME) || '',
   };
 
   return filters;

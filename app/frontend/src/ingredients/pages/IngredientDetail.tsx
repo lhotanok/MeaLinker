@@ -5,7 +5,9 @@ import {
   CardContent,
   Container,
   Divider,
+  Grid,
   Stack,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { Box } from '@mui/system';
@@ -19,12 +21,10 @@ import FlexBox from '../../shared/components/FlexBox';
 import JsonldHelmet from '../../shared/components/JsonldHelmet';
 import useHttp from '../../shared/hooks/use-http';
 import { prepareRecipes } from '../../shared/tools/request-parser';
-import {
-  addThousandsSeparator,
-  buildPlural,
-  escapeAHrefContent,
-} from '../../shared/tools/value-prettifier';
+import { addThousandsSeparator, buildPlural } from '../../shared/tools/value-prettifier';
+import IngredientDescription from '../components/IngredientDescription';
 import IngredientHeader from '../components/IngredientHeader';
+import IngredientNutrition from '../components/IngredientNutrition';
 import IngredientRecipes from '../components/IngredientRecipes';
 import { FullIngredient } from '../types/FullIngredient';
 
@@ -73,11 +73,7 @@ export default function IngredientDetail() {
 
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const { abstract, comment } = ingredient.jsonld;
-  const descriptions = [abstract, comment]
-    .map((localized) => (localized ? localized['@value'] : ''))
-    .filter((value) => value)
-    .join('\n\n');
+  const wikiSource = ingredient.jsonld.isPrimaryTopicOf;
 
   return (
     <Fragment>
@@ -88,21 +84,33 @@ export default function IngredientDetail() {
             <Card>
               <CardContent>
                 <Stack spacing={3}>
-                  <IngredientHeader
-                    isLoading={isLoading}
-                    error={error}
-                    ingredient={ingredient}
+                  <Grid container spacing={7}>
+                    <Grid item>
+                      <IngredientHeader
+                        isLoading={isLoading}
+                        error={error}
+                        ingredient={ingredient}
+                      />
+                    </Grid>
+                    <Grid item xs>
+                      <Box height='100%' pt={7}>
+                        <IngredientNutrition ingredient={ingredient} />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                  <IngredientDescription
+                    abstract={ingredient.jsonld.abstract}
+                    comment={ingredient.jsonld.comment}
                   />
-                  <Typography color='text.primary'>
-                    {escapeAHrefContent(descriptions)}
-                  </Typography>
                 </Stack>
               </CardContent>
               <CardActions>
-                {ingredient.jsonld.isPrimaryTopicOf && (
-                  <Button size='small' href={ingredient.jsonld.isPrimaryTopicOf}>
-                    View Source
-                  </Button>
+                {wikiSource && (
+                  <Tooltip title={wikiSource} placement='right'>
+                    <Button size='small' href={wikiSource}>
+                      View Source
+                    </Button>
+                  </Tooltip>
                 )}
               </CardActions>
             </Card>

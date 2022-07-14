@@ -118,4 +118,5 @@ exports.MEAL_TYPES = [
   'One Dish Meal',
 ];
 
-exports.TIME = ['< 60 Mins', '< 30 Mins', '< 15 Mins', '< 4 Hours'];
+exports.NO_COOK_TAG = 'No Cook';
+exports.WITHOUT_COOKING_TAG = 'Without Cooking';

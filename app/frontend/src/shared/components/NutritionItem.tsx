@@ -1,5 +1,5 @@
 import { ListItem, ListItemAvatar, Avatar, ListItemText } from '@mui/material';
-import { Measurable } from '../../../types/FullRecipe';
+import { Measurable } from '../../recipes/types/FullRecipe';
 
 type NutritionItemProps = {
   name: string;
