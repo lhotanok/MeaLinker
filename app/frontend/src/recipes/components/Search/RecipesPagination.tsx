@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Container, PaginationItem, Stack } from '@mui/material';
 import Pagination, { paginationClasses } from '@mui/material/Pagination';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import FlexBox from '../../../shared/components/FlexBox';
 import {
   MAX_PAGINATION_PAGES,
@@ -10,24 +10,31 @@ import {
 } from '../../constants';
 
 type RecipesPaginationProps = {
+  queryParams: URLSearchParams;
   page?: number;
   maxPages?: number;
-  queryParams: URLSearchParams;
+  onScroll?: () => void;
 };
 
 export default function RecipesPagination({
+  queryParams,
+  onScroll,
   page = 1,
   maxPages = MAX_PAGINATION_PAGES,
-  queryParams,
 }: RecipesPaginationProps) {
   const [paginationLoading, setPaginationLoading] = useState(false);
+  const location = useLocation();
 
   const scrollToTopHandler = () => {
     setPaginationLoading(true);
 
     setTimeout(() => {
       setPaginationLoading(false);
-      window.scrollTo(0, 0);
+      if (onScroll) {
+        onScroll();
+      } else {
+        window.scrollTo(0, 0);
+      }
     }, RENDERING_TIMEOUT);
   };
 
@@ -52,7 +59,7 @@ export default function RecipesPagination({
               return (
                 <PaginationItem
                   component={Link}
-                  to={`/recipes?${updatedQueryParams.toString()}`}
+                  to={`${location.pathname}?${updatedQueryParams.toString()}`}
                   {...item}
                 />
               );

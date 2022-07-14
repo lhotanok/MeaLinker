@@ -126,6 +126,8 @@ function filterRecipeIndexedFields(recipe) {
     reviewsCount: rating.reviews,
     tags: filteredTags,
     cuisine: cuisines.length > 0 ? cuisines[0] : '',
+    diets,
+    mealTypes,
     ingredients,
     cookMinutes: getDurationInMinutes(time.cooking),
     prepMinutes: getDurationInMinutes(time.preparation),
@@ -140,8 +142,6 @@ function filterRecipeIndexedFields(recipe) {
     fiber: fiber.value,
     sugar: sugar.value,
     protein: protein.value,
-    _dietsFacet: diets,
-    _mealTypesFacet: mealTypes,
   };
 
   return filteredRecipe;

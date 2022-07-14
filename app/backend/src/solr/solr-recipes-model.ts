@@ -64,8 +64,8 @@ class SolrRecipesModel extends SolrModel {
       ingredients,
       tags,
       cuisine: [cuisine].filter((cuisine) => cuisine),
-      _dietsFacet: diets,
-      _mealTypesFacet: mealTypes,
+      diets,
+      mealTypes,
     };
 
     const qStringValues: string[] = [];
@@ -86,8 +86,9 @@ class SolrRecipesModel extends SolrModel {
     const solrResponse = await this.prepareSolrResponse(query);
 
     log.info(
-      `Found ${solrResponse.totalCount} recipes for ingredients: ${ingredients}. Fetched recipes ${offset}-${offset +
-        rows}.`,
+      `Found ${solrResponse.totalCount} recipes for filters: ${JSON.stringify(
+        filters,
+      )}. Fetched recipes ${offset}-${offset + rows}.`,
     );
 
     return solrResponse;

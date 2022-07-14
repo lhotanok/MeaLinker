@@ -36,7 +36,6 @@ export default function RecipeHeader({
         </Typography>
         <Link href={author.url}>{author.name}</Link>
       </Stack>
-
       <Typography color='text.primary'>{escapeAHrefContent(description)}</Typography>
     </Grid>
   );

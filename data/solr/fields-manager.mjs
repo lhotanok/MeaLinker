@@ -83,6 +83,8 @@ async function postRecipesAddFields() {
     ingredients: { type: TEXT, multiValued: true },
     tags: { type: TEXT, multiValued: true },
     cuisine: { type: TEXT },
+    diets: { type: TEXT, multiValued: true },
+    mealTypes: { type: TEXT, multiValued: true },
     rating: { type: FLOAT },
     reviewsCount: { type: INT },
     stepsCount: { type: INT },
@@ -111,8 +113,10 @@ async function postRecipesAddFields() {
   };
 
   const copyFields = {
-    tags: ['_tagsFacet'],
-    cuisine: ['_cuisinesFacet'],
+    // tags: ['_tagsFacet'],
+    // cuisine: ['_cuisinesFacet'],
+    diets: ['_dietsFacet'],
+    mealTypes: ['_mealTypesFacet'],
   };
 
   await postAddFields(addFields, SOLR_RECIPES_SCHEMA);

@@ -1,9 +1,8 @@
-import { Button, ButtonGroup, Card, CardMedia, Grid } from '@mui/material';
+import { Box, Button, ButtonGroup, Card, CardMedia, Grid } from '@mui/material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import React from 'react';
 import FlexBox from './FlexBox';
 import { LIGHTER_PRIMARY_COLOR, LIGHTER_SECONDARY_COLOR } from '../constants';
 
@@ -11,49 +10,67 @@ type ZoomableImageProps = {
   src: string;
   alt: string;
   actionButton?: JSX.Element;
+  imageFixedHeight?: number;
+  buttonGroupSize?: 'small' | 'medium' | 'large';
+  buttonGroupPb?: number;
 };
 
-export default function ZoomableImage({ src, alt, actionButton }: ZoomableImageProps) {
+export default function ZoomableImage({
+  src,
+  alt,
+  actionButton,
+  imageFixedHeight,
+  buttonGroupSize,
+  buttonGroupPb,
+}: ZoomableImageProps) {
   return (
-    <TransformWrapper wheel={{ wheelDisabled: true }}>
-      {({ zoomIn, zoomOut, resetTransform }) => (
-        <Card elevation={0} sx={{ maxHeight: 600 }}>
-          <Grid container>
-            <Grid item xs>
-              <ButtonGroup
-                disableElevation={true}
-                variant='contained'
-                color='inherit'
-                aria-label='button group'
-              >
-                <Button
-                  sx={{ backgroundColor: LIGHTER_SECONDARY_COLOR }}
-                  onClick={() => zoomIn()}
+    <Box>
+      <TransformWrapper wheel={{ wheelDisabled: true }}>
+        {({ zoomIn, zoomOut, resetTransform }) => (
+          <Card elevation={0} sx={{ maxHeight: 600 }}>
+            <Grid container>
+              <Grid item xs pb={buttonGroupPb}>
+                <ButtonGroup
+                  disableElevation={true}
+                  variant='contained'
+                  color='inherit'
+                  aria-label='button group'
+                  size={buttonGroupSize}
                 >
-                  <ZoomInIcon />
-                </Button>
-                <Button sx={{ backgroundColor: '#A2DFF9' }} onClick={() => zoomOut()}>
-                  <ZoomOutIcon />
-                </Button>
-                <Button
-                  sx={{ backgroundColor: LIGHTER_PRIMARY_COLOR }}
-                  onClick={() => resetTransform()}
-                >
-                  <ZoomOutMapIcon />
-                </Button>
-              </ButtonGroup>
-            </Grid>
-            {actionButton && (
-              <Grid item xs alignContent='right'>
-                <FlexBox alignment='right'>{actionButton}</FlexBox>
+                  <Button
+                    sx={{ backgroundColor: LIGHTER_SECONDARY_COLOR }}
+                    onClick={() => zoomIn()}
+                  >
+                    <ZoomInIcon />
+                  </Button>
+                  <Button sx={{ backgroundColor: '#A2DFF9' }} onClick={() => zoomOut()}>
+                    <ZoomOutIcon />
+                  </Button>
+                  <Button
+                    sx={{ backgroundColor: LIGHTER_PRIMARY_COLOR }}
+                    onClick={() => resetTransform()}
+                  >
+                    <ZoomOutMapIcon />
+                  </Button>
+                </ButtonGroup>
               </Grid>
-            )}
-          </Grid>
-          <TransformComponent>
-            <CardMedia component='img' image={src} alt={alt} />
-          </TransformComponent>
-        </Card>
-      )}
-    </TransformWrapper>
+              {actionButton && (
+                <Grid item xs alignContent='right'>
+                  <FlexBox alignment='right'>{actionButton}</FlexBox>
+                </Grid>
+              )}
+            </Grid>
+            <TransformComponent>
+              <CardMedia
+                component='img'
+                image={src}
+                alt={alt}
+                height={imageFixedHeight}
+              />
+            </TransformComponent>
+          </Card>
+        )}
+      </TransformWrapper>
+    </Box>
   );
 }

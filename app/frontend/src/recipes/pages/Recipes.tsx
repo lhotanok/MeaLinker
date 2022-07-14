@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -45,6 +45,8 @@ export default function Recipes() {
 
   const { sendRequest: fetchRecipes, error } = useHttp();
   const { snackbar, setNewSnackbarText: setSnackbar } = useSnackbar();
+
+  const headerRef = useRef<HTMLDivElement>(null);
 
   useEffect(
     () => {
@@ -154,7 +156,9 @@ export default function Recipes() {
       >
         <Container maxWidth='md'>
           <InputFilters filterHandlers={filterHandlers} recipesCount={totalCount} />
-          <SearchHeader recipesCount={totalCount} error={error} />
+          <span ref={headerRef}>
+            <SearchHeader recipesCount={totalCount} error={error} />
+          </span>
           <SearchedFilters
             filters={filters}
             filterHandlers={filterHandlers}
@@ -165,9 +169,10 @@ export default function Recipes() {
       <RecipesGrid recipes={paginatedRecipes} />
       {totalCount ? (
         <RecipesPagination
+          queryParams={queryParams}
           page={page}
           maxPages={Math.ceil((totalCount || 0) / PAGINATION_RESULTS_COUNT)}
-          queryParams={queryParams}
+          onScroll={() => headerRef.current && headerRef.current.scrollIntoView()}
         />
       ) : (
         ''

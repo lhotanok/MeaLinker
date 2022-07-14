@@ -7,7 +7,7 @@ const InfoCard: React.FC<{
   iconSrc?: string;
 }> = ({ title, subheader, iconSrc, content }) => {
   return (
-    <Card raised>
+    <Card>
       <CardHeader
         title={title}
         subheader={subheader}
