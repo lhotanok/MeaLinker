@@ -38,7 +38,7 @@ exports.handleDetail = async (context, recipes) => {
         return;
     }
 
-    const identifier = uuid.v5(recipeJsonLd.name, NAMESPACE_UUID);
+    const identifier = uuid.v5(url, NAMESPACE_UUID);
 
     const recipe = {
         jsonld: {

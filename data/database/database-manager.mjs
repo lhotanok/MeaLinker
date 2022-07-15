@@ -1,5 +1,5 @@
-import { unescape } from 'html-escaper';
-import { decode } from 'html-entities';
+import JSONStream from 'jsonstream';
+import { v5 as uuidv5 } from 'uuid';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -23,50 +23,33 @@ import {
 } from './constants.mjs';
 
 import nanoRoot from 'nano';
-import { FILE_ENCODING } from '../constants.js';
+import { FILE_ENCODING, NAMESPACE_UUID } from '../constants.js';
 
 const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
-function readFileFromCurrentDir(filePath) {
-  return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
-}
+// function readFileFromCurrentDir(filePath) {
+//   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
+// }
 
-function decodeJsonStrings(json) {
-  if (typeof json === 'string') {
-    return decode(json);
-  } else if (Array.isArray(json)) {
-    return json.map((item) => decodeJsonStrings(item));
-  } else if (!json || typeof json !== 'object') {
-    return json;
-  }
+// function loadJsonFromFile(filePath) {
+//   const fileContent = readFileFromCurrentDir(filePath);
+//   return JSON.parse(fileContent);
+// }
 
-  const decodedObj = {};
+function loadAndStoreDocs(filePath, insertCallback, mealinkerDb) {
+  log.info(`Reading JSON from ${filePath}`);
 
-  Object.entries(json).forEach(([key, value]) => {
-    if (typeof value === 'object' || typeof value === 'string') {
-      decodedObj[key] = decodeJsonStrings(value);
-    } else {
-      decodedObj[key] = value;
-    }
+  const stream = fs.createReadStream(`${__dirname}/${filePath}`, {
+    encoding: FILE_ENCODING,
   });
 
-  return decodedObj;
-}
+  const parser = JSONStream.parse();
+  stream.pipe(parser);
 
-function loadJsonFromFile(filePath) {
-  const fileContent = readFileFromCurrentDir(filePath);
-
-  // double decoding is used to ensure the best results
-
-  // might be redundant, not powerfull enough by itself
-  const escapedContent = unescape(fileContent);
-
-  const json = JSON.parse(escapedContent);
-
-  // decodes all strings from json object recursively
-  const decodedJson = decodeJsonStrings(json);
-
-  return decodedJson;
+  parser.on('data', (docs) => {
+    log.info(`Inserting ${docs.length} docs to ${mealinkerDb.config.db} database`);
+    insertCallback(mealinkerDb, docs);
+  });
 }
 
 async function createDatabase(dbName) {
@@ -98,7 +81,7 @@ async function tryInsertItem(mealinkerDb, identifier, item) {
 
     await mealinkerDb.insert(itemToInsert);
   } catch (e) {
-    console.error(e);
+    log.error(e);
   }
 }
 
@@ -107,7 +90,9 @@ async function insertRecipes(mealinkerDb, recipes) {
   Use Fauxton web app to watch the results being inserted`);
 
   const reqFnc = async (recipe) => {
-    const { jsonld: { identifier } } = recipe;
+    const { jsonld: { url } } = recipe;
+    const identifier = uuidv5(url, NAMESPACE_UUID);
+
     await tryInsertItem(mealinkerDb, identifier, recipe);
   };
 
@@ -148,11 +133,14 @@ async function main() {
   await createDatabase(RECIPES_DATABASE_NAME);
   await createDatabase(INGREDIENTS_DATABASE_NAME);
 
-  const recipes = loadJsonFromFile(RECIPES_PATH);
-  const ingredients = loadJsonFromFile(INGREDIENTS_PATH);
+  loadAndStoreDocs(RECIPES_PATH, insertRecipes, recipeDb);
+  loadAndStoreDocs(INGREDIENTS_PATH, insertIngredients, ingredientsDb);
 
-  insertRecipes(recipeDb, recipes);
-  insertIngredients(ingredientsDb, ingredients);
+  // const recipes = loadJsonFromFile(RECIPES_PATH);
+  // const ingredients = loadJsonFromFile(INGREDIENTS_PATH);
+
+  // insertRecipes(recipeDb, recipes);
+  // insertIngredients(ingredientsDb, ingredients);
 }
 
 (async () => {

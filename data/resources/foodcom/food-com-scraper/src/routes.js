@@ -24,7 +24,7 @@ exports.handleDetail = async (context, recipes) => {
 
     const normalizedJsonld = normalizeObject(recipeJsonLd);
 
-    const identifier = uuid.v5(normalizedJsonld.name, NAMESPACE_UUID);
+    const identifier = uuid.v5(url, NAMESPACE_UUID);
 
     const recipe = {
         jsonld: {

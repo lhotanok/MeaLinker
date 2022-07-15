@@ -1,4 +1,7 @@
 const fs = require('fs');
+const { unescape } = require('html-escaper');
+const { decode } = require('html-entities');
+const JSONStream = require('JSONStream');
 const log4js = require('log4js');
 const log = log4js.getLogger('Extended ingredients injector');
 log.level = 'debug';
@@ -15,12 +18,24 @@ function readFileFromCurrentDir(filePath) {
   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
-function writeFileFromCurrentDir(filePath, content) {
-  return fs.writeFileSync(`${__dirname}/${filePath}`, content);
+function loadJsonFromFile(filePath) {
+  const unescapedContent = unescape(readFileFromCurrentDir(filePath));
+  return JSON.parse(unescapedContent);
 }
 
-function loadJsonFromFile(filePath) {
-  return JSON.parse(readFileFromCurrentDir(filePath));
+function writeJsonStream(records, resultPath) {
+  log.info(`Writing ${records.length} items from JSON array to ${resultPath}`);
+
+  const transformStream = JSONStream.stringify();
+  const outputStream = fs.createWriteStream(`${__dirname}/${resultPath}`);
+
+  transformStream.pipe(outputStream);
+  records.forEach(transformStream.write);
+  transformStream.end();
+
+  outputStream.on('finish', () => {
+    log.info(`Stored the result to ${resultPath}`);
+  });
 }
 
 function loadExtendedDocs(paths, docType) {
@@ -33,7 +48,8 @@ function loadExtendedDocs(paths, docType) {
     extendedDocs.push(...ingredients);
   });
 
-  return extendedDocs;
+  log.info(`Decoding html entities in ${docType} JSON...`);
+  return decodeJsonStrings(extendedDocs);
 }
 
 function buildSimpleIngredients(extendedIngredients) {
@@ -57,8 +73,17 @@ function injectBestMatchIngredients(extendedIngredients, recipes) {
     const { structured: { ingredients } } = recipe;
 
     for (const recipeIngredient of ingredients) {
+      const text = recipeIngredient.text || recipeIngredient.searchValue;
+
+      if (!text) {
+        log.info(`Found ingredient without text, ignoring the injection.`, {
+          recipeIngredient,
+        });
+        continue;
+      }
+
       let longestMatch = { name: '' };
-      const lowercaseRecipeIngr = recipeIngredient.text.toLowerCase();
+      const lowercaseRecipeIngr = text.toLowerCase();
 
       simpleIngredients.forEach((simpleIngredient) => {
         if (
@@ -86,8 +111,26 @@ function injectBestMatchIngredients(extendedIngredients, recipes) {
   });
 }
 
-function stringifyArray(array) {
-  return '[' + array.map((el) => JSON.stringify(el)).join(',\n') + ']';
+function decodeJsonStrings(json) {
+  if (typeof json === 'string') {
+    return decode(json);
+  } else if (Array.isArray(json)) {
+    return json.map((item) => decodeJsonStrings(item));
+  } else if (!json || typeof json !== 'object') {
+    return json;
+  }
+
+  const decodedObj = {};
+
+  Object.entries(json).forEach(([key, value]) => {
+    if (typeof value === 'object' || typeof value === 'string') {
+      decodedObj[key] = decodeJsonStrings(value);
+    } else {
+      decodedObj[key] = value;
+    }
+  });
+
+  return decodedObj;
 }
 
 function main() {
@@ -100,12 +143,8 @@ function main() {
 
   injectBestMatchIngredients(extendedIngredients, extendedRecipes);
 
-  writeFileFromCurrentDir(EXTENDED_FINAL_RECIPES_PATH, stringifyArray(extendedRecipes));
-
-  writeFileFromCurrentDir(
-    EXTENDED_FINAL_INGREDIENTS_PATH,
-    JSON.stringify(extendedIngredients, null, 2),
-  );
+  writeJsonStream(extendedRecipes, EXTENDED_FINAL_RECIPES_PATH);
+  writeJsonStream(extendedIngredients, EXTENDED_FINAL_INGREDIENTS_PATH);
 
   log.info(
     `Saved the results to ${EXTENDED_FINAL_RECIPES_PATH} and ${EXTENDED_FINAL_INGREDIENTS_PATH}`,

@@ -63,4 +63,8 @@ export type RecipeIngredient = {
   text: string;
   thumbnail?: string;
   label?: LocalizedValue;
+  amountValue?: number;
+  unit?: string;
+  searchValue?: string;
+  category?: string;
 };

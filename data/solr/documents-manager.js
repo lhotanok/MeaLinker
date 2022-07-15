@@ -13,6 +13,7 @@ const {
   MEAL_TYPES,
   NO_COOK_TAG,
   WITHOUT_COOKING_TAG,
+  SAFE_DB_ROWS_LIMIT,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -34,9 +35,22 @@ async function fetchRecipesFromDb() {
   const recipesDatabase = nano.use(RECIPES_DB_NAME);
 
   log.info(`Fetching CouchDB collection: ${RECIPES_DB_NAME} ...`);
-  const recipeDocuments = await recipesDatabase.list({ include_docs: true });
+  let offset = 0;
+  let totalRows = -1;
+  while (totalRows === -1 || offset < totalRows) {
+    const recipeDocuments = await recipesDatabase.list({
+      include_docs: true,
+      skip: offset,
+      limit: SAFE_DB_ROWS_LIMIT,
+    });
+    totalRows = recipeDocuments.total_rows;
 
-  recipeDocuments.rows.forEach(({ doc }) => recipes.push(filterRecipeIndexedFields(doc)));
+    recipeDocuments.rows.forEach(({ doc }) =>
+      recipes.push(filterRecipeIndexedFields(doc)),
+    );
+    offset += SAFE_DB_ROWS_LIMIT;
+    log.info(`Current recipes length: ${recipes.length}, total rows: ${totalRows}`);
+  }
 
   return recipes;
 }
@@ -205,7 +219,9 @@ async function pushDocumentsToSolr(documents, core) {
 
 async function injectSearchIngredientsToRecipes(ingredients, recipes) {
   const recipesMap = {};
-  recipes.forEach((recipe) => (recipesMap[recipe.id] = recipe));
+  recipes.forEach(
+    (recipe) => (recipesMap[recipe.id] = { ...recipe, _ingredientsFacet: [] }),
+  );
 
   const { HOST, PORT, SECURE } = SOLR;
 
@@ -226,13 +242,11 @@ async function injectSearchIngredientsToRecipes(ingredients, recipes) {
     const searchResponse = await client.search(query);
     const { docs } = searchResponse.response;
 
-    docs.forEach((doc) => {
-      if (!recipesMap[doc.id]._ingredientsFacet) {
-        recipesMap[doc.id]._ingredientsFacet = [];
-      }
-
-      recipesMap[doc.id]._ingredientsFacet.push(label);
-    });
+    await Promise.all(
+      docs.map((doc) => recipesMap[doc.id]._ingredientsFacet.push(label)),
+    ).then(() =>
+      log.info(`Injected search ingredient ${ingredient} to ${docs.length} recipes`),
+    );
   }
 
   return Object.values(recipesMap);

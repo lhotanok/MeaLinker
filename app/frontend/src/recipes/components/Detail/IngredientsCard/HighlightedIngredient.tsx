@@ -14,13 +14,21 @@ type HighlightedIngredientProps = {
 export default function HighlightedIngredient({
   ingredient,
 }: HighlightedIngredientProps) {
-  const { identifier, label = { '@value': '' }, thumbnail, text } = ingredient;
+  const {
+    identifier,
+    label = { '@value': '' },
+    thumbnail,
+    text: originaltext,
+    unit,
+  } = ingredient;
 
   const navigate = useNavigate();
 
   const handleViewClick = (ingredientId: string) => {
     navigate(`/ingredients/${ingredientId}`);
   };
+
+  const text = `${unit ? `${unit}` : ''}${originaltext}`;
 
   const lowercaseLabel = label['@value'].toLowerCase();
   const containsHrefLink = text.match(A_HREF_GROUPS_REGEX);

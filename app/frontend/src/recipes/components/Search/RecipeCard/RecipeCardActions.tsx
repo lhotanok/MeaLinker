@@ -8,7 +8,7 @@ import { buildPlural } from '../../../../shared/tools/value-prettifier';
 
 type RecipeCardActionsProps = {
   expanded: boolean;
-  stepsCount: number;
+  stepsCount?: number;
   onExpandClick: React.MouseEventHandler<HTMLButtonElement>;
   onViewClick: React.MouseEventHandler<HTMLButtonElement>;
 };
@@ -25,8 +25,9 @@ export default function RecipeCardActions({
         View
       </Button>
       <Typography marginLeft={0.5} align='center' color='text.secondary'>
-        {buildPlural('step', stepsCount)}
+        {stepsCount ? buildPlural('step', stepsCount) : ''}
       </Typography>
+
       <Stack direction='row' marginLeft='auto'>
         <IngredientsButton
           size='medium'

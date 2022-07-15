@@ -1,7 +1,12 @@
+import { Grid, Box } from '@mui/material';
+import { Fragment } from 'react';
+import { Measurable } from '../../recipes/types/FullRecipe';
 import NutritionGrid from '../../shared/components/NutritionGrid';
 import { ICON_PATHS } from '../../shared/constants';
 import { NutritionIconValue } from '../../shared/types/NutritionIconValue';
-import { FullIngredient } from '../types/FullIngredient';
+import { GRAM_TYPE_IRI, MILLIGRAM_TYPE_IRI } from '../constants';
+import { FullIngredient, MeasuredValue } from '../types/FullIngredient';
+import NutritionDivider from './NutritionDivider';
 
 type IngredientNutritionProps = {
   ingredient: FullIngredient;
@@ -11,7 +16,8 @@ export default function IngredientNutrition({ ingredient }: IngredientNutritionP
   const { carbs, fat, fiber, kj, protein, sugars } = ingredient.jsonld;
 
   const KCAL_TO_KJ = 4.184; // 4.184 kilojoule = 1 kilocalorie
-  const calories = kj ? Number((kj / KCAL_TO_KJ).toFixed(2)) : undefined;
+  const kilojoules = Array.isArray(kj) ? kj[0] : kj;
+  const calories = kilojoules ? Number((kilojoules / KCAL_TO_KJ).toFixed(2)) : undefined;
 
   const {
     caloriesIcon,
@@ -31,6 +37,31 @@ export default function IngredientNutrition({ ingredient }: IngredientNutritionP
     { name: 'Fat', icon: fatIcon, value: fat },
   ];
 
+  const nutritionItems = buildNutritionItems(nutritionWithIcons);
+
+  return (
+    <Fragment>
+      {nutritionItems.length > 0 && (
+        <Grid item>
+          <NutritionDivider />
+        </Grid>
+      )}
+      <Grid item xs>
+        <Box height='100%' pt={10}>
+          <NutritionGrid nutritionItems={nutritionItems} xs={false} />
+        </Box>
+      </Grid>
+    </Fragment>
+  );
+}
+
+const buildNutritionItems = (
+  nutritionWithIcons: {
+    name: string;
+    icon: string;
+    value?: number | MeasuredValue | MeasuredValue[];
+  }[],
+): NutritionIconValue[] => {
   const nutritionItems: NutritionIconValue[] = [];
 
   nutritionWithIcons.forEach((nutrition) => {
@@ -44,10 +75,20 @@ export default function IngredientNutrition({ ingredient }: IngredientNutritionP
           ? Number(measuredValue['@value'])
           : measuredValue;
 
-      const nutritionValue: NutritionIconValue = { ...nutrition, value };
+      const measurableValue: Measurable = { value, unit: '' };
+
+      if (typeof measuredValue === 'object') {
+        if (measuredValue['@type'] === GRAM_TYPE_IRI) {
+          measurableValue.unit = 'g';
+        } else if (measuredValue['@type'] === MILLIGRAM_TYPE_IRI) {
+          measurableValue.unit = 'mg';
+        }
+      }
+
+      const nutritionValue: NutritionIconValue = { ...nutrition, value: measurableValue };
       nutritionItems.push(nutritionValue);
     }
   });
 
-  return <NutritionGrid nutritionItems={nutritionItems} xs={false} />;
-}
+  return nutritionItems;
+};

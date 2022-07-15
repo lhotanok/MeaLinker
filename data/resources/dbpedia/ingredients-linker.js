@@ -65,22 +65,31 @@ function buildDbpediaIngredientsFetchRequests(resources) {
 async function fetchDbpediaIngredients(fetchRequests) {
   const ingredients = [];
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   log.info('Fetching ingredients from DBpedia sparql endpoint...');
 
   const reqFnc = async (request) => {
-    const { body } = await Apify.utils.requestAsBrowser({ url: request });
-    const jsonld = JSON.parse(body);
+    await delay(1500);
 
-    const jsonldIngredients = jsonld['@graph'];
-    log.info(`Fetched ${jsonldIngredients.length} ingredients`);
+    const { body } = await Apify.utils.requestAsBrowser({
+      url: request,
+    });
+    try {
+      const jsonld = JSON.parse(body);
+      const jsonldIngredients = jsonld['@graph'];
+      log.info(`Fetched ${jsonldIngredients.length} ingredients`);
 
-    if (jsonldIngredients) {
-      const commonContext = jsonld['@context'];
+      if (jsonldIngredients) {
+        const commonContext = jsonld['@context'];
 
-      const mergedIngredients = jsonldIngredients.map((ingredient) =>
-        mergeIngredientWithContext(ingredient, commonContext),
-      );
-      ingredients.push(...mergedIngredients);
+        const mergedIngredients = jsonldIngredients.map((ingredient) =>
+          mergeIngredientWithContext(ingredient, commonContext),
+        );
+        ingredients.push(...mergedIngredients);
+      }
+    } catch (e) {
+      log.info(`Error occurred. Probably request limit exceeded.`);
     }
   };
 

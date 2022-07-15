@@ -92,11 +92,7 @@ export default function IngredientDetail() {
                         ingredient={ingredient}
                       />
                     </Grid>
-                    <Grid item xs>
-                      <Box height='100%' pt={7}>
-                        <IngredientNutrition ingredient={ingredient} />
-                      </Box>
-                    </Grid>
+                    <IngredientNutrition ingredient={ingredient} />
                   </Grid>
                   <IngredientDescription
                     abstract={ingredient.jsonld.abstract}

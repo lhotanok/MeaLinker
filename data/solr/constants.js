@@ -10,6 +10,8 @@ exports.FIELD_TYPES = {
   STRING: 'string',
 };
 
+exports.SAFE_DB_ROWS_LIMIT = 30000;
+
 exports.FOOD_COM_SEARCH_INGREDIENTS_PATH =
   '../resources/foodcom/ingredients/search_ingredients.json';
 
@@ -117,3 +119,4 @@ exports.MEAL_TYPES = [
 
 exports.NO_COOK_TAG = 'No Cook';
 exports.WITHOUT_COOKING_TAG = 'Without Cooking';
+

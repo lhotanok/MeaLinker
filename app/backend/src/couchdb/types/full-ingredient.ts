@@ -37,6 +37,6 @@ export type FullIngredient = {
     fat?: MeasuredValue | MeasuredValue[];
     fiber?: MeasuredValue | MeasuredValue[];
     protein?: MeasuredValue | MeasuredValue[];
-    kj?: number;
+    kj?: number | number[];
   };
 };
