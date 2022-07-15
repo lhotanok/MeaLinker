@@ -46,7 +46,7 @@ export default function SearchedFilters({
           </Stack>
         </FlexBox>
       </Grid>
-      {otherFiltersChips.length > 0 && (
+      {[...ingredientChips, ...otherFiltersChips].length > 0 && (
         <Grid item>
           <FlexBox>
             <IconButton key='remove-all-chips' size='large' onClick={() => onRemoveAll()}>

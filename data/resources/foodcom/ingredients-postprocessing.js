@@ -9,6 +9,7 @@ const {
   UNIQUE_INGR_WITH_IDS_PATH,
   EXTENDED_INGREDIENTS_PATH,
   MIN_INGREDIENT_NAME_LENGTH,
+  CATEGORY_PREFIX_REGEX,
 } = require('./constants');
 
 function readFile(filePath) {
@@ -65,6 +66,69 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds, uniqueIngredients) {
     }
   });
 
+  return mergedIngredients;
+}
+
+function mergeIngredientsWithStructuredInfo(extendedIngredients) {
+  const mergedIngredients = {};
+
+  const iriToIdAndLabel = {};
+  const categoriesWithIngrs = {};
+
+  Object.values(extendedIngredients).forEach((ingredient) => {
+    const id = ingredient.jsonld['@id'];
+    iriToIdAndLabel[id] = {
+      id: ingredient.identifier,
+      name: ingredient.jsonld.label['@value'],
+    };
+  });
+
+  Object.values(extendedIngredients).forEach((extendedIngredient) => {
+    const { identifier, jsonld: { subject = [], ingredient = [] } } = extendedIngredient;
+
+    const subjects = Array.isArray(subject) ? subject : [subject];
+    const categories = subjects.map((category) =>
+      category.replace(CATEGORY_PREFIX_REGEX, '').replace(/_+/g, ' '),
+    );
+
+    categories.forEach((category) => {
+      if (!categoriesWithIngrs[category]) {
+        categoriesWithIngrs[category] = [];
+      }
+
+      categoriesWithIngrs[category].push(extendedIngredient);
+    });
+
+    const ingredients = Array.isArray(ingredient) ? ingredient : [ingredient];
+    const madeOfIngredients = ingredients
+      .map((ingr) => iriToIdAndLabel[ingr])
+      .filter((ingr) => ingr);
+
+    mergedIngredients[identifier] = {
+      ...extendedIngredient,
+      structured: { madeOfIngredients },
+    };
+  });
+
+  Object.entries(categoriesWithIngrs).forEach(([categoryName, ingredients]) => {
+    ingredients.forEach((ingredient) => {
+      const { identifier } = ingredient;
+      if (!mergedIngredients[identifier].structured.categories) {
+        mergedIngredients[identifier].structured.categories = [];
+      }
+
+      mergedIngredients[identifier].structured.categories.push({
+        name: categoryName,
+        ingredients: ingredients
+          .map((ingr) => {
+            const { identifier: id, jsonld: { label } } = ingr;
+            return { id, name: label['@value'] };
+          })
+          .filter(({ id }) => id !== identifier),
+      });
+    });
+  });
+
   return Object.values(mergedIngredients);
 }
 
@@ -86,11 +150,13 @@ function main() {
     uniqueIngredients,
   );
 
-  console.log(`Created ${mergedIngredients.length} merged ingredients`);
+  const structuredIngredients = mergeIngredientsWithStructuredInfo(mergedIngredients);
+
+  console.log(`Created ${structuredIngredients.length} merged ingredients`);
 
   writeFileFromCurrentDir(
     EXTENDED_INGREDIENTS_PATH,
-    JSON.stringify(mergedIngredients, null, 2),
+    JSON.stringify(structuredIngredients, null, 2),
   );
 }
 

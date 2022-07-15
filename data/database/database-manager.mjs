@@ -27,15 +27,6 @@ import { FILE_ENCODING, NAMESPACE_UUID } from '../constants.js';
 
 const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
-// function readFileFromCurrentDir(filePath) {
-//   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
-// }
-
-// function loadJsonFromFile(filePath) {
-//   const fileContent = readFileFromCurrentDir(filePath);
-//   return JSON.parse(fileContent);
-// }
-
 function loadAndStoreDocs(filePath, insertCallback, mealinkerDb) {
   log.info(`Reading JSON from ${filePath}`);
 
@@ -135,12 +126,6 @@ async function main() {
 
   loadAndStoreDocs(RECIPES_PATH, insertRecipes, recipeDb);
   loadAndStoreDocs(INGREDIENTS_PATH, insertIngredients, ingredientsDb);
-
-  // const recipes = loadJsonFromFile(RECIPES_PATH);
-  // const ingredients = loadJsonFromFile(INGREDIENTS_PATH);
-
-  // insertRecipes(recipeDb, recipes);
-  // insertIngredients(ingredientsDb, ingredients);
 }
 
 (async () => {

@@ -28,7 +28,7 @@ export default function HighlightedIngredient({
     navigate(`/ingredients/${ingredientId}`);
   };
 
-  const text = `${unit ? `${unit}` : ''}${originaltext}`;
+  const text = `${unit ? `${unit} ` : ''}${originaltext}`;
 
   const lowercaseLabel = label['@value'].toLowerCase();
   const containsHrefLink = text.match(A_HREF_GROUPS_REGEX);

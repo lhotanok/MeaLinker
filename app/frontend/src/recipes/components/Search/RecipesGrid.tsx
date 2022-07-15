@@ -10,12 +10,12 @@ type RecipesGridProps = {
 export default function RecipesGrid({ recipes }: RecipesGridProps) {
   return (
     <Container>
-      <Grid container spacing={4}>
+      <Grid container spacing={4} justifyContent='center'>
         {recipes.map((recipe, index) => {
           const props = { ...recipe, position: index };
 
           return (
-            <Grid item key={recipe.id} xs>
+            <Grid item key={recipe.id} xs={recipes.length !== 2 ? true : false}>
               <RecipeCard {...props} />
             </Grid>
           );

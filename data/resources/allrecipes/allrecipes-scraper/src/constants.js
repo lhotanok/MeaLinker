@@ -32,3 +32,5 @@ exports.LABELS = {
     LIST: 'LIST',
     DETAIL: 'DETAIL',
 };
+
+exports.DEFAULT_IMAGE = 'https://www.allrecipes.com/img/misc/og-default.png';

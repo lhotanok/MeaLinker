@@ -12,15 +12,19 @@ const IngredientHeader: React.FC<{
   if (error) headlineText = 'Ingredient could not be loaded';
   if (isLoading) headlineText = '';
 
+  const jsonldCountry = ingredient.jsonld.country || '';
+  const country =
+    typeof jsonldCountry === 'object' ? jsonldCountry['@value'] : jsonldCountry;
+
   return (
     <Box>
       {isLoading && <LinearLoadingProgress />}
       <Typography component='h1' variant='h4' color='text.primary' gutterBottom>
         {headlineText}
       </Typography>
-      {ingredient.jsonld.country && (
+      {country && (
         <Typography color='text.secondary' gutterBottom>
-          Origin: {ingredient.jsonld.country.replace(/^.*\//gi, '').replace(/_+/g, ' ')}
+          Origin: {country.replace(/^.*\//gi, '').replace(/_+/g, ' ')}
         </Typography>
       )}
       {ingredient.jsonld.thumbnail && (
@@ -33,7 +37,7 @@ const IngredientHeader: React.FC<{
               ingredient.name
             )
           }
-          maxHeight={400}
+          maxHeight={350}
           buttonGroupSize='small'
           buttonGroupPb={1}
         />

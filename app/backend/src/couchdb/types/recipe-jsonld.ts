@@ -3,7 +3,7 @@ export type RecipeJsonld = {
   '@type': string;
   mainEntityOfPage: boolean;
   name: string;
-  author: string;
+  author: string | JsonldName | JsonldName[];
   cookTime: string;
   prepTime: string;
   totalTime: string;
@@ -21,6 +21,11 @@ export type RecipeJsonld = {
   publisher: Publisher;
   url: string;
   identifier: string;
+};
+
+export type JsonldName = {
+  '@type': string;
+  'name': string;
 };
 
 export type AggregateRating = {

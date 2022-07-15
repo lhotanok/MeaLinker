@@ -12,6 +12,7 @@ const {
   RECIPE_PATHS,
   EXTENDED_FINAL_RECIPES_PATH,
   EXTENDED_FINAL_INGREDIENTS_PATH,
+  DEFAULT_ALLRECIPES_IMAGE,
 } = require('./constants');
 
 function readFileFromCurrentDir(filePath) {
@@ -135,10 +136,12 @@ function decodeJsonStrings(json) {
 
 function main() {
   const extendedIngredients = loadExtendedDocs(EXTENDED_INGREDIENT_PATHS, 'ingredients');
-  const extendedRecipes = loadExtendedDocs(RECIPE_PATHS, 'recipes');
+  const extendedRecipes = loadExtendedDocs(RECIPE_PATHS, 'recipes').filter(
+    (recipe) => recipe.jsonld.image !== DEFAULT_ALLRECIPES_IMAGE,
+  );
 
   log.info(
-    `Loaded ${extendedIngredients.length} ingredients and ${extendedRecipes.length} recipes in total`,
+    `Loaded ${extendedIngredients.length} ingredients and ${extendedRecipes.length} recipes with images in total`,
   );
 
   injectBestMatchIngredients(extendedIngredients, extendedRecipes);

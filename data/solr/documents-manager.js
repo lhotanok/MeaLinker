@@ -14,6 +14,8 @@ const {
   NO_COOK_TAG,
   WITHOUT_COOKING_TAG,
   SAFE_DB_ROWS_LIMIT,
+  REPLACE_TAG_BACK_PART,
+  REPLACE_TAG_FRONT_PART,
 } = require('./constants');
 const nano = require('nano')(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
 
@@ -29,7 +31,7 @@ function loadJsonFromFile(filePath) {
   return JSON.parse(fileContent);
 }
 
-async function fetchRecipesFromDb() {
+async function fetchRecipesFromDb(searchIngredients) {
   const recipes = [];
 
   const recipesDatabase = nano.use(RECIPES_DB_NAME);
@@ -46,7 +48,7 @@ async function fetchRecipesFromDb() {
     totalRows = recipeDocuments.total_rows;
 
     recipeDocuments.rows.forEach(({ doc }) =>
-      recipes.push(filterRecipeIndexedFields(doc)),
+      recipes.push(filterRecipeIndexedFields(doc, searchIngredients)),
     );
     offset += SAFE_DB_ROWS_LIMIT;
     log.info(`Current recipes length: ${recipes.length}, total rows: ${totalRows}`);
@@ -87,7 +89,7 @@ function getParsedDate(datePublished) {
 function extractSpecificTags(tags, specificTags) {
   const specifics = specificTags.filter((specific) => {
     for (const tag of tags) {
-      if (tag.toLowerCase().startsWith(specific.toLowerCase())) {
+      if (tag.toLowerCase().includes(specific.toLowerCase())) {
         return true;
       }
     }
@@ -119,7 +121,42 @@ function buildTimeTags(totalMinutes) {
   return timeTags;
 }
 
-function filterRecipeIndexedFields(recipe) {
+function mergeTags(tags, recipeCategory, cookMinutes) {
+  const noCookTags = cookMinutes ? [] : [WITHOUT_COOKING_TAG];
+
+  const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
+  const mergedTags = [
+    ...tags.filter((tag) => tag !== NO_COOK_TAG),
+    ...categories,
+    ...noCookTags,
+  ]
+    .filter((tag) => tag)
+    .map((tag) =>
+      tag
+        .replace(REPLACE_TAG_BACK_PART, '')
+        .replace(REPLACE_TAG_FRONT_PART, '')
+        .replace(/dairy-free/gi, 'Dairy Free')
+        .replace(/gluten-free/gi, 'Gluten Free')
+        .replace(/^dessert$/gi, 'Desserts')
+        .replace(/^drinks$/gi, 'Beverages'),
+    );
+
+  return mergedTags;
+}
+
+function filterTags(mergedTags, specificTags) {
+  const filteredTags = Array.from(
+    new Set(
+      mergedTags.filter(
+        (tag) => !specificTags.includes(tag.toLowerCase()) && !tag.startsWith('<'),
+      ),
+    ),
+  );
+
+  return filteredTags;
+}
+
+function filterRecipeIndexedFields(recipe, searchIngredients) {
   const { _id, jsonld, structured } = recipe;
 
   const {
@@ -129,6 +166,7 @@ function filterRecipeIndexedFields(recipe) {
     recipeCategory,
     datePublished,
     recipeIngredient: ingredients,
+    recipeInstructions: steps,
   } = jsonld;
   const { tags, rating, stepsCount, time, nutritionInfo } = structured;
   const {
@@ -146,32 +184,33 @@ function filterRecipeIndexedFields(recipe) {
   const totalMinutes = getDurationInMinutes(time.total);
   const cookMinutes = getDurationInMinutes(time.cooking);
 
-  const noCookTags = cookMinutes ? [] : [WITHOUT_COOKING_TAG];
-
-  const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
-  const mergedTags = [
-    ...tags.filter((tag) => tag !== NO_COOK_TAG),
-    ...categories,
-    ...noCookTags,
-  ].filter((tag) => tag);
+  const mergedTags = mergeTags(tags, recipeCategory, cookMinutes);
 
   const cuisines = extractSpecificTags(mergedTags, CUISINES);
   const diets = extractSpecificTags(mergedTags, DIETS);
-  const mealTypes = extractSpecificTags(mergedTags, MEAL_TYPES);
+  const mealTypes = extractSpecificTags(
+    mergedTags.map((tag) => tag.replace(/drinks$/gi, 'Beverages')),
+    MEAL_TYPES,
+  );
 
   const timeTags = buildTimeTags(totalMinutes);
 
-  const specificTags = [...cuisines, ...diets, ...mealTypes, ...timeTags];
-  const filteredTags = mergedTags.filter(
-    (tag) => !specificTags.includes(tag) && !tag.startsWith('<'),
-  );
+  const specificTags = [
+    ...cuisines,
+    ...diets,
+    ...mealTypes,
+    ...timeTags,
+    ...searchIngredients,
+  ].map((tag) => tag.toLowerCase());
+
+  const filteredTags = filterTags(mergedTags, specificTags);
 
   const filteredRecipe = {
     id: _id,
     name,
     image,
     description,
-    stepsCount,
+    stepsCount: stepsCount || steps.length,
     rating: rating.value,
     reviewsCount: rating.reviews,
     tags: filteredTags,
@@ -217,7 +256,7 @@ async function pushDocumentsToSolr(documents, core) {
   log.info(`Commit response: ${JSON.stringify(commitResponse, null, 2)}`);
 }
 
-async function injectSearchIngredientsToRecipes(ingredients, recipes) {
+async function injectSearchIngredientsToRecipes(ingredientLabels, recipes) {
   const recipesMap = {};
   recipes.forEach(
     (recipe) => (recipesMap[recipe.id] = { ...recipe, _ingredientsFacet: [] }),
@@ -233,28 +272,36 @@ async function injectSearchIngredientsToRecipes(ingredients, recipes) {
   });
 
   log.info(
-    `Fetching all recipes to match them with search ingredients. Processing ${ingredients.length} recipe search queries...`,
+    `Fetching all recipes to match them with search ingredients. Processing ${ingredientLabels.length} recipe search queries...`,
   );
 
-  for (const ingredient of ingredients) {
-    const label = ingredient.label['@value'];
+  for (const label of ingredientLabels) {
     const query = client.query().q(`ingredients: "${label}"`).qop('AND').rows(500000);
     const searchResponse = await client.search(query);
     const { docs } = searchResponse.response;
 
     await Promise.all(
       docs.map((doc) => recipesMap[doc.id]._ingredientsFacet.push(label)),
-    ).then(() =>
-      log.info(`Injected search ingredient ${ingredient} to ${docs.length} recipes`),
     );
+    // ).then(() =>
+    //   log.info(
+    //     `Injected search ingredient ${ingredient.label[
+    //       '@value'
+    //     ]} to ${docs.length} recipes`,
+    //   ),
+    // );
   }
 
   return Object.values(recipesMap);
 }
 
 async function main() {
-  const recipes = await fetchRecipesFromDb();
   const searchIngredients = loadJsonFromFile(FOOD_COM_SEARCH_INGREDIENTS_PATH);
+  const searchIngredientLabels = searchIngredients.map(
+    (ingredient) => ingredient.label['@value'],
+  );
+
+  const recipes = await fetchRecipesFromDb(searchIngredientLabels);
 
   log.info(
     `Extracted ${recipes.length} recipes from CouchDB,
@@ -266,7 +313,7 @@ async function main() {
   await pushDocumentsToSolr(recipes, RECIPES);
 
   const extendedRecipes = await injectSearchIngredientsToRecipes(
-    searchIngredients,
+    searchIngredientLabels,
     recipes,
   );
   await pushDocumentsToSolr(extendedRecipes, RECIPES);

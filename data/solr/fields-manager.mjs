@@ -74,7 +74,7 @@ async function postCopyFields(copyFields, schemaUrl) {
   log.info(`Copy fields posted`, { schemaUrl });
 }
 
-async function postRecipesAddFields() {
+async function postRecipesFields() {
   const { INT, FLOAT, TEXT, STRING } = FIELD_TYPES;
 
   const addFields = {
@@ -126,7 +126,7 @@ async function postRecipesAddFields() {
 }
 
 async function main() {
-  await postRecipesAddFields();
+  await postRecipesFields();
 }
 
 (async () => {

@@ -26,6 +26,7 @@ exports.NON_DIGIT_REGEX = /[^0-9]/g;
 exports.IRI_DEREFERENCE_REGEX = /[<>]/g;
 exports.SEARCH_INGREDIENT_TRUNCATE_REGEX = /^(whole|shredded|self[- ]rising|seedles|natural|seasoned|regular|refrigerated|processed|minute|mild|medium|light|for|large|fresh|cream of|cooked|condensed cream of|chocolate-covered|center[- ]cut|bottled|all[- ]purpose) /gi;
 exports.SEARCH_INGREDIENT_EXCLUDE_REGEX = /^(slice|clove|seed|piece|extract|chip|roast|rol|jar|stick|noodle|half-and-half|cake|shortening|rib|liquid|roma|preserves?|meal)$/gi;
+exports.CATEGORY_PREFIX_REGEX = /^http(s)?:\/\/dbpedia.org\/resource\/Category:/gi;
 
 exports.FOOD_COM_DEFAULT_IMAGE_SRC =
   'https://img.sndimg.com/food/image/upload/q_92,fl_progressive,w_1200,c_scale/v1/gk-static/fdc-new/img/fdc-shareGraphic.png';

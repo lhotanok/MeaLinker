@@ -1,3 +1,5 @@
+import { SimpleIngredient } from './SimpleIngredient';
+
 export type LocalizedValue = {
   '@value': string;
   '@language': string;
@@ -8,8 +10,17 @@ export type MeasuredValue = {
   '@type': string;
 };
 
+export type Category = {
+  name: string;
+  ingredients: SimpleIngredient[];
+};
+
 export type FullIngredient = {
   name: string;
+  structured: {
+    categories: Category[];
+    madeOfIngredients: SimpleIngredient[];
+  };
   jsonld: {
     '@context': Record<
       string,
@@ -23,7 +34,7 @@ export type FullIngredient = {
     label: LocalizedValue;
     comment?: LocalizedValue;
     subject?: string[];
-    country?: string;
+    country?: LocalizedValue | string;
     imageCaption?: LocalizedValue;
     thumbnail?: string;
     ingredient?: string[];

@@ -1,8 +1,6 @@
 exports.RECIPE_JSONLD_TYPE = 'Recipe';
 exports.INGREDIENT_JSONLD_TYPE = 'http://dbpedia.org/ontology/ingredient';
 
-exports.RECIPES_PATH = 'recipes.json';
-
 exports.FIELD_TYPES = {
   TEXT: 'text_en',
   INT: 'pint',
@@ -17,9 +15,11 @@ exports.FOOD_COM_SEARCH_INGREDIENTS_PATH =
 
 exports.CUISINES = [
   'European',
+  'Italian',
   'Asian',
   'Mexican',
   'Greek',
+  'French',
   'Australian',
   'Canadian',
   'Chinese',
@@ -42,6 +42,8 @@ exports.CUISINES = [
   'Scandinavian',
   'New Zealand',
   'Scottish',
+  'English',
+  'Irish',
   'South African',
   'Egyptian',
   'Malaysian',
@@ -97,6 +99,7 @@ exports.DIETS = [
   'Low Cholesterol',
   'Low Protein',
   'Vegan',
+  'Vegetarian',
   'Very Low Carbs',
   'High Protein',
   'Egg Free',
@@ -104,6 +107,7 @@ exports.DIETS = [
   'Kosher',
   'High Fiber',
   'Dairy Free',
+  'Gluten Free',
 ];
 
 exports.MEAL_TYPES = [
@@ -115,8 +119,18 @@ exports.MEAL_TYPES = [
   'Savory',
   'Salad Dressings',
   'One Dish Meal',
+  'Main Dishes',
+  'Side Dishes',
+  'Appetizers',
+  'Cocktails',
+  'Casseroles',
+  'Relishes',
+  'Dips',
+  'Sauces and Condiments',
 ];
 
 exports.NO_COOK_TAG = 'No Cook';
 exports.WITHOUT_COOKING_TAG = 'Without Cooking';
 
+exports.REPLACE_TAG_BACK_PART = / (recipes|foods)$/gi;
+exports.REPLACE_TAG_FRONT_PART = /^allrecipes allstars/gi;

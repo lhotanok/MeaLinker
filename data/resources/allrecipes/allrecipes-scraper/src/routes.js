@@ -19,6 +19,7 @@ const {
     EXPANDED_DETAIL_SELECTOR,
     INGR_AMOUNT_VALUE_ATTRIBUTE,
     REAL_INGR_TEXT_SELECTOR,
+    DEFAULT_IMAGE,
 } = require('./constants');
 const { getStructuredRecipeInfo } = require('./parser');
 
@@ -54,8 +55,11 @@ exports.handleDetail = async (context, recipes) => {
         },
     };
 
-    if (recipe.structured.nutritionInfo) {
-        // save only recipes with nutrition info
+    if (recipe.structured.nutritionInfo
+        && recipe.jsonld.image
+        && recipe.jsonld.image !== DEFAULT_IMAGE
+    ) {
+        // save only recipes with nutrition info and custom image
         recipes.push(recipe);
 
         log.info(`Saved ${recipes.length} recipes in jsonld format into dataset`);
