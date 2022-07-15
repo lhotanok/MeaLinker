@@ -59,7 +59,7 @@ export default function RecipeCard(props: RecipeCardProps) {
     <Card
       ref={cardRef}
       sx={{
-        maxWidth: 400,
+        maxWidth: 350,
         margin: 'auto',
         height: '100%',
         display: 'flex',

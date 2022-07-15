@@ -130,19 +130,22 @@ export default function IngredientDetail() {
           <Divider variant='middle' sx={{ paddingY: 4 }} />
         </Container>
         <FlexBox>
-          <Typography
-            component='h1'
-            variant='h5'
-            color='text.secondary'
-            p={4}
-            ref={headerRef}
-          >
-            {totalCount !== null &&
-              `${ingredient.jsonld.label['@value']} is part of ${buildPlural(
-                'recipe',
-                addThousandsSeparator(totalCount),
-              )}`}
-          </Typography>
+          <Fragment>
+            {totalCount && (
+              <Typography
+                component='h1'
+                variant='h5'
+                color='text.secondary'
+                p={4}
+                ref={headerRef}
+              >
+                {`${ingredient.jsonld.label['@value']} is part of ${buildPlural(
+                  'recipe',
+                  addThousandsSeparator(totalCount),
+                )}`}
+              </Typography>
+            )}
+          </Fragment>
         </FlexBox>
         <IngredientRecipes
           totalCount={totalCount}

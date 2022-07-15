@@ -3,13 +3,11 @@ import {
   AccordionSummary,
   Typography,
   AccordionDetails,
-  Chip,
-  Stack,
   Grid,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { SimpleIngredient } from '../types/SimpleIngredient';
-import { Fragment } from 'react';
+import IngredientChip from './IngredientChip';
 
 type IngredientCategoryProps = {
   name: string;
@@ -20,37 +18,25 @@ export default function IngredientCategory({
   name,
   ingredients,
 }: IngredientCategoryProps) {
-  const ingredientChips = ingredients.map((item) => (
-    <Grid item key={item.id}>
-      <Chip
-        label={item.name}
-        component='a'
-        href={`/ingredients/${item.id}`}
-        clickable
-        color='secondary'
-      />
-    </Grid>
-  ));
-
   return (
-    <Fragment>
-      {ingredientChips.length > 0 && (
-        <Accordion color='black'>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls='panel1a-content'
-            id='panel1a-header'
-            color='#000000'
-          >
-            <Typography>{name}</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={1}>
-              {ingredientChips}
+    <Accordion color='black'>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls='panel1a-content'
+        id='panel1a-header'
+        color='#000000'
+      >
+        <Typography>{name}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Grid container spacing={1}>
+          {ingredients.map((item) => (
+            <Grid item key={item.id}>
+              <IngredientChip item={item} />
             </Grid>
-          </AccordionDetails>
-        </Accordion>
-      )}
-    </Fragment>
+          ))}
+        </Grid>
+      </AccordionDetails>
+    </Accordion>
   );
 }
