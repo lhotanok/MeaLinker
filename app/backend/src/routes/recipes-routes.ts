@@ -9,8 +9,6 @@ import { SolrResponse } from '../solr/types/search-response';
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const recipesModel = new SolrRecipesModel();
-
   const {
     ingredients = '',
     tags = '',
@@ -35,12 +33,18 @@ router.get('/', async (req, res) => {
 
   const searchParameters = parseSearchParameters(searchQueryParams);
 
-  const recipes: SolrResponse<Recipe> =
-    !ingredients && !tags && !cuisine && !diets && !mealTypes && !time
-      ? await recipesModel.getAllRecipes(searchParameters.rows, searchParameters.offset)
-      : await recipesModel.getRecipesByFilters(searchParameters);
+  const recipesModel = new SolrRecipesModel();
 
-  res.status(200).json(recipes);
+  try {
+    const recipes: SolrResponse<Recipe> =
+      !ingredients && !tags && !cuisine && !diets && !mealTypes && !time
+        ? await recipesModel.getAllRecipes(searchParameters.rows, searchParameters.offset)
+        : await recipesModel.getRecipesByFilters(searchParameters);
+
+    res.status(200).json(recipes);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 router.get('/:recipeId', async (req, res) => {

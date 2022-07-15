@@ -13,8 +13,12 @@ router.get('/:ingredientId', async (req, res) => {
   const { params: { ingredientId } } = req;
 
   const couchdbModel = new CouchDbIngredientsModel();
-  const ingredient = await couchdbModel.getIngredientById(ingredientId);
-  res.status(200).json(ingredient);
+  try {
+    const ingredient = await couchdbModel.getIngredientById(ingredientId);
+    res.status(200).json(ingredient);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
 
 export default router;
