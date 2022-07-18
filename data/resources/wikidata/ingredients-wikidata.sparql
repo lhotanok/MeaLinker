@@ -1,0 +1,68 @@
+CONSTRUCT {
+    ?ingredient rdfs:label ?label ;
+                rdfs:comment ?description ;
+                wdt:P18 ?image ;
+                wdt:P462 ?color ;
+                wdt:P487 ?unicodeChar ;
+                wdt:P495 ?countryOfOrigin ;
+                wdt:P527 ?hasParts ;
+                wdt:P186 ?madeFromMaterial ;
+                wdt:P279 ?subclassOfEntity .
+
+    ?subclassOfEntity rdfs:label ?subclassOfLabel
+}
+WHERE {
+    VALUES ?ingredient {
+        ##INGREDIENTS##
+        # Replace this section with ingredient resources in the following format:
+        # <http://www.wikidata.org/entity/Q13360268> <http://www.wikidata.org/entity/Q8495>
+        ##INGREDIENTS##
+    }
+
+    ?ingredient rdfs:label ?label .
+    FILTER (LANG(?label) = "en")
+
+    OPTIONAL {
+        ?ingredient wdt:P18 ?image
+    }
+
+    OPTIONAL {
+        ?ingredient schema:description ?description.
+        FILTER(LANG(?description) = "en")
+    }
+
+    OPTIONAL {
+        ?ingredient wdt:P462 ?colorEntity .
+        ?colorEntity rdfs:label ?color .
+        FILTER (LANG(?color) = "en")
+    }
+
+    OPTIONAL {
+        ?ingredient wdt:P487 ?unicodeChar
+    }
+
+    OPTIONAL {
+        ?ingredient  wdt:P495 ?countryEntity .
+        ?countryEntity rdfs:label ?countryOfOrigin .
+        FILTER (LANG(?countryOfOrigin) = "en")
+    }
+
+    OPTIONAL {
+        ?ingredient wdt:P527 ?hasParts
+    }
+
+    OPTIONAL {
+        ?ingredient wdt:P186 ?madeFromMaterial
+    }
+
+    OPTIONAL {
+        ?ingredient wdt:P279 ?subclassOfEntity .
+        ?subclassOfEntity rdfs:label ?subclassOfLabel ;
+                          wdt:P18 ?subclassImage .
+
+        FILTER (LANG(?subclassOfLabel) = "en")
+        FILTER (STR(?subclassOfLabel) != "food ingredient")
+        FILTER (STR(?subclassOfLabel) != "food")
+        FILTER (STR(?subclassOfLabel) != "anatomical structure (individual)")
+    }
+}
