@@ -25,7 +25,7 @@ export default function SearchHeader({ recipesCount, error }: SearchHeaderProps)
         </Typography>
       </Grid>
       <Grid item pl={2}>
-        {recipesCount === null && <CircularLoadingProgress />}
+        {recipesCount === null && !error && <CircularLoadingProgress />}
       </Grid>
     </Grid>
   );

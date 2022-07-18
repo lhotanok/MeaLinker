@@ -14,6 +14,7 @@ import DirectionsCard from '../components/Detail/DirectionsCard';
 import PrepTimeBox from '../components/Detail/PrepTimeSection/PrepTimeBox';
 import PrepTimeDivider from '../components/Detail/PrepTimeSection/PrepTimeDivider';
 import JsonldHelmet from '../../shared/components/JsonldHelmet';
+import FlexBox from '../../shared/components/FlexBox';
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<FullRecipe>({
@@ -49,7 +50,7 @@ export default function RecipeDetail() {
 
   const viewSourceButton = (
     <Tooltip title={recipe.jsonld.url || ''} placement='left'>
-      <Button size='large' href={recipe.jsonld.url}>
+      <Button size='medium' href={recipe.jsonld.url}>
         View Source
       </Button>
     </Tooltip>
@@ -60,45 +61,56 @@ export default function RecipeDetail() {
 
   return (
     <Fragment>
-      <JsonldHelmet
-        jsonld={JSON.stringify({ ...recipe.jsonld, identifier: undefined })}
-        typeLabel='recipe'
-      />
-      <Container maxWidth='xl'>
-        <Grid container padding={3} pt={6} spacing={6}>
-          {isLoading && <LinearLoadingProgress />}
-          <Grid item key='left-column' lg={7} md={7} sm={12}>
-            <Card>
-              <CardContent>
-                <RecipeHeader
-                  headline={headlineText}
-                  description={recipe.jsonld.description}
-                  rating={recipe.structured.rating}
-                  author={recipe.structured.author || recipe.jsonld.author}
+      {error && (
+        <FlexBox>
+          <Typography variant='h4' pt={5}>
+            {headlineText}
+          </Typography>
+        </FlexBox>
+      )}
+      {!error && (
+        <Fragment>
+          <JsonldHelmet
+            jsonld={JSON.stringify({ ...recipe.jsonld, identifier: undefined })}
+            typeLabel='recipe'
+          />
+          <Container maxWidth='xl'>
+            <Grid container padding={3} pt={6} spacing={6}>
+              {isLoading && <LinearLoadingProgress />}
+              <Grid item key='left-column' lg={7} md={7} sm={12}>
+                <Card>
+                  <CardContent>
+                    <RecipeHeader
+                      headline={headlineText}
+                      description={recipe.jsonld.description}
+                      rating={recipe.structured.rating}
+                      author={recipe.structured.author || recipe.jsonld.author}
+                    />
+                    <PrepTimeDivider totalTime={(recipe.structured.time || {}).total} />
+                    <PrepTimeBox time={recipe.structured.time || {}} />
+                    <ZoomableImage
+                      src={recipe.jsonld.image}
+                      alt={recipe.jsonld.name}
+                      actionButton={viewSourceButton}
+                    />
+                    <Typography pt={1} color='text.secondary'>
+                      {`Published: ${convertToReadableDate(recipe.jsonld.datePublished)}`}
+                    </Typography>
+                  </CardContent>
+                </Card>
+                <DirectionsCard directions={directions} />
+              </Grid>
+              <Grid item key='right-column' xs>
+                <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
+                <IngredientsCard
+                  ingredients={recipe.structured.ingredients}
+                  servings={recipe.jsonld.recipeYield}
                 />
-                <PrepTimeDivider totalTime={(recipe.structured.time || {}).total} />
-                <PrepTimeBox time={recipe.structured.time || {}} />
-                <ZoomableImage
-                  src={recipe.jsonld.image}
-                  alt={recipe.jsonld.name}
-                  actionButton={viewSourceButton}
-                />
-                <Typography pt={1} color='text.secondary'>
-                  {`Published: ${convertToReadableDate(recipe.jsonld.datePublished)}`}
-                </Typography>
-              </CardContent>
-            </Card>
-            <DirectionsCard directions={directions} />
-          </Grid>
-          <Grid item key='right-column' xs>
-            <NutritionCard nutrition={recipe.structured.nutritionInfo || {}} />
-            <IngredientsCard
-              ingredients={recipe.structured.ingredients}
-              servings={recipe.jsonld.recipeYield}
-            />
-          </Grid>
-        </Grid>
-      </Container>
+              </Grid>
+            </Grid>
+          </Container>
+        </Fragment>
+      )}
     </Fragment>
   );
 }

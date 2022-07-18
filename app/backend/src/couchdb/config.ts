@@ -1,4 +1,5 @@
 export const PORT = 5984;
+export const HOST = 'localhost';
 export const USERNAME = 'admin';
 export const PASSWORD = process.env.COUCHDB_PASSWORD;
 export const RECIPES_DATABASE_NAME = 'recipes';

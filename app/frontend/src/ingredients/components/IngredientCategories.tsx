@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardContent, Divider, Stack } from '@mui/material';
+import { Card, CardHeader, CardContent, Stack } from '@mui/material';
 import { Box } from '@mui/system';
 import { Fragment } from 'react';
 import { Category } from '../types/FullIngredient';
@@ -23,21 +23,29 @@ export default function IngredientCategories({ categories }: IngredientCategorie
 
   return (
     <Fragment>
-      <Card elevation={0} sx={{ maxWidth: 700 }}>
-        <CardHeader title='Categories' />
-        <CardContent>
-          <Stack spacing={3}>
-            <CategoryChips categories={categoriesWithoutIngredients} />
-            {categoriesWithIngredients.length > 0 && (
-              <Box>
-                {categoriesWithIngredients.map(({ name, ingredients }) => (
-                  <IngredientCategory key={name} name={name} ingredients={ingredients} />
-                ))}
-              </Box>
-            )}
-          </Stack>
-        </CardContent>
-      </Card>
+      {categories.length > 0 && (
+        <Card elevation={0} sx={{ maxWidth: 700 }}>
+          <CardHeader title='Categories' />
+          <CardContent>
+            <Stack spacing={3}>
+              {categoriesWithoutIngredients.length > 0 && (
+                <CategoryChips categories={categoriesWithoutIngredients} />
+              )}
+              {categoriesWithIngredients.length > 0 && (
+                <Box>
+                  {categoriesWithIngredients.map(({ name, ingredients }) => (
+                    <IngredientCategory
+                      key={name}
+                      name={name}
+                      ingredients={ingredients}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Stack>
+          </CardContent>
+        </Card>
+      )}
     </Fragment>
   );
 }

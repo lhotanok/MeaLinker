@@ -11,7 +11,6 @@ type MadeOfCardProps = {
 export default function MadeOfCard({ madeOfIngredients, alignment }: MadeOfCardProps) {
   return (
     <Fragment>
-      {' '}
       {madeOfIngredients.length > 0 && (
         <Grid item>
           <FlexBox alignment={alignment}>

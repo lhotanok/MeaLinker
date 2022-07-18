@@ -62,6 +62,10 @@ export const buildNutritionItems = (
         }
       }
 
+      if (!measurableValue.unit && nutrition.icon !== ICON_PATHS.caloriesIcon) {
+        measurableValue.unit = 'g';
+      }
+
       const nutritionValue: NutritionIconValue = { ...nutrition, value: measurableValue };
       nutritionItems.push(nutritionValue);
     }

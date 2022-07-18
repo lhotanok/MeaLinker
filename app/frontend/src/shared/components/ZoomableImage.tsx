@@ -3,7 +3,6 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
-import FlexBox from './FlexBox';
 import { LIGHTER_PRIMARY_COLOR, LIGHTER_SECONDARY_COLOR } from '../constants';
 
 type ZoomableImageProps = {
@@ -20,7 +19,7 @@ export default function ZoomableImage({
   alt,
   actionButton,
   maxHeight = 600,
-  buttonGroupSize,
+  buttonGroupSize = 'small',
   buttonGroupPb,
 }: ZoomableImageProps) {
   return (
@@ -55,8 +54,8 @@ export default function ZoomableImage({
                 </ButtonGroup>
               </Grid>
               {actionButton && (
-                <Grid item xs alignContent='right'>
-                  <FlexBox alignment='right'>{actionButton}</FlexBox>
+                <Grid item alignContent='right'>
+                  {actionButton}
                 </Grid>
               )}
             </Grid>

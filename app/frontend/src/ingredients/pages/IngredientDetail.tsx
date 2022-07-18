@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { Box } from '@mui/system';
 import { useState, useEffect, Fragment, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import {
   SimpleRecipe,
   SimpleRecipesResponse,
@@ -22,7 +22,11 @@ import {
   buildNutritionItems,
   parseNutritionFromIngredientJsonld,
 } from '../../shared/tools/nutrition-parser';
-import { prepareRecipes } from '../../shared/tools/request-parser';
+import {
+  buildIngredientSearchUrl,
+  buildRecipesSearchUrl,
+  prepareRecipes,
+} from '../../shared/tools/request-parser';
 import { addThousandsSeparator, buildPlural } from '../../shared/tools/value-prettifier';
 import IngredientCategories from '../components/IngredientCategories';
 import IngredientDescription from '../components/IngredientDescription';
@@ -41,6 +45,7 @@ export default function IngredientDetail() {
   } as FullIngredient);
 
   const params = useParams();
+  const { search } = useLocation();
 
   const [totalCount, setTotalCount] = useState<number | null>(null);
   const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
@@ -50,9 +55,6 @@ export default function IngredientDetail() {
   useEffect(
     () => {
       window.scrollTo(0, 0);
-      const ingredientRequestConfig = {
-        url: `http://localhost:5000/api/ingredients/${params.ingredientId}`,
-      };
 
       const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
         setTotalCount(recipesResponse.totalCount);
@@ -63,18 +65,24 @@ export default function IngredientDetail() {
         document.title = `Ingredient | ${ingredient.jsonld.label['@value']}`;
         setIngredient(ingredient);
 
+        const searchParams = new URLSearchParams(decodeURI(search));
+        searchParams.set('ingredients', encodeURI(ingredient.name));
+
         const recipesRequestConfig = {
-          url: `http://localhost:5000/api/recipes?ingredients=${encodeURI(
-            ingredient.name,
-          )}`,
+          url: buildRecipesSearchUrl(searchParams),
         };
 
         sendRequest(recipesRequestConfig, fetchedRecipesHandler);
       };
 
-      sendRequest(ingredientRequestConfig, fetchedIngredientHandler);
+      if (params.ingredientId) {
+        const ingredientRequestConfig = {
+          url: buildIngredientSearchUrl(params.ingredientId),
+        };
+        sendRequest(ingredientRequestConfig, fetchedIngredientHandler);
+      }
     },
-    [params.ingredientId, sendRequest],
+    [params.ingredientId, sendRequest, search],
   );
 
   const headerRef = useRef<HTMLDivElement>(null);

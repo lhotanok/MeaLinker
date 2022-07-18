@@ -14,6 +14,7 @@ type IngredientRecipesProps = {
 export default function IngredientRecipes({
   totalCount,
   paginatedRecipes,
+
   scrollHandler,
 }: IngredientRecipesProps) {
   const location = useLocation();

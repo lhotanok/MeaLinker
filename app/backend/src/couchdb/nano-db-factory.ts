@@ -1,9 +1,9 @@
-import { PORT, USERNAME, PASSWORD } from './config';
+import { PORT, USERNAME, PASSWORD, HOST } from './config';
 import nanoRoot from 'nano';
 import { FullRecipe } from './types/full-recipe';
 import { FullIngredient } from './types/full-ingredient';
 
-const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@localhost:${PORT}`);
+const nano = nanoRoot(`http://${USERNAME}:${PASSWORD}@${HOST}:${PORT}`);
 
 export interface NanoDb extends nanoRoot.DocumentScope<any> {}
 export interface RecipeNanoDb extends nanoRoot.DocumentScope<FullRecipe> {}

@@ -1,11 +1,11 @@
 import { Tooltip, Button } from '@mui/material';
 import { Fragment } from 'react';
 
-type IngredientSource = {
+type IngredientSourceProps = {
   wikiSource: string;
 };
 
-export default function IngredientSource({ wikiSource }: IngredientSource) {
+export default function IngredientSource({ wikiSource }: IngredientSourceProps) {
   return (
     <Fragment>
       {wikiSource && (

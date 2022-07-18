@@ -102,8 +102,7 @@ const getEncodedParam = (param?: string | string[]): string | undefined => {
 export const encodeArrayToQueryParam = (array: string[]): string =>
   encodeURI(array.join(';'));
 
-export const buildRecipeSearchUrl = (locationSearch: string): string => {
-  const searchParams = new URLSearchParams(decodeURI(locationSearch));
+export const buildRecipesSearchUrl = (searchParams: URLSearchParams): string => {
   const filterParams: Record<string, string> = {};
 
   Object.values(QUERY_PARAM_NAMES).forEach((name) => {
@@ -123,6 +122,10 @@ export const buildRecipeSearchUrl = (locationSearch: string): string => {
   });
 
   return `http://localhost:5000/api/recipes?${apiSearchParams.toString()}`;
+};
+
+export const buildIngredientSearchUrl = (ingredientId: string): string => {
+  return `http://localhost:5000/api/ingredients/${ingredientId}`;
 };
 
 export const prepareRecipes = (

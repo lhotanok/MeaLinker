@@ -11,7 +11,7 @@ import {
   QUERY_PARAM_NAMES,
 } from '../constants';
 import {
-  buildRecipeSearchUrl,
+  buildRecipesSearchUrl,
   buildUrl,
   parseFilters,
   prepareRecipes,
@@ -64,7 +64,7 @@ export default function Recipes() {
       };
 
       const requestConfig = {
-        url: buildRecipeSearchUrl(search),
+        url: buildRecipesSearchUrl(new URLSearchParams(decodeURI(search))),
       };
 
       fetchRecipes(requestConfig, fetchedRecipesHandler);

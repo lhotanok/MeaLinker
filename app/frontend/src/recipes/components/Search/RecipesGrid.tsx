@@ -13,9 +13,15 @@ export default function RecipesGrid({ recipes }: RecipesGridProps) {
       <Grid container spacing={4} justifyContent='center'>
         {recipes.map((recipe, index) => {
           const props = { ...recipe, position: index };
+          const oneOflastTwoCards =
+            index !== recipes.length - 1 && index !== recipes.length - 2;
 
           return (
-            <Grid item key={recipe.id} xs={recipes.length !== 2 ? true : false}>
+            <Grid
+              item
+              key={recipe.id}
+              xs={recipes.length % 3 !== 2 ? true : oneOflastTwoCards ? true : false}
+            >
               <RecipeCard {...props} />
             </Grid>
           );

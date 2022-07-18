@@ -21,7 +21,7 @@ export default function NutritionItem({
       </ListItemAvatar>
       <ListItemText
         primary={name}
-        secondary={nutritionValue && `${value} ${unit ? `${unit}` : ''}`}
+        secondary={nutritionValue && `${value || 0} ${unit ? `${unit}` : ''}`}
         secondaryTypographyProps={{
           width: 80,
         }}

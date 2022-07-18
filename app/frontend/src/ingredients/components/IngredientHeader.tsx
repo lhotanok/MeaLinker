@@ -24,7 +24,7 @@ const IngredientHeader: React.FC<{
       </Typography>
       {country && (
         <Typography color='text.secondary' gutterBottom>
-          Origin: {country.replace(/^.*\//gi, '').replace(/_+/g, ' ')}
+          Place of origin: {country.replace(/^.*\//gi, '').replace(/_+/g, ' ')}
         </Typography>
       )}
       {ingredient.jsonld.thumbnail && (
@@ -37,7 +37,7 @@ const IngredientHeader: React.FC<{
               ingredient.name
             )
           }
-          maxHeight={350}
+          maxHeight={450}
           buttonGroupSize='small'
           buttonGroupPb={1}
         />

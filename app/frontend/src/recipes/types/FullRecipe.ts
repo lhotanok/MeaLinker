@@ -52,7 +52,7 @@ export type RecipeNutrition = {
 };
 
 export type Measurable = {
-  value: number;
+  value: number | null;
   unit: string;
 };
 

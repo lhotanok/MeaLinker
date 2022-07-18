@@ -6,7 +6,6 @@ import TabPanel from '../../../../shared/components/TabPanel';
 import { Fragment, useState } from 'react';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import CuisineIcon from '@mui/icons-material/RamenDining';
-import RatingIcon from '@mui/icons-material/Star';
 import TimeIcon from '@mui/icons-material/AccessTime';
 import MealTypeIcon from '@mui/icons-material/BrunchDining';
 import CloseIcon from '@mui/icons-material/Close';
