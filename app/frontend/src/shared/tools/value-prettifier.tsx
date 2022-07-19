@@ -199,3 +199,7 @@ export const getItemsWithoutCount = (items: string[]): string[] => {
 
   return itemsWithoutCount;
 };
+
+export const convertFirstLetterToUppercase = (text: string): string => {
+  return text ? `${text[0].toUpperCase()}${text.slice(1)}` : text;
+};

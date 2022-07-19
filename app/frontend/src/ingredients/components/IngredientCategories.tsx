@@ -6,14 +6,22 @@ import CategoryChips from './CategoryChips';
 import IngredientCategory from './IngredientCategory';
 
 type IngredientCategoriesProps = {
+  ingredientName: string;
   categories: Category[];
 };
 
-export default function IngredientCategories({ categories }: IngredientCategoriesProps) {
+export default function IngredientCategories({
+  ingredientName,
+  categories,
+}: IngredientCategoriesProps) {
   const categoriesWithoutIngredients: Category[] = [];
   const categoriesWithIngredients: Category[] = [];
 
   categories.forEach((category) => {
+    if (category.name === ingredientName) {
+      return;
+    }
+
     if (category.ingredients.length > 0) {
       categoriesWithIngredients.push(category);
     } else {

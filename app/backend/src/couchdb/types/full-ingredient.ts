@@ -34,9 +34,17 @@ export type FullIngredient = {
     comment?: LocalizedValue;
     subject?: string[];
     country?: LocalizedValue | string;
+    countryOfOrigin?: LocalizedValue;
     imageCaption?: LocalizedValue;
     thumbnail?: string;
-    ingredient?: string[];
+    image?: string | string[];
+    color?: LocalizedValue | LocalizedValue[];
+    subclassOf?: string | string[];
+    unicodeChar?: LocalizedValue | LocalizedValue[];
+    hasParts?: string | string[];
+    description?: LocalizedValue;
+    ingredient?: string | string[];
+    madeFromMaterial?: string | string[];
     abstract?: LocalizedValue;
     isPrimaryTopicOf: string;
     sugars?: MeasuredValue | MeasuredValue[];
@@ -45,5 +53,6 @@ export type FullIngredient = {
     fiber?: MeasuredValue | MeasuredValue[];
     protein?: MeasuredValue | MeasuredValue[];
     kj?: number | number[];
+    sameAs?: string | string[];
   };
 };

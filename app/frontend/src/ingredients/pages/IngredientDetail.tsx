@@ -27,7 +27,11 @@ import {
   buildRecipesSearchUrl,
   prepareRecipes,
 } from '../../shared/tools/request-parser';
-import { addThousandsSeparator, buildPlural } from '../../shared/tools/value-prettifier';
+import {
+  addThousandsSeparator,
+  buildPlural,
+  convertFirstLetterToUppercase,
+} from '../../shared/tools/value-prettifier';
 import IngredientCategories from '../components/IngredientCategories';
 import IngredientDescription from '../components/IngredientDescription';
 import IngredientHeader from '../components/IngredientHeader';
@@ -92,6 +96,8 @@ export default function IngredientDetail() {
     parseNutritionFromIngredientJsonld(ingredient),
   );
 
+  const label = convertFirstLetterToUppercase(ingredient.jsonld.label['@value']);
+
   return (
     <Fragment>
       <JsonldHelmet jsonld={JSON.stringify(ingredient.jsonld)} typeLabel='ingredient' />
@@ -128,6 +134,7 @@ export default function IngredientDetail() {
             <Grid container mt={5}>
               <Grid item>
                 <IngredientCategories
+                  ingredientName={label}
                   categories={ingredient.structured.categories || []}
                 />
               </Grid>
@@ -147,7 +154,7 @@ export default function IngredientDetail() {
                 p={4}
                 ref={headerRef}
               >
-                {`${ingredient.jsonld.label['@value']} is part of ${buildPlural(
+                {`${label} is part of ${buildPlural(
                   'recipe',
                   addThousandsSeparator(totalCount),
                 )}`}

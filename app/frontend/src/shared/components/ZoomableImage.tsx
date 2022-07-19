@@ -10,6 +10,7 @@ type ZoomableImageProps = {
   alt: string;
   actionButton?: JSX.Element;
   maxHeight?: number;
+  maxWidth?: number;
   buttonGroupSize?: 'small' | 'medium' | 'large';
   buttonGroupPb?: number;
 };
@@ -19,6 +20,7 @@ export default function ZoomableImage({
   alt,
   actionButton,
   maxHeight = 600,
+  maxWidth,
   buttonGroupSize = 'small',
   buttonGroupPb,
 }: ZoomableImageProps) {
@@ -26,7 +28,7 @@ export default function ZoomableImage({
     <Box>
       <TransformWrapper wheel={{ wheelDisabled: true }}>
         {({ zoomIn, zoomOut, resetTransform }) => (
-          <Card elevation={0} sx={{ maxHeight }}>
+          <Card elevation={0} sx={{ maxHeight, maxWidth }}>
             <Grid container>
               <Grid item xs pb={buttonGroupPb}>
                 <ButtonGroup
