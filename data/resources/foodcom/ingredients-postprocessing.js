@@ -2,14 +2,11 @@ const fs = require('fs');
 const { FILE_ENCODING } = require('../../constants');
 
 const {
-  FOOD_DBPEDIA_INGREDIENTS_PATH,
-  DBPEDIA_INGREDIENTS_PATH,
-  NON_DIGIT_REGEX,
-  IRI_DEREFERENCE_REGEX,
   UNIQUE_INGR_WITH_IDS_PATH,
   EXTENDED_INGREDIENTS_PATH,
   MIN_INGREDIENT_NAME_LENGTH,
   CATEGORY_PREFIX_REGEX,
+  JSONLD_INGRS_PATH,
 } = require('./constants');
 
 function readFile(filePath) {
@@ -26,33 +23,10 @@ function readJsonFromFile(filePath) {
   return JSON.parse(readFile(filePath));
 }
 
-function getDbpediaIrisMappedToIngredientIds() {
-  const ingredients = {};
-
-  const foodDbpediaLinks = readFile(FOOD_DBPEDIA_INGREDIENTS_PATH).split('\n');
-
-  foodDbpediaLinks.forEach((link) => {
-    const triple = link.split(' ');
-    if (triple.length >= 3) {
-      const foodIri = triple[0];
-      const dbpediaIri = triple[2];
-
-      const ingredientId = foodIri.replace(NON_DIGIT_REGEX, '');
-      const dereferencedIri = dbpediaIri.replace(IRI_DEREFERENCE_REGEX, '');
-
-      ingredients[dereferencedIri] = ingredientId;
-    }
-  });
-
-  return ingredients;
-}
-
-function mergeIngredientsWithJsonlds(irisWithIds, jsonlds, uniqueIngredients) {
+function mergeIngredientsWithJsonlds(jsonldIngredients, uniqueIngredients) {
   const mergedIngredients = {};
 
-  jsonlds.forEach((jsonld) => {
-    const iri = jsonld['@id'];
-    const foodComId = irisWithIds[iri];
+  Object.entries(jsonldIngredients).forEach(([foodComId, jsonld]) => {
     const ingredient = uniqueIngredients[foodComId];
     const { identifier, name } = ingredient;
 
@@ -66,6 +40,7 @@ function mergeIngredientsWithJsonlds(irisWithIds, jsonlds, uniqueIngredients) {
     }
   });
 
+  console.log(`Merged ${Object.keys(mergedIngredients).length} ingredients with jsonlds`);
   return mergedIngredients;
 }
 
@@ -133,26 +108,25 @@ function mergeIngredientsWithStructuredInfo(extendedIngredients) {
 }
 
 function main() {
-  const irisWithIds = getDbpediaIrisMappedToIngredientIds();
-
-  const dbpediaIngredients = readJsonFromFile(DBPEDIA_INGREDIENTS_PATH);
+  const jsonldIngredients = readJsonFromFile(JSONLD_INGRS_PATH);
   const uniqueIngredients = readJsonFromFile(UNIQUE_INGR_WITH_IDS_PATH);
 
   console.log(
-    `Loaded ${dbpediaIngredients.length} dbpedia ingredients and ${Object.keys(
+    `Loaded ${Object.keys(jsonldIngredients).length} jsonld ingredients and ${Object.keys(
       uniqueIngredients,
     ).length} unique ingredients`,
   );
 
   const mergedIngredients = mergeIngredientsWithJsonlds(
-    irisWithIds,
-    dbpediaIngredients,
+    jsonldIngredients,
     uniqueIngredients,
   );
 
   const structuredIngredients = mergeIngredientsWithStructuredInfo(mergedIngredients);
 
-  console.log(`Created ${structuredIngredients.length} merged ingredients`);
+  console.log(
+    `Created ${structuredIngredients.length} ingredients with structured info and jsonlds`,
+  );
 
   writeFileFromCurrentDir(
     EXTENDED_INGREDIENTS_PATH,

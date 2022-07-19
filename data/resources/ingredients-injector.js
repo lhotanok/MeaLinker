@@ -55,12 +55,20 @@ function loadExtendedDocs(paths, docType) {
 
 function buildSimpleIngredients(extendedIngredients) {
   return extendedIngredients.map(
-    ({ identifier, name, jsonld: { label, thumbnail } }) => ({
-      identifier,
-      name: name.toLowerCase(),
-      label,
-      thumbnail,
-    }),
+    ({ identifier, name, jsonld: { label, thumbnail, image } }) => {
+      let bestThumbnail = thumbnail;
+
+      if (image) {
+        bestThumbnail = Array.isArray(image) ? image[0] : image;
+      }
+
+      return {
+        identifier,
+        name: name.toLowerCase(),
+        label,
+        thumbnail: bestThumbnail,
+      };
+    },
   );
 }
 
@@ -92,8 +100,9 @@ function injectBestMatchIngredients(extendedIngredients, recipes) {
           longestMatch.name.length < simpleIngredient.name.length
         ) {
           if (
-            lowercaseRecipeIngr.includes('teaspoon') &&
-            simpleIngredient.name === 'tea'
+            (lowercaseRecipeIngr.includes('teaspoon') &&
+              simpleIngredient.name === 'tea') ||
+            (lowercaseRecipeIngr.includes('peel') && simpleIngredient.name === 'eel')
           ) {
             return;
           }

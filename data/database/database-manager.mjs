@@ -96,7 +96,7 @@ async function insertIngredients(mealinkerDb, ingredients) {
   log.info(
     `Inserting ${ingredients.length} ingredients into ${mealinkerDb.config
       .db} database in parallel...
-      Use Fauxton web app to watch the results being inserted`,
+      Use Fauxton web app to watch the documents being inserted`,
   );
 
   const reqFnc = async (ingredient) => {

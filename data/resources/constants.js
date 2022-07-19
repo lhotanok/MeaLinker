@@ -14,3 +14,5 @@ exports.EXTENDED_FINAL_RECIPES_PATH = 'extended_recipes.json';
 exports.EXTENDED_FINAL_INGREDIENTS_PATH = 'extended_ingredients.json';
 
 exports.DEFAULT_ALLRECIPES_IMAGE = 'https://www.allrecipes.com/img/misc/og-default.png';
+
+exports.INGREDIENTS_SECTION_REGEX = /##INGREDIENTS##(.)*##INGREDIENTS##/gs;

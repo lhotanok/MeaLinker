@@ -1,81 +1,40 @@
 const fs = require('fs');
 const Apify = require('apify');
 const log4js = require('log4js');
-const log = log4js.getLogger('RDF dataset linker');
+const log = log4js.getLogger('DBpedia ingredients linker');
 log.level = 'debug';
 
 const {
-  INGREDIENTS_SECTION_REGEX,
   DBPEDIA_INGREDIENTS_QUERY,
   DBPEDIA_SPARQL_QUERY_PREFIX,
-  DBPEDIA_JSONLD_QUERY_PARAM,
   INGREDIENTS_GROUP_SIZE,
   CONTEXT_KEY_DATATYPE_REGEX,
   DBPEDIA_INGREDIENT_TYPE,
 } = require('./constants');
 const { FILE_ENCODING } = require('../../constants');
+const { buildIngredientsFetchRequests } = require('../sparql-request-builder');
 
 function readFileFromCurrentDir(filePath) {
   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
 }
 
-function createIngredientGroups(resources) {
-  const groups = [];
-
-  let groupNumber = 0;
-
-  while (groupNumber * INGREDIENTS_GROUP_SIZE < resources.length) {
-    const startIndex = groupNumber * INGREDIENTS_GROUP_SIZE;
-    const endIndex = startIndex + INGREDIENTS_GROUP_SIZE;
-
-    const group = resources.slice(startIndex, endIndex);
-    groups.push(group);
-
-    groupNumber++;
-  }
-
-  return groups;
-}
-
-function buildDbpediaIngredientsFetchRequests(resources) {
-  const fetchRequests = [];
-
-  const ingredientGroups = createIngredientGroups(resources);
-  log.info(`Created ${ingredientGroups.length} ingredient groups`);
-
-  const sparqlQuery = readFileFromCurrentDir(DBPEDIA_INGREDIENTS_QUERY);
-
-  for (const group of ingredientGroups) {
-    const joinedIngredients = group.join(' ');
-
-    const injectedIngredientsQuery = sparqlQuery.replace(
-      INGREDIENTS_SECTION_REGEX,
-      joinedIngredients,
-    );
-    const encodedQuery = encodeURIComponent(injectedIngredientsQuery);
-    const fetchRequest = `${DBPEDIA_SPARQL_QUERY_PREFIX}${encodedQuery}&${DBPEDIA_JSONLD_QUERY_PARAM}`;
-
-    fetchRequests.push(fetchRequest);
-  }
-
-  log.info(`Created ${fetchRequests.length} fetch requests`);
-  return fetchRequests;
-}
-
-async function fetchDbpediaIngredients(fetchRequests) {
+async function fetchIngredients(fetchRequests) {
   const ingredients = [];
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const fetchUrls = fetchRequests.map((req) => ({ url: req }));
 
-  log.info('Fetching ingredients from DBpedia sparql endpoint...');
+  const proxyConfiguration = await Apify.createProxyConfiguration();
+  const requestList = await Apify.openRequestList(null, fetchUrls);
 
-  const reqFnc = async (request) => {
-    await delay(1500);
+  const crawler = new Apify.BasicCrawler({
+    requestList,
+    maxConcurrency: 10,
+    handleRequestFunction: async ({ request, session }) => {
+      const { body } = await Apify.utils.requestAsBrowser({
+        url: request.url,
+        proxyUrl: proxyConfiguration.newUrl(session.id),
+      });
 
-    const { body } = await Apify.utils.requestAsBrowser({
-      url: request,
-    });
-    try {
       const jsonld = JSON.parse(body);
       const jsonldIngredients = jsonld['@graph'];
       log.info(`Fetched ${jsonldIngredients.length} ingredients`);
@@ -86,16 +45,15 @@ async function fetchDbpediaIngredients(fetchRequests) {
         const mergedIngredients = jsonldIngredients.map((ingredient) =>
           mergeIngredientWithContext(ingredient, commonContext),
         );
+
         ingredients.push(...mergedIngredients);
       }
-    } catch (e) {
-      log.info(`Error occurred. Probably request limit exceeded.`);
-    }
-  };
+    },
+  });
 
-  await Promise.all(fetchRequests.map((request) => reqFnc(request))).then(() =>
-    log.info(`Fetched ${ingredients.length} DBpedia ingredients in total`),
-  );
+  log.info('Fetching ingredients from DBpedia sparql endpoint...');
+  await crawler.run();
+  log.info(`Fetched ${ingredients.length} ingredients`);
 
   return ingredients;
 }
@@ -134,9 +92,17 @@ function mergeIngredientWithContext(ingredient, commonContext) {
   };
 }
 
-async function fetchDBpediaIngredients(ingredientIris) {
-  const fetchRequests = buildDbpediaIngredientsFetchRequests(ingredientIris);
-  const ingredients = await fetchDbpediaIngredients(fetchRequests);
+async function fetchDBpediaIngredients(ingredientLinks) {
+  const sparqlQuery = readFileFromCurrentDir(DBPEDIA_INGREDIENTS_QUERY);
+
+  const fetchRequests = buildIngredientsFetchRequests(
+    ingredientLinks,
+    sparqlQuery,
+    DBPEDIA_SPARQL_QUERY_PREFIX,
+    INGREDIENTS_GROUP_SIZE,
+  );
+
+  const ingredients = await fetchIngredients(fetchRequests);
 
   return ingredients;
 }
