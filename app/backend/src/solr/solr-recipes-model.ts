@@ -64,34 +64,43 @@ class SolrRecipesModel extends SolrModel {
     const filters: Record<string, string[]> = {
       ingredients,
       tags,
-      cuisine: [cuisine].filter((cuisine) => cuisine),
       diets,
-      time,
       mealTypes,
+      cuisine: [cuisine].filter((cuisine) => cuisine),
+      time: [time].filter((time) => time),
     };
 
-    const qStringValues: string[] = [];
+    const defaultQueryString = this.buildQueryString(filters);
+    const cuisineFacetQueryString = this.buildQueryString({ ...filters, cuisine: [] });
+    const timeFacetQueryString = this.buildQueryString({ ...filters, time: [] });
 
-    Object.entries(filters).forEach(([filterName, filterValue]) => {
-      if (filterValue.length > 0) {
-        qStringValues.push(this.buildPhraseQuery(filterValue, filterName));
-      }
-    });
-
-    const qString = qStringValues.join('\n');
-
-    const query = this.buildQuery(qString, offset, rows, sortOptions).hl({
+    const query = this.buildQuery(defaultQueryString, offset, rows, sortOptions).hl({
       fl: 'ingredients',
       preserveMulti: true,
     });
 
-    const solrResponse = await this.prepareSolrResponse(query);
+    const cuisineFacetQuery = this.buildQuery(cuisineFacetQueryString, 0, 0, sortOptions);
+    const timeFacetQuery = this.buildQuery(timeFacetQueryString, 0, 0, sortOptions);
+
+    const defaultSolrResponse = await this.prepareSolrResponse(query);
+    const cuisineSolrResponse = await this.prepareSolrResponse(cuisineFacetQuery);
+    const timeSolrResponse = await this.prepareSolrResponse(timeFacetQuery);
 
     log.info(
-      `Found ${solrResponse.totalCount} recipes for filters: ${JSON.stringify(
+      `Found ${defaultSolrResponse.totalCount} recipes for filters: ${JSON.stringify(
         filters,
       )}. Fetched recipes ${offset}-${offset + rows}.`,
     );
+
+    const defaultFacets = this.getFacets(defaultSolrResponse);
+    const solrResponse: SolrResponse<Recipe> = {
+      ...defaultSolrResponse,
+      facets: {
+        ...defaultFacets,
+        cuisineFacets: (cuisineSolrResponse.facets || {}).cuisineFacets || [],
+        timeFacets: (timeSolrResponse.facets || {}).timeFacets || [],
+      },
+    };
 
     return solrResponse;
   }
@@ -106,6 +115,36 @@ class SolrRecipesModel extends SolrModel {
       )}`,
     );
     return recipe;
+  }
+
+  private getFacets(solrResponse: SolrResponse<Recipe>): Facets {
+    if (solrResponse.facets) {
+      return solrResponse.facets;
+    }
+
+    return {
+      ingredientFacets: [],
+      tagFacets: [],
+      cuisineFacets: [],
+      dietFacets: [],
+      mealTypeFacets: [],
+      timeFacets: [],
+    };
+  }
+
+  private buildQueryString(filters: Record<string, string[]>): string {
+    const qStringValues: string[] = [];
+
+    Object.entries(filters).forEach(([filterName, filterValue]) => {
+      if (filterValue.length > 0) {
+        qStringValues.push(this.buildPhraseQuery(filterValue, filterName));
+      }
+    });
+
+    // If no filters were provided, search for all documents
+    const qString = qStringValues.length > 0 ? qStringValues.join('\n') : '*:*';
+
+    return qString;
   }
 
   private buildQuery(

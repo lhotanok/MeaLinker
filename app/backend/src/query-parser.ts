@@ -11,7 +11,7 @@ export const parseSearchParameters = (
     cuisine: decodeURI(cuisine),
     diets: parseArrayParam(diets),
     mealTypes: parseArrayParam(mealTypes),
-    time: parseArrayParam(time),
+    time: decodeURI(time),
     rows: Math.min(Number(rows), MAX_RESULTS_COUNT),
     offset: Number(offset),
   };
