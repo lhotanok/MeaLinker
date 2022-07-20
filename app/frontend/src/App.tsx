@@ -7,6 +7,8 @@ import Header from './shared/components/Header';
 import Footer from './shared/components/Footer';
 import IngredientDetail from './ingredients/pages/IngredientDetail';
 import RecipeDetail from './recipes/pages/RecipeDetail';
+import KeepAlive, { AliveScope } from 'react-activation';
+
 import { PRIMARY_COLOR, SECONDARY_COLOR } from './shared/constants';
 
 const theme = createTheme({
@@ -27,12 +29,35 @@ export default function App() {
         <CssBaseline />
         <Header />
         <main>
-          <Routes>
-            <Route path='/recipes' element={<Recipes />} />
-            <Route path='/recipes/:recipeId' element={<RecipeDetail />} />
-            <Route path='/ingredients/:ingredientId' element={<IngredientDetail />} />
-            <Route path='/' element={<Navigate to='/recipes' />} />
-          </Routes>
+          <AliveScope>
+            <Routes>
+              <Route
+                path='/recipes'
+                element={
+                  <KeepAlive cacheKey='Recipes'>
+                    <Recipes />
+                  </KeepAlive>
+                }
+              />
+              <Route
+                path='/recipes/:recipeId'
+                element={
+                  <KeepAlive cacheKey='Recipe'>
+                    <RecipeDetail />
+                  </KeepAlive>
+                }
+              />
+              <Route
+                path='/ingredients/:ingredientId'
+                element={
+                  <KeepAlive cacheKey='Ingredient'>
+                    <IngredientDetail />
+                  </KeepAlive>
+                }
+              />
+              <Route path='/' element={<Navigate to='/recipes' />} />
+            </Routes>
+          </AliveScope>
         </main>
         <Footer />
       </ThemeProvider>

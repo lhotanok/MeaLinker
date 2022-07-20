@@ -58,8 +58,6 @@ export default function IngredientDetail() {
 
   useEffect(
     () => {
-      window.scrollTo(0, 0);
-
       const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
         setTotalCount(recipesResponse.totalCount);
         setPaginatedRecipes(prepareRecipes(recipesResponse));
@@ -71,6 +69,11 @@ export default function IngredientDetail() {
 
         const searchParams = new URLSearchParams(decodeURI(search));
         searchParams.set('ingredients', encodeURI(ingredient.name));
+
+        const page = searchParams.get('page') || '1';
+        if (page === '1') {
+          window.scrollTo(0, 0);
+        }
 
         const recipesRequestConfig = {
           url: buildRecipesSearchUrl(searchParams),

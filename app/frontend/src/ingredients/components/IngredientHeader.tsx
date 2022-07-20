@@ -1,5 +1,4 @@
 import { Box, Divider, Typography } from '@mui/material';
-import { Fragment } from 'react';
 import LinearLoadingProgress from '../../shared/components/LinearLoadingProgress';
 import ZoomableImage from '../../shared/components/ZoomableImage';
 import { convertFirstLetterToUppercase } from '../../shared/tools/value-prettifier';
@@ -83,7 +82,7 @@ const buildShortDescription = (ingredient: FullIngredient): string => {
     ? convertFirstLetterToUppercase(description['@value'])
     : '';
 
-  return prettifiedDesc.replace(/, (use|for)[^Q]*Q.*$/gi, '');
+  return prettifiedDesc.replace(/(,|;) (use|for)[^Q]*Q.*$/gi, '');
 };
 
 const buildImageUrl = (ingredient: FullIngredient): string => {
@@ -112,7 +111,7 @@ const buildEmoji = (ingredient: FullIngredient): string => {
       ? ingredient.jsonld.unicodeChar.map((char) => char['@value']).join(' ')
       : ingredient.jsonld.unicodeChar['@value'];
 
-    return emoji;
+    return emoji.replace(/🫘/gi, '');
   }
 
   return '';

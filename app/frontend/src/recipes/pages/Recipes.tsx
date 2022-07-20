@@ -29,7 +29,7 @@ import useSnackbar from '../../shared/hooks/use-snackbar';
 import { FilterName, Filters } from '../types/Filters';
 import { getFilterHandlers } from '../../shared/tools/filter-handler-builder';
 
-export default function Recipes() {
+const Recipes: React.FC<{}> = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -179,7 +179,7 @@ export default function Recipes() {
       )}
     </Container>
   );
-}
+};
 
 const mergeSearchFilters = (
   originalFilters: string[],
@@ -195,3 +195,5 @@ const mergeSearchFilters = (
 
   return mergedFilters;
 };
+
+export default Recipes;

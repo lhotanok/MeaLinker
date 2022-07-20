@@ -26,6 +26,7 @@ export default function Header() {
       disableElevation
       onClick={() => {
         navigate(page.path);
+        window.scrollTo(0, 0);
       }}
       sx={{ color: 'inherit' }}
     >

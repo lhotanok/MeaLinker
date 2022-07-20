@@ -4,7 +4,7 @@ import LinearLoadingProgress from '../../shared/components/LinearLoadingProgress
 import useHttp from '../../shared/hooks/use-http';
 import Container from '@mui/material/Container';
 import { FullRecipe } from '../types/FullRecipe';
-import { Button, Card, CardContent, Grid, Tooltip, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Grid, Tooltip, Typography } from '@mui/material';
 import ZoomableImage from '../../shared/components/ZoomableImage';
 import { convertToReadableDate } from '../../shared/tools/value-prettifier';
 import RecipeHeader from '../components/Detail/RecipeHeader';
@@ -15,6 +15,7 @@ import PrepTimeBox from '../components/Detail/PrepTimeSection/PrepTimeBox';
 import PrepTimeDivider from '../components/Detail/PrepTimeSection/PrepTimeDivider';
 import JsonldHelmet from '../../shared/components/JsonldHelmet';
 import FlexBox from '../../shared/components/FlexBox';
+import RecipeBreadcrumbs from '../components/Detail/RecipeBreadcrumbs';
 
 export default function RecipeDetail() {
   const [recipe, setRecipe] = useState<FullRecipe>({
@@ -30,6 +31,7 @@ export default function RecipeDetail() {
   useEffect(
     () => {
       window.scrollTo(0, 0);
+
       const recipeRequestConfig = {
         url: `http://localhost:5000/api/recipes/${recipeId}`,
       };
@@ -75,7 +77,10 @@ export default function RecipeDetail() {
             typeLabel='recipe'
           />
           <Container maxWidth='xl'>
-            <Grid container padding={3} pt={6} spacing={6}>
+            <Box padding={3} pt={3}>
+              <RecipeBreadcrumbs recipeName={recipe.jsonld.name} />
+            </Box>
+            <Grid container padding={3} pt={2} spacing={6}>
               {isLoading && <LinearLoadingProgress />}
               <Grid item key='left-column' lg={7} md={7} sm={12}>
                 <Card>
