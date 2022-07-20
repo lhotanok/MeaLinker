@@ -14,7 +14,17 @@ export default function RecipeBreadcrumbs({ recipeName }: RecipeBreadcrumbsProps
       separator={<NavigateNextIcon fontSize='small' />}
       aria-label='breadcrumb'
     >
-      <LinkRouter underline='hover' color='inherit' to='/recipes'>
+      <LinkRouter
+        underline='hover'
+        color='inherit'
+        to='/recipes'
+        onClick={() => {
+          // Make sure the scroll is not overrided by the caching mechanism
+          setTimeout(() => {
+            window.scrollTo(0, 0);
+          }, 100);
+        }}
+      >
         <SearchIcon sx={{ mr: 0.5 }} fontSize='inherit' />
         Recipes
       </LinkRouter>

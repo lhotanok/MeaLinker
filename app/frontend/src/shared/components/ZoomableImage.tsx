@@ -4,6 +4,7 @@ import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import ZoomOutMapIcon from '@mui/icons-material/ZoomOutMap';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { LIGHTER_PRIMARY_COLOR, LIGHTER_SECONDARY_COLOR } from '../constants';
+import FlexBox from './FlexBox';
 
 type ZoomableImageProps = {
   src: string;
@@ -26,9 +27,23 @@ export default function ZoomableImage({
 }: ZoomableImageProps) {
   return (
     <Box>
-      <TransformWrapper wheel={{ wheelDisabled: true }}>
+      <TransformWrapper
+        centerOnInit={true}
+        centerZoomedOut={true}
+        wheel={{ wheelDisabled: true }}
+      >
         {({ zoomIn, zoomOut, resetTransform }) => (
-          <Card elevation={0} sx={{ maxHeight, maxWidth }}>
+          <Card
+            elevation={0}
+            sx={{
+              maxHeight,
+              maxWidth,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
             <Grid container>
               <Grid item xs pb={buttonGroupPb}>
                 <ButtonGroup
@@ -62,7 +77,9 @@ export default function ZoomableImage({
               )}
             </Grid>
             <TransformComponent>
-              <CardMedia component='img' image={src} alt={alt} />
+              <FlexBox>
+                <CardMedia component='img' image={src} alt={alt} />
+              </FlexBox>
             </TransformComponent>
           </Card>
         )}

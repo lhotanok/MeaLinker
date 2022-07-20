@@ -1,5 +1,6 @@
 import { Grid, Card, CardHeader, CardContent, Chip } from '@mui/material';
 import { Fragment } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FlexBox from '../../shared/components/FlexBox';
 import { SimpleIngredient } from '../types/SimpleIngredient';
 
@@ -9,6 +10,8 @@ type MadeOfCardProps = {
 };
 
 export default function MadeOfCard({ madeOfIngredients, alignment }: MadeOfCardProps) {
+  const navigate = useNavigate();
+
   return (
     <Fragment>
       {madeOfIngredients.length > 0 && (
@@ -23,9 +26,9 @@ export default function MadeOfCard({ madeOfIngredients, alignment }: MadeOfCardP
                       <Chip
                         label={name}
                         component='a'
-                        href={`/ingredients/${id}`}
                         clickable
                         color='secondary'
+                        onClick={() => navigate(`/ingredients/${id}`)}
                       />
                     </Grid>
                   ))}

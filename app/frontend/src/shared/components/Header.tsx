@@ -26,7 +26,11 @@ export default function Header() {
       disableElevation
       onClick={() => {
         navigate(page.path);
-        window.scrollTo(0, 0);
+
+        // Make sure the scroll is not overrided by the caching mechanism
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
       }}
       sx={{ color: 'inherit' }}
     >

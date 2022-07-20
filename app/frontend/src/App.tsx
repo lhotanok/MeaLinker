@@ -10,6 +10,8 @@ import RecipeDetail from './recipes/pages/RecipeDetail';
 import KeepAlive, { AliveScope } from 'react-activation';
 
 import { PRIMARY_COLOR, SECONDARY_COLOR } from './shared/constants';
+import TopScroll from './shared/components/TopScroll';
+import { Fragment } from 'react';
 
 const theme = createTheme({
   palette: {
@@ -34,7 +36,7 @@ export default function App() {
               <Route
                 path='/recipes'
                 element={
-                  <KeepAlive cacheKey='Recipes'>
+                  <KeepAlive cacheKey='Recipes' saveScrollPosition='screen'>
                     <Recipes />
                   </KeepAlive>
                 }
@@ -42,9 +44,12 @@ export default function App() {
               <Route
                 path='/recipes/:recipeId'
                 element={
-                  <KeepAlive cacheKey='Recipe'>
-                    <RecipeDetail />
-                  </KeepAlive>
+                  <Fragment>
+                    <TopScroll />
+                    <KeepAlive cacheKey='Recipe'>
+                      <RecipeDetail />
+                    </KeepAlive>
+                  </Fragment>
                 }
               />
               <Route

@@ -30,8 +30,6 @@ export default function RecipeDetail() {
 
   useEffect(
     () => {
-      window.scrollTo(0, 0);
-
       const recipeRequestConfig = {
         url: `http://localhost:5000/api/recipes/${recipeId}`,
       };

@@ -1,5 +1,5 @@
 import { Avatar, Link, Stack, Tooltip } from '@mui/material';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import reactStringReplace from 'react-string-replace';
 import { A_HREF_GROUPS_REGEX, PRIMARY_COLOR } from '../../../../shared/constants';
@@ -23,9 +23,24 @@ export default function HighlightedIngredient({
   } = ingredient;
 
   const navigate = useNavigate();
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+
+  const handleClose = () => {
+    setTooltipOpen(false);
+  };
+
+  const handleOpen = () => {
+    setTooltipOpen(true);
+  };
 
   const handleViewClick = (ingredientId: string) => {
-    navigate(`/ingredients/${ingredientId}`);
+    handleClose();
+    window.scrollTo(0, 0);
+
+    // Ensure that the tooltip gets hidden before ingredient page is opened
+    setTimeout(() => {
+      navigate(`/ingredients/${ingredientId}`);
+    }, 100);
   };
 
   const text = `${unit ? `${unit} ` : ''}${originaltext}`;
@@ -44,6 +59,10 @@ export default function HighlightedIngredient({
               <Tooltip
                 key={index}
                 placement='bottom-start'
+                open={tooltipOpen}
+                onClose={handleClose}
+                onOpen={handleOpen}
+                defaultValue={''}
                 title={
                   <Stack>
                     See more

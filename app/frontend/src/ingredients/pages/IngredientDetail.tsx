@@ -87,6 +87,12 @@ export default function IngredientDetail() {
           url: buildIngredientSearchUrl(params.ingredientId),
         };
         sendRequest(ingredientRequestConfig, fetchedIngredientHandler);
+
+        // Caching hotfix, happens only with ingredient
+        const cacheDiv = document.querySelector('[_nk="UVSV21"]');
+        if (cacheDiv) {
+          cacheDiv.removeAttribute('style');
+        }
       }
     },
     [params.ingredientId, sendRequest, search],
@@ -102,75 +108,73 @@ export default function IngredientDetail() {
   const label = convertFirstLetterToUppercase(ingredient.jsonld.label['@value']);
 
   return (
-    <Fragment>
+    <Container>
       <JsonldHelmet jsonld={JSON.stringify(ingredient.jsonld)} typeLabel='ingredient' />
-      <Container>
-        <Container maxWidth='xl'>
-          <Box pt={6}>
-            <Card>
-              <CardContent>
-                <Stack spacing={3}>
-                  <Grid container columnSpacing={8} rowSpacing={2}>
-                    <Grid item>
-                      <IngredientHeader
-                        isLoading={isLoading}
-                        error={error}
-                        ingredient={ingredient}
-                      />
-                    </Grid>
-                    <MadeOfCard
-                      madeOfIngredients={madeOfIngredients}
-                      alignment={nutritionItems.length > 0 ? 'center' : 'flex-end'}
+      <Container maxWidth='xl'>
+        <Box pt={6}>
+          <Card>
+            <CardContent>
+              <Stack spacing={3}>
+                <Grid container columnSpacing={8} rowSpacing={2}>
+                  <Grid item>
+                    <IngredientHeader
+                      isLoading={isLoading}
+                      error={error}
+                      ingredient={ingredient}
                     />
-                    <IngredientNutrition nutritionItems={nutritionItems} />
                   </Grid>
-                  <IngredientDescription
-                    abstract={ingredient.jsonld.abstract}
-                    comment={ingredient.jsonld.comment}
+                  <MadeOfCard
+                    madeOfIngredients={madeOfIngredients}
+                    alignment={nutritionItems.length > 0 ? 'center' : 'flex-end'}
                   />
-                </Stack>
-              </CardContent>
-              <CardActions>
-                <IngredientSource wikiSource={ingredient.jsonld.isPrimaryTopicOf || ''} />
-              </CardActions>
-            </Card>
-            <Grid container mt={5}>
-              <Grid item>
-                <IngredientCategories
-                  ingredientName={label}
-                  categories={ingredient.structured.categories || []}
+                  <IngredientNutrition nutritionItems={nutritionItems} />
+                </Grid>
+                <IngredientDescription
+                  abstract={ingredient.jsonld.abstract}
+                  comment={ingredient.jsonld.comment}
                 />
-              </Grid>
+              </Stack>
+            </CardContent>
+            <CardActions>
+              <IngredientSource wikiSource={ingredient.jsonld.isPrimaryTopicOf || ''} />
+            </CardActions>
+          </Card>
+          <Grid container mt={5}>
+            <Grid item>
+              <IngredientCategories
+                ingredientName={label}
+                categories={ingredient.structured.categories || []}
+              />
             </Grid>
-          </Box>
-        </Container>
-        <Container maxWidth='md'>
-          <Divider variant='middle' sx={{ paddingY: 4 }} />
-        </Container>
-        <FlexBox>
-          <Fragment>
-            {totalCount && (
-              <Typography
-                component='h1'
-                variant='h5'
-                color='text.secondary'
-                p={4}
-                ref={headerRef}
-              >
-                {`${label} is part of ${buildPlural(
-                  'recipe',
-                  addThousandsSeparator(totalCount),
-                )}`}
-              </Typography>
-            )}
-          </Fragment>
-        </FlexBox>
-        <IngredientRecipes
-          totalCount={totalCount}
-          paginatedRecipes={paginatedRecipes}
-          scrollHandler={() => headerRef.current && headerRef.current.scrollIntoView()}
-        />
+          </Grid>
+        </Box>
       </Container>
-    </Fragment>
+      <Container maxWidth='md'>
+        <Divider variant='middle' sx={{ paddingY: 4 }} />
+      </Container>
+      <FlexBox>
+        <Fragment>
+          {totalCount && (
+            <Typography
+              component='h1'
+              variant='h5'
+              color='text.secondary'
+              p={4}
+              ref={headerRef}
+            >
+              {`${label} is part of ${buildPlural(
+                'recipe',
+                addThousandsSeparator(totalCount),
+              )}`}
+            </Typography>
+          )}
+        </Fragment>
+      </FlexBox>
+      <IngredientRecipes
+        totalCount={totalCount}
+        paginatedRecipes={paginatedRecipes}
+        scrollHandler={() => headerRef.current && headerRef.current.scrollIntoView()}
+      />
+    </Container>
   );
 }
