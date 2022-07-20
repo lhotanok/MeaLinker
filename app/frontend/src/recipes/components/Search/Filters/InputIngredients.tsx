@@ -11,7 +11,7 @@ export default function InputIngredients({ filterHandler }: InputIngredientsProp
     <AutocompleteSearchBar
       facetItems={facets}
       searched={value}
-      label='Add ingredients (from the list / your own)'
+      label='Add ingredients (from a list / your own)'
       placeholder='ingredient'
       onSearch={onSearch}
       onRemove={onRemove}
