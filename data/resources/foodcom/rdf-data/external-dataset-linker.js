@@ -100,12 +100,21 @@ function mergeJsonlds(mergedMap, dbpediaIngredients, wikidataIngredients) {
         mergedJsonlds[foodComId] = { '@type': DBPEDIA_INGREDIENT_TYPE, ...entity };
       }
     } else {
-      const wikidataEntity = wikidataMap[jsonlds[0]] || {};
-      const dbpediaEntity = dbpediaMap[jsonlds[1]] || {};
+      let wikidataEntity = wikidataMap[jsonlds[0]] || null;
+      let dbpediaEntity = dbpediaMap[jsonlds[1]] || null;
+
+      // Handle faulty labels such as Beere label of Berry, matched for Beer incorrectly
+      if (
+        !wikidataEntity ||
+        !wikidataEntity.label ||
+        wikidataEntity.label['@value'].length > dbpediaEntity.label['@value'].length
+      ) {
+        wikidataEntity = null;
+      }
 
       const mergedContext = {
-        ...(dbpediaEntity['@context'] || {}),
-        ...(wikidataEntity['@context'] || {}),
+        ...((dbpediaEntity || {})['@context'] || {}),
+        ...((wikidataEntity || {})['@context'] || {}),
       };
 
       const mergedIngredient = {
@@ -117,7 +126,7 @@ function mergeJsonlds(mergedMap, dbpediaIngredients, wikidataIngredients) {
             : mergedContext,
       };
 
-      if (dbpediaEntity) {
+      if (dbpediaEntity && wikidataEntity) {
         mergedIngredient.sameAs = jsonlds[0];
       } else if (wikidataEntity) {
         mergedIngredient.sameAs = jsonlds[1];
