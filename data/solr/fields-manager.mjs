@@ -113,11 +113,13 @@ async function postRecipesFields() {
   };
 
   const copyFields = {
-    tags: ['_tagsFacet'],
-    // cuisine: ['_cuisinesFacet'],
-    // diets: ['_dietsFacet'],
-    // mealTypes: ['_mealTypesFacet'],
-    // time: ['_timeFacet'],
+    // tags will be corrected to ensure proper counts in facet hierarchy
+    // tags: ['_tagsFacet'],
+
+    cuisine: ['_cuisinesFacet'],
+    diets: ['_dietsFacet'],
+    mealTypes: ['_mealTypesFacet'],
+    time: ['_timeFacet'],
   };
 
   await postAddFields(addFields, SOLR_RECIPES_SCHEMA);

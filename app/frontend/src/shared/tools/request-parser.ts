@@ -1,4 +1,5 @@
 import { PAGINATION_RESULTS_COUNT, QUERY_PARAM_NAMES } from '../../recipes/constants';
+import { FacetItem, Facets } from '../../recipes/types/Facets';
 import { Filters } from '../../recipes/types/Filters';
 import {
   SimpleRecipesResponse,
@@ -162,4 +163,28 @@ export const prepareRecipes = (
     });
 
   return searchedRecipes;
+};
+
+export const prepareFacets = (facets: Facets, currentFilters: Filters): Facets => {
+  const updatedFacets: Record<string, FacetItem[]> = {};
+
+  const currentFilterNames: string[] = [];
+
+  Object.values(currentFilters).forEach((value) => {
+    if (Array.isArray(value)) {
+      currentFilterNames.push(...value);
+    } else if (value) {
+      currentFilterNames.push(value);
+    }
+  });
+
+  Object.entries(facets).forEach(([facetName, facetItems]) => {
+    const filteredFacetItems = facetItems.filter(
+      (item) => !currentFilterNames.includes(item.name),
+    );
+
+    updatedFacets[facetName] = filteredFacetItems;
+  });
+
+  return updatedFacets as Facets;
 };

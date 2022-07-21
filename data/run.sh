@@ -4,6 +4,10 @@ cd resources/foodcom
 /bin/bash run.sh
 cd ..
 
+cd resources/allrecipes
+/bin/bash run.sh
+cd ..
+
 /bin/bash run.sh
 cd ..
 

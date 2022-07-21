@@ -14,6 +14,7 @@ import {
   buildRecipesSearchUrl,
   buildUrl,
   parseFilters,
+  prepareFacets,
   prepareRecipes,
 } from '../../../shared/tools/request-parser';
 import SearchHeader from './SearchHeader';
@@ -70,14 +71,17 @@ const RecipesCached: React.FC<RecipesCachedProps> = ({
 
   useEffect(
     () => {
+      const currentQueryParams = new URLSearchParams(decodeURI(search));
+      const currentFilters: Filters = parseFilters(currentQueryParams);
+
       const fetchedRecipesHandler = (recipesResponse: SimpleRecipesResponse) => {
         setTotalCount(recipesResponse.totalCount);
-        setFacets(recipesResponse.facets);
+        setFacets(prepareFacets(recipesResponse.facets, currentFilters));
         setPaginatedRecipes(prepareRecipes(recipesResponse));
       };
 
       const requestConfig = {
-        url: buildRecipesSearchUrl(new URLSearchParams(decodeURI(search))),
+        url: buildRecipesSearchUrl(currentQueryParams),
       };
 
       fetchRecipes(requestConfig, fetchedRecipesHandler);

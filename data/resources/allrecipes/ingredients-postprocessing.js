@@ -2,7 +2,7 @@ const fs = require('fs');
 const { FILE_ENCODING } = require('../../constants');
 
 const {
-  UNIQUE_INGR_WITH_IDS_PATH,
+  UNIQUE_INGREDIENTS_PATH,
   EXTENDED_INGREDIENTS_PATH,
   MIN_INGREDIENT_NAME_LENGTH,
   CATEGORY_PREFIX_REGEX,
@@ -28,6 +28,12 @@ function mergeIngredientsWithJsonlds(jsonldIngredients, uniqueIngredients) {
 
   Object.entries(jsonldIngredients).forEach(([ingredientId, jsonld]) => {
     const ingredient = uniqueIngredients[ingredientId];
+
+    if (!ingredient) {
+      console.log(`Ingredient id ${ingredientId} was not found in unique ingredients`);
+      return;
+    }
+
     const { identifier = ingredientId, name } = ingredient;
 
     if (name.length >= MIN_INGREDIENT_NAME_LENGTH) {
@@ -112,7 +118,7 @@ function mergeIngredientsWithStructuredInfo(extendedIngredients) {
 
 function main() {
   const jsonldIngredients = readJsonFromFile(JSONLD_INGRS_PATH);
-  const uniqueIngredients = readJsonFromFile(UNIQUE_INGR_WITH_IDS_PATH);
+  const uniqueIngredients = readJsonFromFile(UNIQUE_INGREDIENTS_PATH);
 
   console.log(
     `Loaded ${Object.keys(jsonldIngredients).length} jsonld ingredients and ${Object.keys(

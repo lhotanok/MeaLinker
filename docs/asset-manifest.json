@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.js": "/build/bundle.0321ccc5.js",
+    "main.js": "/build/bundle.cf8f81ff.js",
     "fiber-icon.png": "/891ad3b0352949e191f7.png",
     "directions-icon.png": "/dccdb66d3083ac7dc1f7.png",
     "grain-icon.png": "/db8f07c4ce5abf3a4fd3.png",
@@ -17,6 +17,6 @@
     "index.html": "/index.html"
   },
   "entrypoints": [
-    "build/bundle.0321ccc5.js"
+    "build/bundle.cf8f81ff.js"
   ]
 }

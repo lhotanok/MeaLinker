@@ -14,7 +14,6 @@ import {
   getItemWithoutCount,
 } from '../tools/value-prettifier';
 import { Fragment } from 'react';
-import { Tooltip } from '@mui/material';
 
 type AutocompleteSearchBarProps = {
   facetItems: FacetItem[];
@@ -61,13 +60,7 @@ export default function AutocompleteSearchBar({
         <Fragment>
           <Stack direction='row' spacing={1.5} alignItems='center'>
             {searchIcon}
-            {facetItems.length === 0 ? (
-              <Tooltip title='No more filters' placement='bottom-start'>
-                <TextField {...params} label={label} />
-              </Tooltip>
-            ) : (
-              <TextField {...params} label={label} />
-            )}
+            <TextField {...params} label={label} />
           </Stack>
         </Fragment>
       )}

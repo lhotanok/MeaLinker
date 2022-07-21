@@ -1,14 +1,19 @@
 const fs = require('fs');
 const log4js = require('log4js');
-const log = log4js.getLogger('Food.com RDF dataset linker');
+const log = log4js.getLogger('Allrecipes RDF dataset linker');
 log.level = 'debug';
 
 const {
-  FOOD_DBPEDIA_INGREDIENTS_PATH,
+  DBPEDIA_LINKS_PATH,
   DBPEDIA_INGREDIENTS_PATH,
+  WIKIDATA_LINKS_PATH,
+  WIKIDATA_INGREDIENTS_PATH,
+  JSONLD_INGRS_PATH,
+  MERGED_MAP_PATH,
 } = require('./constants');
-const { fetchDBpediaIngredients } = require('../../dbpedia/ingredients-linker');
 const { FILE_ENCODING } = require('../../../constants');
+
+const { fetchIngredientsFromExternalDatasets } = require('../../external-dataset-linker');
 
 function readFileFromCurrentDir(filePath) {
   return fs.readFileSync(`${__dirname}/${filePath}`, FILE_ENCODING);
@@ -18,30 +23,45 @@ function writeFileFromCurrentDir(filePath, content) {
   return fs.writeFileSync(`${__dirname}/${filePath}`, content);
 }
 
-function getDbpediaIngredientIris() {
-  const ingredientIris = [];
-
-  const ingredientLinks = readFileFromCurrentDir(FOOD_DBPEDIA_INGREDIENTS_PATH).split(
-    '\n',
-  );
-
-  ingredientLinks.forEach((link) => {
-    const triple = link.split(' ');
-    if (triple.length >= 3) {
-      const dbpediaIri = triple[2];
-      ingredientIris.push(dbpediaIri);
-    }
-  });
-
-  log.info(`Found ${ingredientIris.length} ingredient IRIs`);
-  return ingredientIris;
+function parseLinks(ntriplesFilePath) {
+  return readFileFromCurrentDir(ntriplesFilePath).split('\n');
 }
 
 async function main() {
-  const ingredientIris = getDbpediaIngredientIris();
-  const ingredients = await fetchDBpediaIngredients(ingredientIris);
+  const dbpediaIngredientsLinks = parseLinks(DBPEDIA_LINKS_PATH);
+  const wikidataIngredientsLinks = parseLinks(WIKIDATA_LINKS_PATH);
 
-  writeFileFromCurrentDir(DBPEDIA_INGREDIENTS_PATH, JSON.stringify(ingredients, null, 2));
+  const {
+    dbpediaIngredients,
+    wikidataIngredients,
+    mergedMap,
+    mergedJsonlds,
+  } = await fetchIngredientsFromExternalDatasets(
+    dbpediaIngredientsLinks,
+    wikidataIngredientsLinks,
+  );
+
+  writeFileFromCurrentDir(
+    DBPEDIA_INGREDIENTS_PATH,
+    JSON.stringify(dbpediaIngredients, null, 2),
+  );
+
+  writeFileFromCurrentDir(
+    WIKIDATA_INGREDIENTS_PATH,
+    JSON.stringify(wikidataIngredients, null, 2),
+  );
+
+  writeFileFromCurrentDir(MERGED_MAP_PATH, JSON.stringify(mergedMap, null, 2));
+  writeFileFromCurrentDir(JSONLD_INGRS_PATH, JSON.stringify(mergedJsonlds, null, 2));
+
+  log.info(
+    `Saved results to: ${[
+      DBPEDIA_INGREDIENTS_PATH,
+      WIKIDATA_INGREDIENTS_PATH,
+      MERGED_MAP_PATH,
+      JSONLD_INGRS_PATH,
+    ].join(', ')}`,
+  );
 }
 
 (async () => {

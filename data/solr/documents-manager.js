@@ -144,19 +144,15 @@ function mergeTags(tags, recipeCategory, cookMinutes) {
   return mergedTags;
 }
 
-// function filterTags(mergedTags, specificTags) {
-//   const filteredTags = Array.from(
-//     new Set(
-//       mergedTags.filter(
-//         (tag) => !specificTags.includes(tag.toLowerCase()) && !tag.startsWith('<'),
-//       ),
-//     ),
-//   );
+function filterTags(mergedTags, specificTags) {
+  const filteredTags = Array.from(
+    new Set(mergedTags.filter((tag) => !specificTags.includes(tag.toLowerCase()))),
+  );
 
-//   return filteredTags;
-// }
+  return filteredTags;
+}
 
-function filterRecipeIndexedFields(recipe /**, searchIngredients**/) {
+function filterRecipeIndexedFields(recipe, searchIngredients) {
   const { _id, jsonld, structured } = recipe;
 
   const {
@@ -183,6 +179,7 @@ function filterRecipeIndexedFields(recipe /**, searchIngredients**/) {
 
   const totalMinutes = getDurationInMinutes(time.total);
   const cookMinutes = getDurationInMinutes(time.cooking);
+  const timeTags = buildTimeTags(totalMinutes);
 
   const mergedTags = mergeTags(tags, recipeCategory, cookMinutes);
 
@@ -193,22 +190,18 @@ function filterRecipeIndexedFields(recipe /**, searchIngredients**/) {
     MEAL_TYPES,
   );
 
-  const timeTags = buildTimeTags(totalMinutes);
-
   // Excluding specific tags from general tags is controversial.
   // It might make general tags more readable but users often try
   // general tags first for any search query.
   // Plus we need to support all clickable tags from recipe detail.
 
-  // const specificTags = [
-  //   ...cuisines,
-  //   ...diets,
-  //   ...mealTypes,
-  //   ...timeTags,
-  //   ...searchIngredients,
-  // ].map((tag) => tag.toLowerCase());
-
-  // const filteredTags = filterTags(mergedTags, specificTags);
+  const specificTags = [
+    ...cuisines,
+    ...diets,
+    ...mealTypes,
+    ...timeTags,
+    ...searchIngredients,
+  ].map((tag) => tag.toLowerCase());
 
   const filteredRecipe = {
     id: _id,
@@ -218,7 +211,7 @@ function filterRecipeIndexedFields(recipe /**, searchIngredients**/) {
     stepsCount: stepsCount || steps.length,
     rating: rating.value,
     reviewsCount: rating.reviews,
-    tags: mergedTags,
+    tags: Array.from(new Set(mergedTags)),
     cuisine: cuisines.length > 0 ? cuisines[0] : '',
     diets,
     time: timeTags,
@@ -235,6 +228,7 @@ function filterRecipeIndexedFields(recipe /**, searchIngredients**/) {
     fiber: fiber.value,
     sugar: sugar.value,
     protein: protein.value,
+    _tagsFacet: filterTags(mergedTags, specificTags),
   };
 
   return filteredRecipe;
@@ -261,43 +255,48 @@ async function pushDocumentsToSolr(documents, core) {
   log.info(`Commit response: ${JSON.stringify(commitResponse, null, 2)}`);
 }
 
-async function injectSearchIngredientsToRecipes(ingredientLabels, recipes) {
+async function injectSearchFacetsToRecipes(
+  client,
+  labels,
+  recipes,
+  searchField,
+  facetField,
+) {
   const recipesMap = {};
-  recipes.forEach(
-    (recipe) => (recipesMap[recipe.id] = { ...recipe, _ingredientsFacet: [] }),
-  );
-
-  const { HOST, PORT, SECURE } = SOLR;
-
-  const client = solr.createClient({
-    host: HOST,
-    port: PORT,
-    core: SOLR.CORES.RECIPES,
-    secure: SECURE,
-  });
+  recipes.forEach((recipe) => (recipesMap[recipe.id] = { ...recipe, [facetField]: [] }));
 
   log.info(
-    `Fetching all recipes to match them with search ingredients. Processing ${ingredientLabels.length} recipe search queries...`,
+    `Fetching all recipes to match them with search facets.
+    Processing ${labels.length} recipe search queries for search field ${searchField} and facetField ${facetField}...`,
   );
 
-  for (const label of ingredientLabels) {
-    const query = client.query().q(`ingredients: "${label}"`).qop('AND').rows(500000);
+  for (const label of labels) {
+    const query = client.query().q(`${searchField}: "${label}"`).qop('AND').rows(500000);
     const searchResponse = await client.search(query);
     const { docs } = searchResponse.response;
 
     await Promise.all(
-      docs.map((doc) => recipesMap[doc.id]._ingredientsFacet.push(label)),
+      docs.map((doc) => {
+        recipesMap[doc.id][facetField].push(label);
+      }),
     );
-    // ).then(() =>
-    //   log.info(
-    //     `Injected search ingredient ${ingredient.label[
-    //       '@value'
-    //     ]} to ${docs.length} recipes`,
-    //   ),
-    // );
   }
 
   return Object.values(recipesMap);
+}
+
+function getUniqueTagFacets(recipes) {
+  const allTags = [];
+
+  recipes.forEach((recipe) => {
+    const { _tagsFacet } = recipe;
+    allTags.push(..._tagsFacet);
+  });
+
+  const uniqueTags = Array.from(new Set(allTags));
+  log.info(`Found ${uniqueTags.length} unique tags`);
+
+  return uniqueTags;
 }
 
 async function main() {
@@ -317,11 +316,32 @@ async function main() {
 
   await pushDocumentsToSolr(recipes, RECIPES);
 
-  const extendedRecipes = await injectSearchIngredientsToRecipes(
+  const { HOST, PORT, SECURE } = SOLR;
+
+  const client = solr.createClient({
+    host: HOST,
+    port: PORT,
+    core: SOLR.CORES.RECIPES,
+    secure: SECURE,
+  });
+
+  const recipesExtendedWithIngrs = await injectSearchFacetsToRecipes(
+    client,
     searchIngredientLabels,
     recipes,
+    'ingredients',
+    '_ingredientsFacet',
   );
-  await pushDocumentsToSolr(extendedRecipes, RECIPES);
+
+  const recipesExtendedWithTags = await injectSearchFacetsToRecipes(
+    client,
+    getUniqueTagFacets(recipes),
+    recipesExtendedWithIngrs,
+    'tags',
+    '_tagsFacet',
+  );
+
+  await pushDocumentsToSolr(recipesExtendedWithTags, RECIPES);
 }
 
 (async () => {

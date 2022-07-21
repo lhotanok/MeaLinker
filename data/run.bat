@@ -1,14 +1,18 @@
 cd resources/foodcom
-/bin/bash run.sh
+call run.bat
 cd ..
 
-/bin/bash run.sh
+cd resources/allrecipes
+call run.bat
+cd ..
+
+call run.bat
 cd ..
 
 cd database
-/bin/bash run.sh
+call run.bat
 cd ..
 
 cd solr
-/bin/bash run.sh
+call run.bat
 cd ..

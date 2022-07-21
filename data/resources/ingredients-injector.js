@@ -143,6 +143,16 @@ function decodeJsonStrings(json) {
   return decodedObj;
 }
 
+function getUniqueExtendedIngredients(extendedIngredients) {
+  const uniqueIngredients = {};
+
+  extendedIngredients.forEach((ingredient) => {
+    uniqueIngredients[ingredient.identifier] = ingredient;
+  });
+
+  return Object.values(uniqueIngredients);
+}
+
 function main() {
   const extendedIngredients = loadExtendedDocs(EXTENDED_INGREDIENT_PATHS, 'ingredients');
   const extendedRecipes = loadExtendedDocs(RECIPE_PATHS, 'recipes').filter(
@@ -150,13 +160,19 @@ function main() {
   );
 
   log.info(
-    `Loaded ${extendedIngredients.length} ingredients and ${extendedRecipes.length} recipes with images in total`,
+    `Loaded ${extendedIngredients.length} ingredients from ${EXTENDED_INGREDIENT_PATHS.length} datasets in total`,
   );
 
-  injectBestMatchIngredients(extendedIngredients, extendedRecipes);
+  const uniqueExtendedIngredients = getUniqueExtendedIngredients(extendedIngredients);
+
+  log.info(
+    `Loaded ${uniqueExtendedIngredients.length} ingredients and ${extendedRecipes.length} recipes with images in total`,
+  );
+
+  injectBestMatchIngredients(uniqueExtendedIngredients, extendedRecipes);
 
   writeJsonStream(extendedRecipes, EXTENDED_FINAL_RECIPES_PATH);
-  writeJsonStream(extendedIngredients, EXTENDED_FINAL_INGREDIENTS_PATH);
+  writeJsonStream(uniqueExtendedIngredients, EXTENDED_FINAL_INGREDIENTS_PATH);
 
   log.info(
     `Saved the results to ${EXTENDED_FINAL_RECIPES_PATH} and ${EXTENDED_FINAL_INGREDIENTS_PATH}`,
