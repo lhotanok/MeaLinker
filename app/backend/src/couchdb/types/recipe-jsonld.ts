@@ -49,7 +49,12 @@ export type RecipeJsonldNutrition = {
 
 export type RecipeInstruction = {
   '@type': string;
-  text: string;
+  text?: string;
+  name?: string;
+  itemListElement?: {
+    '@type': string;
+    text: string;
+  }[];
 };
 
 export type Review = {

@@ -1,29 +1,33 @@
-import { Avatar, Box, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material';
+import { Box, Divider, List } from '@mui/material';
+import { Fragment } from 'react';
 import directionsIcon from '../../../assets/directions-icon.png';
 import InfoCard from '../../../shared/components/InfoCard';
-import { LIGHTER_SECONDARY_COLOR } from '../../../shared/constants';
+import { RecipeInstruction } from '../../types/RecipeJsonld';
+import DirectionItem from './DirectionItem';
 
 type DirectionsCardProps = {
-  directions: string[];
+  directions: RecipeInstruction[];
 };
 
 export default function DirectionsCard({ directions }: DirectionsCardProps) {
   const directionListItems = directions.map((direction, index) => {
+    if (direction.itemListElement) {
+      if (direction.name) {
+        return (
+          <Fragment>
+            <Divider variant='middle'>{direction.name.replace(/:$/, '')}</Divider>
+            <List>
+              {direction.itemListElement.map((item, i) => (
+                <DirectionItem direction={item.text} position={i} />
+              ))}
+            </List>
+          </Fragment>
+        );
+      }
+    }
+
     return (
-      <ListItem key={index}>
-        <ListItemAvatar>
-          <Avatar
-            sx={{
-              bgcolor: LIGHTER_SECONDARY_COLOR,
-              width: 30,
-              height: 30,
-            }}
-          >
-            {index + 1}
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText primary={direction} />
-      </ListItem>
+      <List>{<DirectionItem direction={direction.text || ''} position={index} />}</List>
     );
   });
 

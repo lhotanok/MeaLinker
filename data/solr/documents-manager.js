@@ -144,17 +144,17 @@ function mergeTags(tags, recipeCategory, cookMinutes) {
   return mergedTags;
 }
 
-function filterTags(mergedTags, specificTags) {
-  const filteredTags = Array.from(
-    new Set(
-      mergedTags.filter(
-        (tag) => !specificTags.includes(tag.toLowerCase()) && !tag.startsWith('<'),
-      ),
-    ),
-  );
+// function filterTags(mergedTags, specificTags) {
+//   const filteredTags = Array.from(
+//     new Set(
+//       mergedTags.filter(
+//         (tag) => !specificTags.includes(tag.toLowerCase()) && !tag.startsWith('<'),
+//       ),
+//     ),
+//   );
 
-  return filteredTags;
-}
+//   return filteredTags;
+// }
 
 function filterRecipeIndexedFields(recipe, searchIngredients) {
   const { _id, jsonld, structured } = recipe;
@@ -195,15 +195,15 @@ function filterRecipeIndexedFields(recipe, searchIngredients) {
 
   const timeTags = buildTimeTags(totalMinutes);
 
-  const specificTags = [
-    ...cuisines,
-    ...diets,
-    ...mealTypes,
-    ...timeTags,
-    ...searchIngredients,
-  ].map((tag) => tag.toLowerCase());
+  // const specificTags = [
+  //   ...cuisines,
+  //   ...diets,
+  //   ...mealTypes,
+  //   ...timeTags,
+  //   ...searchIngredients,
+  // ].map((tag) => tag.toLowerCase());
 
-  const filteredTags = filterTags(mergedTags, specificTags);
+  // const filteredTags = filterTags(mergedTags, specificTags);
 
   const filteredRecipe = {
     id: _id,
@@ -213,7 +213,7 @@ function filterRecipeIndexedFields(recipe, searchIngredients) {
     stepsCount: stepsCount || steps.length,
     rating: rating.value,
     reviewsCount: rating.reviews,
-    tags: filteredTags,
+    tags: mergedTags,
     cuisine: cuisines.length > 0 ? cuisines[0] : '',
     diets,
     time: timeTags,

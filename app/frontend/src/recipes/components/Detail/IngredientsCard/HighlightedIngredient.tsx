@@ -40,7 +40,7 @@ export default function HighlightedIngredient({
     // Ensure that the tooltip gets hidden before ingredient page is opened
     setTimeout(() => {
       navigate(`/ingredients/${ingredientId}`);
-    }, 100);
+    }, 50);
   };
 
   const text = `${unit ? `${unit} ` : ''}${originaltext}`;
