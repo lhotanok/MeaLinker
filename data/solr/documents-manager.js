@@ -121,14 +121,15 @@ function buildTimeTags(totalMinutes) {
   return timeTags;
 }
 
-function mergeTags(tags, recipeCategory, cookMinutes) {
+function mergeTags(tags, recipeCategory, cookMinutes, timeTags) {
   const noCookTags = cookMinutes ? [] : [WITHOUT_COOKING_TAG];
 
   const categories = Array.isArray(recipeCategory) ? recipeCategory : [recipeCategory];
   const mergedTags = [
-    ...tags.filter((tag) => tag !== NO_COOK_TAG),
+    ...tags.filter((tag) => tag.toLowerCase() !== NO_COOK_TAG.toLowerCase()),
     ...categories,
     ...noCookTags,
+    ...timeTags,
   ]
     .filter((tag) => tag)
     .map((tag) =>
@@ -141,7 +142,7 @@ function mergeTags(tags, recipeCategory, cookMinutes) {
         .replace(/^drinks$/gi, 'Beverages'),
     );
 
-  return mergedTags;
+  return Array.from(new Set(mergedTags));
 }
 
 function filterTags(mergedTags, specificTags) {
@@ -181,7 +182,7 @@ function filterRecipeIndexedFields(recipe, searchIngredients) {
   const cookMinutes = getDurationInMinutes(time.cooking);
   const timeTags = buildTimeTags(totalMinutes);
 
-  const mergedTags = mergeTags(tags, recipeCategory, cookMinutes);
+  const mergedTags = mergeTags(tags, recipeCategory, cookMinutes, timeTags);
 
   const cuisines = extractSpecificTags(mergedTags, CUISINES);
   const diets = extractSpecificTags(mergedTags, DIETS);
@@ -211,7 +212,7 @@ function filterRecipeIndexedFields(recipe, searchIngredients) {
     stepsCount: stepsCount || steps.length,
     rating: rating.value,
     reviewsCount: rating.reviews,
-    tags: Array.from(new Set(mergedTags)),
+    tags: mergedTags,
     cuisine: cuisines.length > 0 ? cuisines[0] : '',
     diets,
     time: timeTags,

@@ -180,7 +180,10 @@ export const prepareFacets = (facets: Facets, currentFilters: Filters): Facets =
 
   Object.entries(facets).forEach(([facetName, facetItems]) => {
     const filteredFacetItems = facetItems.filter(
-      (item) => !currentFilterNames.includes(item.name),
+      (item) =>
+        !currentFilterNames.includes(item.name) &&
+        item.name !== 'No Cook' &&
+        (facetName === 'timeFacets' || !item.name.startsWith('<')),
     );
 
     updatedFacets[facetName] = filteredFacetItems;
