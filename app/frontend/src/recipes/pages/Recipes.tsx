@@ -1,5 +1,7 @@
+import { Container } from '@mui/material';
 import KeepAlive from 'react-activation';
 import { useLocation } from 'react-router-dom';
+import useSnackbar from '../../shared/hooks/use-snackbar';
 import RecipesPage from './RecipesPage';
 
 /**
@@ -9,11 +11,17 @@ import RecipesPage from './RecipesPage';
 export default function RecipesWrapper() {
   const location = useLocation();
 
+  const { snackbar, setNewSnackbarText: setSnackbar } = useSnackbar();
+
   const { search } = location;
+  const cacheKey = `recipes-${search}`;
 
   return (
-    <KeepAlive cacheKey={`recipes-${search}`}>
-      <RecipesPage />
-    </KeepAlive>
+    <Container>
+      {snackbar}
+      <KeepAlive cacheKey={cacheKey} id={cacheKey}>
+        <RecipesPage setSnackbar={setSnackbar} />
+      </KeepAlive>
+    </Container>
   );
 }

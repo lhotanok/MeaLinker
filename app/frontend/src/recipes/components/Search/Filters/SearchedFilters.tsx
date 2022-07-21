@@ -1,4 +1,4 @@
-import { IconButton, Avatar, Grid, Tooltip } from '@mui/material';
+import { IconButton, Avatar, Grid } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemovableChips, {
@@ -49,12 +49,10 @@ export default function SearchedFilters({
       {[...ingredientChips, ...otherFiltersChips].length > 0 && (
         <Grid item>
           <FlexBox>
-            <IconButton key='remove-all-chips' size='large' onClick={() => onRemoveAll()}>
-              <Tooltip title='Clear all filters' placement='right-end' enterDelay={500}>
-                <Avatar sx={{ bgcolor: PRIMARY_COLOR }}>
-                  <DeleteIcon />
-                </Avatar>
-              </Tooltip>
+            <IconButton key='remove-all-chips' size='large' onClick={onRemoveAll}>
+              <Avatar sx={{ bgcolor: PRIMARY_COLOR }}>
+                <DeleteIcon />
+              </Avatar>
             </IconButton>
           </FlexBox>
         </Grid>

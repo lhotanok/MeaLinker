@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Dispatch, Fragment } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -25,11 +25,19 @@ import {
 } from '../../shared/tools/snackbar-builder';
 import SearchedFilters from '../components/Search/Filters/SearchedFilters';
 import InputFilters from '../components/Search/Filters/InputFilters';
-import useSnackbar from '../../shared/hooks/use-snackbar';
 import { FilterName, Filters } from '../types/Filters';
 import { getFilterHandlers } from '../../shared/tools/filter-handler-builder';
 
-const RecipesPage: React.FC<{}> = () => {
+type RecipesPageProps = {
+  setSnackbar: Dispatch<
+    React.SetStateAction<{
+      text: string;
+      severity: 'success' | 'info' | 'error';
+    } | null>
+  >;
+};
+
+const RecipesPage: React.FC<RecipesPageProps> = ({ setSnackbar }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -39,12 +47,11 @@ const RecipesPage: React.FC<{}> = () => {
   const filters: Filters = parseFilters(queryParams);
   const page = Number(queryParams.get(QUERY_PARAM_NAMES.PAGE)) || 1;
 
-  const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [totalCount, setTotalCount] = useState<number | null>(null);
+  const [paginatedRecipes, setPaginatedRecipes] = useState<SimpleRecipe[]>([]);
   const [facets, setFacets] = useState<Facets>(INITIAL_FACETS);
 
   const { sendRequest: fetchRecipes, error } = useHttp();
-  const { snackbar, setNewSnackbarText: setSnackbar } = useSnackbar();
 
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -69,7 +76,7 @@ const RecipesPage: React.FC<{}> = () => {
 
       fetchRecipes(requestConfig, fetchedRecipesHandler);
     },
-    [fetchRecipes, search],
+    [fetchRecipes, search, setTotalCount],
   );
 
   const searchHandler = (
@@ -90,16 +97,15 @@ const RecipesPage: React.FC<{}> = () => {
 
       if (addedFilters.length > 0) {
         // Some filter(s) changed, recipe results need to be updated
-        setTotalCount(null);
-
-        const snackbarText = buildItemsAddedSnackbar(addedFilters, filterName);
-        setSnackbar({ text: snackbarText, severity: 'success' });
 
         navigate(
           buildUrl(pathname, queryParams, {
             [filterName]: searchFilters,
           }),
         );
+
+        const snackbarText = buildItemsAddedSnackbar(addedFilters, filterName);
+        setSnackbar({ text: snackbarText, severity: 'success' });
       }
     }
   };
@@ -117,7 +123,11 @@ const RecipesPage: React.FC<{}> = () => {
       return;
     }
 
-    setTotalCount(null);
+    navigate(
+      buildUrl(pathname, queryParams, {
+        [filterName]: filteredLabels,
+      }),
+    );
 
     setSnackbar({
       text: buildItemsRemovedSnackbar(
@@ -128,25 +138,17 @@ const RecipesPage: React.FC<{}> = () => {
       ),
       severity: 'error',
     });
-
-    navigate(
-      buildUrl(pathname, queryParams, {
-        [filterName]: filteredLabels,
-      }),
-    );
   };
 
   const filterHandlers = getFilterHandlers(filters, facets, searchHandler, removeHandler);
 
   const removeAllFiltersHandler = () => {
-    setTotalCount(null);
     setSnackbar({ text: 'Cleared all filters', severity: 'error' });
     navigate(buildUrl(pathname, queryParams, null));
   };
 
   return (
-    <Container>
-      {snackbar}
+    <Fragment>
       <Box
         sx={{
           bgcolor: 'background.paper',
@@ -177,7 +179,7 @@ const RecipesPage: React.FC<{}> = () => {
       ) : (
         ''
       )}
-    </Container>
+    </Fragment>
   );
 };
 

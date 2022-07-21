@@ -76,7 +76,10 @@ export default function RecipeDetailPage() {
           <Container maxWidth='xl'>
             <Box padding={3} pt={3}>
               <RecipeBreadcrumbs recipeName={recipe.jsonld.name} />
-              {recipe.structured.tags && <TagGrid tags={recipe.structured.tags} />}
+              <TagGrid
+                tags={recipe.structured.tags}
+                category={recipe.jsonld.recipeCategory}
+              />
             </Box>
             <Grid container padding={3} pt={2} spacing={6}>
               {isLoading && <LinearLoadingProgress />}

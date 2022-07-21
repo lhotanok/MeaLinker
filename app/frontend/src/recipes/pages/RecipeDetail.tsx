@@ -12,11 +12,12 @@ export default function RecipesWrapper() {
   const params = useParams();
 
   const { recipeId } = params;
+  const cacheKey = `recipe-${recipeId}`;
 
   return (
     <Fragment>
       <TopScroll />
-      <KeepAlive cacheKey={`recipe-${recipeId}`}>
+      <KeepAlive cacheKey={cacheKey} id={cacheKey}>
         <RecipeDetailPage />
       </KeepAlive>
     </Fragment>
