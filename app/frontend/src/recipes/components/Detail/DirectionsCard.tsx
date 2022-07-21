@@ -18,7 +18,7 @@ export default function DirectionsCard({ directions }: DirectionsCardProps) {
             <Divider variant='middle'>{direction.name.replace(/:$/, '')}</Divider>
             <List>
               {direction.itemListElement.map((item, i) => (
-                <DirectionItem direction={item.text} position={i} />
+                <DirectionItem key={direction.name} direction={item.text} position={i} />
               ))}
             </List>
           </Fragment>
@@ -27,7 +27,7 @@ export default function DirectionsCard({ directions }: DirectionsCardProps) {
     }
 
     return (
-      <List>{<DirectionItem direction={direction.text || ''} position={index} />}</List>
+      <DirectionItem key={index} direction={direction.text || ''} position={index} />
     );
   });
 
