@@ -53,6 +53,9 @@ function buildSearchIngredients(uniqueIngredients) {
       const truncatedName = name
         .replace(SEARCH_INGREDIENT_TRUNCATE_REGEX, '')
         .replaceAll('chily', 'chili')
+        .replace(/halve$/gi, 'halves')
+        .replace(/sparagu$/gi, 'sparagus')
+        .replace(/^parmesan cheese/gi, 'Parmesan')
         .trim();
 
       const words = truncatedName.split(' ');

@@ -156,7 +156,7 @@ function mergeTags(tags, recipeCategory, cookMinutes) {
 //   return filteredTags;
 // }
 
-function filterRecipeIndexedFields(recipe, searchIngredients) {
+function filterRecipeIndexedFields(recipe /**, searchIngredients**/) {
   const { _id, jsonld, structured } = recipe;
 
   const {
@@ -194,6 +194,11 @@ function filterRecipeIndexedFields(recipe, searchIngredients) {
   );
 
   const timeTags = buildTimeTags(totalMinutes);
+
+  // Excluding specific tags from general tags is controversial.
+  // It might make general tags more readable but users often try
+  // general tags first for any search query.
+  // Plus we need to support all clickable tags from recipe detail.
 
   // const specificTags = [
   //   ...cuisines,
