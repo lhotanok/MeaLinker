@@ -148,7 +148,8 @@ export default function IngredientDetailPage() {
       </Container>
       <FlexBox>
         <Fragment>
-          {totalCount && (
+          {totalCount !== null &&
+          totalCount !== 0 && (
             <Typography
               component='h1'
               variant='h5'
