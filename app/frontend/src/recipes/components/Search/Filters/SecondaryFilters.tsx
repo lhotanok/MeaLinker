@@ -1,36 +1,30 @@
 import { FilterHandlers } from '../../../types/Filters';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
 import Box from '@mui/material/Box';
 import TabPanel from '../../../../shared/components/TabPanel';
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import CuisineIcon from '@mui/icons-material/RamenDining';
 import TimeIcon from '@mui/icons-material/AccessTime';
 import MealTypeIcon from '@mui/icons-material/BrunchDining';
-import CloseIcon from '@mui/icons-material/Close';
 import DietIcon from '@mui/icons-material/MonitorWeight';
 import AutocompleteSearchBar from '../../../../shared/components/AutocompleteSearchBar';
-import { IconButton, Stack, Tooltip } from '@mui/material';
+import { Stack } from '@mui/material';
+import { Filters } from '../../../../shared/tools/filters-enum';
 
 type SecondaryFiltersProps = {
   filterHandlers: FilterHandlers;
+  tabs: JSX.Element;
+  currentTab: number;
 };
 
-enum Filters {
-  Tags,
-  Cuisine,
-  MealTypes,
-  Time,
-  Diets,
-}
-
-export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersProps) {
-  const [currentTab, setCurrentTab] = useState(-1);
-
+export default function SecondaryFilters({
+  filterHandlers,
+  tabs,
+  currentTab,
+}: SecondaryFiltersProps) {
   const { tags, cuisine, diets, mealTypes, time } = filterHandlers;
 
-  const tabs = [
+  const tabItems = [
     {
       index: Filters.Tags,
       label: 'Tags',
@@ -58,11 +52,7 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
     },
   ];
 
-  const tabElements = tabs.map((tab) => (
-    <Tab key={tab.index} label={tab.label} {...a11yProps(tab.index)} />
-  ));
-
-  const tabPanels = tabs.map((tab) => {
+  const tabPanels = tabItems.map((tab) => {
     const { value: searched, facets: facetItems, onSearch, onRemove } = tab.filterHandler;
 
     return {
@@ -74,6 +64,8 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
       onRemove,
     };
   });
+
+  console.log(JSON.stringify(tabPanels[Filters.Tags], null, 2));
 
   return (
     <Box
@@ -87,23 +79,7 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
       <Fragment>
         <Box mb={1} sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Stack direction='row' spacing={1.5} alignItems='center'>
-            <Tabs
-              selectionFollowsFocus
-              value={currentTab === -1 ? false : currentTab}
-              onChange={(_ev, value: number) => setCurrentTab(value)}
-              aria-label='secondary filters'
-              variant='scrollable'
-              scrollButtons='auto'
-            >
-              {tabElements}
-            </Tabs>
-            {currentTab !== -1 && (
-              <Tooltip title='Hide filters' enterDelay={500} placement='right-end'>
-                <IconButton onClick={() => setCurrentTab(-1)}>
-                  <CloseIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+            {tabs}
           </Stack>
         </Box>
         {currentTab !== -1 && (
@@ -146,10 +122,3 @@ export default function SecondaryFilters({ filterHandlers }: SecondaryFiltersPro
     </Box>
   );
 }
-
-const a11yProps = (index: number) => {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-};

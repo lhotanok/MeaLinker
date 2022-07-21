@@ -186,7 +186,6 @@ export const escapeAHrefContent = (text: string) => {
 
 export const buildItemsWithCount = (items: FacetItem[]): string[] => {
   const itemsWithCount = items.map((item) => `${item.name} (${item.count})`);
-
   return itemsWithCount;
 };
 

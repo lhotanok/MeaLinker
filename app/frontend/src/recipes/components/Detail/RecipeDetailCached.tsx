@@ -1,24 +1,24 @@
 import { useState, useEffect, Fragment } from 'react';
 import { useParams } from 'react-router-dom';
-import LinearLoadingProgress from '../../shared/components/LinearLoadingProgress';
-import useHttp from '../../shared/hooks/use-http';
+import LinearLoadingProgress from '../../../shared/components/LinearLoadingProgress';
+import useHttp from '../../../shared/hooks/use-http';
 import Container from '@mui/material/Container';
-import { FullRecipe } from '../types/FullRecipe';
+import { FullRecipe } from '../../types/FullRecipe';
 import { Box, Button, Card, CardContent, Grid, Tooltip, Typography } from '@mui/material';
-import ZoomableImage from '../../shared/components/ZoomableImage';
-import { convertToReadableDate } from '../../shared/tools/value-prettifier';
-import RecipeHeader from '../components/Detail/RecipeHeader';
-import IngredientsCard from '../components/Detail/IngredientsCard/IngredientsCard';
-import NutritionCard from '../components/Detail/NutritionCard/NutritionCard';
-import DirectionsCard from '../components/Detail/DirectionsCard';
-import PrepTimeBox from '../components/Detail/PrepTimeSection/PrepTimeBox';
-import PrepTimeDivider from '../components/Detail/PrepTimeSection/PrepTimeDivider';
-import JsonldHelmet from '../../shared/components/JsonldHelmet';
-import FlexBox from '../../shared/components/FlexBox';
-import RecipeBreadcrumbs from '../components/Detail/RecipeBreadcrumbs';
-import TagGrid from '../components/Detail/TagGrid';
+import ZoomableImage from '../../../shared/components/ZoomableImage';
+import { convertToReadableDate } from '../../../shared/tools/value-prettifier';
+import RecipeHeader from './RecipeHeader';
+import IngredientsCard from './IngredientsCard/IngredientsCard';
+import NutritionCard from './NutritionCard/NutritionCard';
+import DirectionsCard from './DirectionsCard';
+import PrepTimeBox from './PrepTimeSection/PrepTimeBox';
+import PrepTimeDivider from './PrepTimeSection/PrepTimeDivider';
+import JsonldHelmet from '../../../shared/components/JsonldHelmet';
+import FlexBox from '../../../shared/components/FlexBox';
+import RecipeBreadcrumbs from './RecipeBreadcrumbs';
+import TagGrid from './TagGrid';
 
-export default function RecipeDetailPage() {
+export default function RecipeDetailCached() {
   const [recipe, setRecipe] = useState<FullRecipe>({
     jsonld: {},
     structured: {},

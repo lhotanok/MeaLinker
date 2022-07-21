@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import KeepAlive from 'react-activation';
 import { useParams } from 'react-router-dom';
 import TopScroll from '../../shared/components/TopScroll';
-import RecipeDetailPage from './RecipeDetailPage';
+import RecipeDetailCached from '../components/Detail/RecipeDetailCached';
 
 /**
  * Wrapper component used to set `cacheKey` property of `KeepAlive` komponent properly.
@@ -18,7 +18,7 @@ export default function RecipesWrapper() {
     <Fragment>
       <TopScroll />
       <KeepAlive cacheKey={cacheKey} id={cacheKey}>
-        <RecipeDetailPage />
+        <RecipeDetailCached />
       </KeepAlive>
     </Fragment>
   );

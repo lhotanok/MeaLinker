@@ -6,11 +6,15 @@ import SecondaryFilters from './SecondaryFilters';
 type InputFiltersProps = {
   filterHandlers: FilterHandlers;
   recipesCount: number | null;
+  tabs: JSX.Element;
+  currentTab: number;
 };
 
 export default function InputFilters({
   filterHandlers,
   recipesCount,
+  tabs,
+  currentTab,
 }: InputFiltersProps) {
   const normalizedHandlers: Record<string, FilterHandler> = {};
 
@@ -26,7 +30,11 @@ export default function InputFilters({
   return (
     <Fragment>
       <InputIngredients filterHandler={normalizedFilterHandlers.ingredients} />
-      <SecondaryFilters filterHandlers={normalizedFilterHandlers} />
+      <SecondaryFilters
+        filterHandlers={normalizedFilterHandlers}
+        tabs={tabs}
+        currentTab={currentTab}
+      />
     </Fragment>
   );
 }

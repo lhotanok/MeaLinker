@@ -32,13 +32,13 @@ import {
   buildPlural,
   convertFirstLetterToUppercase,
 } from '../../shared/tools/value-prettifier';
-import IngredientCategories from '../components/IngredientCategories';
-import IngredientDescription from '../components/IngredientDescription';
-import IngredientHeader from '../components/IngredientHeader';
-import IngredientNutrition from '../components/IngredientNutrition';
-import IngredientRecipes from '../components/IngredientRecipes';
-import IngredientSource from '../components/IngredientSource';
-import MadeOfCard from '../components/MadeOfCard';
+import IngredientCategories from './IngredientCategories';
+import IngredientDescription from './IngredientDescription';
+import IngredientHeader from './IngredientHeader';
+import IngredientNutrition from './IngredientNutrition';
+import IngredientRecipes from './IngredientRecipes';
+import IngredientSource from './IngredientSource';
+import MadeOfCard from './MadeOfCard';
 import { FullIngredient } from '../types/FullIngredient';
 
 export default function IngredientDetailPage() {

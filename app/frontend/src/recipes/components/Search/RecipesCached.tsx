@@ -2,33 +2,35 @@ import { useState, useEffect, useRef, Dispatch, Fragment } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import RecipesGrid from '../components/Search/RecipesGrid';
-import useHttp from '../../shared/hooks/use-http';
-import { SimpleRecipe, SimpleRecipesResponse } from '../types/SimpleRecipesResponse';
+import RecipesGrid from './RecipesGrid';
+import useHttp from '../../../shared/hooks/use-http';
+import { SimpleRecipe, SimpleRecipesResponse } from '../../types/SimpleRecipesResponse';
 import {
   INITIAL_FACETS,
   PAGINATION_RESULTS_COUNT,
   QUERY_PARAM_NAMES,
-} from '../constants';
+} from '../../constants';
 import {
   buildRecipesSearchUrl,
   buildUrl,
   parseFilters,
   prepareRecipes,
-} from '../../shared/tools/request-parser';
-import SearchHeader from '../components/Search/SearchHeader';
-import RecipesPagination from '../components/Search/RecipesPagination';
-import { Facets } from '../types/Facets';
+} from '../../../shared/tools/request-parser';
+import SearchHeader from './SearchHeader';
+import RecipesPagination from './RecipesPagination';
+import { Facets } from '../../types/Facets';
 import {
   buildItemsAddedSnackbar,
   buildItemsRemovedSnackbar,
-} from '../../shared/tools/snackbar-builder';
-import SearchedFilters from '../components/Search/Filters/SearchedFilters';
-import InputFilters from '../components/Search/Filters/InputFilters';
-import { FilterName, Filters } from '../types/Filters';
-import { getFilterHandlers } from '../../shared/tools/filter-handler-builder';
+} from '../../../shared/tools/snackbar-builder';
+import SearchedFilters from './Filters/SearchedFilters';
+import InputFilters from './Filters/InputFilters';
+import { FilterName, Filters } from '../../types/Filters';
+import { getFilterHandlers } from '../../../shared/tools/filter-handler-builder';
 
-type RecipesPageProps = {
+type RecipesCachedProps = {
+  tabs: JSX.Element;
+  currentTab: number;
   setSnackbar: Dispatch<
     React.SetStateAction<{
       text: string;
@@ -37,7 +39,11 @@ type RecipesPageProps = {
   >;
 };
 
-const RecipesPage: React.FC<RecipesPageProps> = ({ setSnackbar }) => {
+const RecipesCached: React.FC<RecipesCachedProps> = ({
+  setSnackbar,
+  tabs,
+  currentTab,
+}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -157,7 +163,12 @@ const RecipesPage: React.FC<RecipesPageProps> = ({ setSnackbar }) => {
         }}
       >
         <Container maxWidth='md'>
-          <InputFilters filterHandlers={filterHandlers} recipesCount={totalCount} />
+          <InputFilters
+            filterHandlers={filterHandlers}
+            recipesCount={totalCount}
+            tabs={tabs}
+            currentTab={currentTab}
+          />
           <span ref={headerRef}>
             <SearchHeader recipesCount={totalCount} error={error} />
           </span>
@@ -198,4 +209,4 @@ const mergeSearchFilters = (
   return mergedFilters;
 };
 
-export default RecipesPage;
+export default RecipesCached;
