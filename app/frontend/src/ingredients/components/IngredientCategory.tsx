@@ -18,6 +18,10 @@ export default function IngredientCategory({
   name,
   ingredients,
 }: IngredientCategoryProps) {
+  // hotfix
+  const filteredIngredients = Array.from(new Map(ingredients.map(ingredient =>
+    [ingredient.name, ingredient])).values());
+
   return (
     <Accordion color='black'>
       <AccordionSummary
@@ -30,7 +34,7 @@ export default function IngredientCategory({
       </AccordionSummary>
       <AccordionDetails>
         <Grid container spacing={1}>
-          {ingredients.map((item) => (
+          {filteredIngredients.map((item) => (
             <Grid item key={item.id}>
               <IngredientChip item={item} />
             </Grid>

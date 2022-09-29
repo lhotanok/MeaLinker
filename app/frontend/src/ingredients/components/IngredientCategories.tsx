@@ -22,10 +22,14 @@ export default function IngredientCategories({
       return;
     }
 
-    if (category.ingredients.length > 0) {
-      categoriesWithIngredients.push(category);
+    // hotfix
+    const ingredients = category.ingredients
+      .filter((ingredient) => ingredient.name !== ingredientName)
+
+    if (ingredients.length > 0) {
+      categoriesWithIngredients.push({ ...category, ingredients });
     } else {
-      categoriesWithoutIngredients.push(category);
+      categoriesWithoutIngredients.push({ ...category, ingredients });
     }
   });
 
